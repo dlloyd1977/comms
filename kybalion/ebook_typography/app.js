@@ -1,7 +1,10 @@
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
 const DATA_URL = "data/kybalion.json";
 const APP_VERSION = "1.1.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
+const NOTES_GUEST_KEY = "kybalion.notes.guest";
 
 const contentEl = document.getElementById("content");
 const tocListEl = document.getElementById("tocList");
@@ -17,6 +20,14 @@ const closeNotesBtn = document.getElementById("closeNotesBtn");
 const copyNotesBtn = document.getElementById("copyNotesBtn");
 const notesList = document.getElementById("notesList");
 const appVersionEl = document.getElementById("appVersion");
+const authEmail = document.getElementById("authEmail");
+const authPassword = document.getElementById("authPassword");
+const authSignInBtn = document.getElementById("authSignInBtn");
+const authSignUpBtn = document.getElementById("authSignUpBtn");
+const authSignOutBtn = document.getElementById("authSignOutBtn");
+const authGuestBtn = document.getElementById("authGuestBtn");
+const authStatus = document.getElementById("authStatus");
+const authWarning = document.getElementById("authWarning");
 
 const state = {
   data: null,
@@ -26,6 +37,12 @@ const state = {
   tag: "",
   showPages: true,
   showRefs: true,
+  auth: {
+    client: null,
+    user: null,
+    ready: false,
+    mode: "local",
+  },
 };
 
 if (appVersionEl) {
@@ -54,6 +71,14 @@ function loadNotes() {
 
 function saveNotes(notes) {
   localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+}
+
+function loadGuestMode() {
+  return localStorage.getItem(NOTES_GUEST_KEY) === "true";
+}
+
+function saveGuestMode(value) {
+  localStorage.setItem(NOTES_GUEST_KEY, value ? "true" : "false");
 }
 
 function stanzaId(chapterNumber, stanzaIndex) {
@@ -299,6 +324,170 @@ function renderNotes() {
   });
 }
 
+function setNotes(nextNotes) {
+  state.notes = nextNotes;
+  saveNotes(state.notes);
+  renderNotes();
+  applyHighlights();
+}
+
+function getSupabaseConfig() {
+  const url = document.body?.dataset?.supabaseUrl || "";
+  const anonKey = document.body?.dataset?.supabaseAnonKey || "";
+  return { url, anonKey };
+}
+
+function updateAuthUI() {
+  if (!authStatus || !authWarning || !authSignOutBtn || !authGuestBtn) return;
+  const { client, user, ready, mode } = state.auth;
+
+  if (!ready || !client) {
+    authStatus.textContent = "Sync not configured.";
+    authWarning.style.display = "block";
+    authSignOutBtn.style.display = "none";
+    authGuestBtn.style.display = "inline-flex";
+    return;
+  }
+
+  if (user) {
+    authStatus.textContent = `Signed in as ${user.email || "user"}. Notes sync is active.`;
+    authWarning.style.display = "none";
+    authSignOutBtn.style.display = "inline-flex";
+    authGuestBtn.style.display = "none";
+    return;
+  }
+
+  if (mode === "guest") {
+    authStatus.textContent = "Guest mode enabled. Notes stay on this device only.";
+    authWarning.style.display = "block";
+    authSignOutBtn.style.display = "none";
+    authGuestBtn.style.display = "inline-flex";
+    return;
+  }
+
+  authStatus.textContent = "Sign in to sync notes across devices.";
+  authWarning.style.display = "block";
+  authSignOutBtn.style.display = "none";
+  authGuestBtn.style.display = "inline-flex";
+}
+
+async function initializeSupabase() {
+  const { url, anonKey } = getSupabaseConfig();
+  if (!url || !anonKey) {
+    state.auth.ready = false;
+    updateAuthUI();
+    return;
+  }
+
+  state.auth.client = createClient(url, anonKey);
+  state.auth.ready = true;
+
+  const { data } = await state.auth.client.auth.getSession();
+  state.auth.user = data.session?.user || null;
+  state.auth.mode = loadGuestMode() ? "guest" : "local";
+  updateAuthUI();
+
+  state.auth.client.auth.onAuthStateChange((_event, session) => {
+    state.auth.user = session?.user || null;
+    if (state.auth.user) {
+      saveGuestMode(false);
+      state.auth.mode = "authenticated";
+      void loadNotesFromCloud();
+    }
+    updateAuthUI();
+  });
+
+  if (state.auth.user) {
+    state.auth.mode = "authenticated";
+    await loadNotesFromCloud();
+  }
+}
+
+async function loadNotesFromCloud() {
+  if (!state.auth.client || !state.auth.user) return;
+  const { data, error } = await state.auth.client
+    .from("notes")
+    .select("id, ref, text, label")
+    .eq("user_id", state.auth.user.id)
+    .order("id", { ascending: true });
+
+  if (error) {
+    window.alert("Unable to load cloud notes. Please try again.");
+    return;
+  }
+
+  const remoteNotes = Array.isArray(data) ? data : [];
+  if (!remoteNotes.length && state.notes.length) {
+    await syncNotesToCloud();
+    return;
+  }
+
+  const merged = new Map();
+  state.notes.forEach((note) => merged.set(note.id, note));
+  remoteNotes.forEach((note) => merged.set(note.id, note));
+  setNotes(Array.from(merged.values()));
+}
+
+async function syncNotesToCloud() {
+  if (!state.auth.client || !state.auth.user) return;
+  const payload = state.notes.map((note) => ({
+    id: note.id,
+    user_id: state.auth.user.id,
+    ref: note.ref,
+    text: note.text,
+    label: note.label || "Notes",
+  }));
+  if (!payload.length) return;
+  const { error } = await state.auth.client.from("notes").upsert(payload, { onConflict: "id" });
+  if (error) {
+    window.alert("Unable to sync notes. Please try again.");
+  }
+}
+
+async function handleSignIn() {
+  if (!state.auth.client) return;
+  const email = authEmail?.value?.trim();
+  const password = authPassword?.value || "";
+  if (!email || !password) {
+    window.alert("Enter both email and password.");
+    return;
+  }
+  const { error } = await state.auth.client.auth.signInWithPassword({ email, password });
+  if (error) {
+    window.alert(error.message);
+  }
+}
+
+async function handleSignUp() {
+  if (!state.auth.client) return;
+  const email = authEmail?.value?.trim();
+  const password = authPassword?.value || "";
+  if (!email || !password) {
+    window.alert("Enter both email and password.");
+    return;
+  }
+  const { error } = await state.auth.client.auth.signUp({ email, password });
+  if (error) {
+    window.alert(error.message);
+  } else {
+    window.alert("Account created. Please sign in.");
+  }
+}
+
+async function handleSignOut() {
+  if (!state.auth.client) return;
+  await state.auth.client.auth.signOut();
+  state.auth.user = null;
+  state.auth.mode = "local";
+  updateAuthUI();
+}
+
+function handleGuestMode() {
+  saveGuestMode(true);
+  state.auth.mode = "guest";
+  updateAuthUI();
+}
+
 function setNotesModalOpen(open) {
   if (!notesModal || !toggleNotesBtn) return;
   notesModal.classList.toggle("active", open);
@@ -363,9 +552,9 @@ function saveSelectionAsNote() {
     return;
   }
 
-  state.notes.push({ id: noteId, ref, text: selectedText, label: "Notes" });
-  saveNotes(state.notes);
-  renderNotes();
+  const nextNotes = [...state.notes, { id: noteId, ref, text: selectedText, label: "Notes" }];
+  setNotes(nextNotes);
+  syncNotesToCloud();
   selection.removeAllRanges();
 }
 
@@ -444,6 +633,12 @@ async function init() {
       }
     });
     copyNotesBtn?.addEventListener("click", copyNotesToClipboard);
+    authSignInBtn?.addEventListener("click", handleSignIn);
+    authSignUpBtn?.addEventListener("click", handleSignUp);
+    authSignOutBtn?.addEventListener("click", handleSignOut);
+    authGuestBtn?.addEventListener("click", handleGuestMode);
+
+    await initializeSupabase();
 
     printBtn?.addEventListener("click", () => window.print());
   } catch (error) {
