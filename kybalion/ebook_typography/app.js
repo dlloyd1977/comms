@@ -371,6 +371,13 @@ function updateAuthUI() {
   authGuestBtn.style.display = "inline-flex";
 }
 
+function setAuthStatus(message, type = "info") {
+  if (!authStatus) return;
+  authStatus.textContent = message;
+  authStatus.classList.remove("is-info", "is-success", "is-error");
+  authStatus.classList.add(`is-${type}`);
+}
+
 async function initializeSupabase() {
   const { url, anonKey } = getSupabaseConfig();
   if (!url || !anonKey) {
@@ -412,7 +419,7 @@ async function loadNotesFromCloud() {
     .order("id", { ascending: true });
 
   if (error) {
-    window.alert("Unable to load cloud notes. Please try again.");
+    setAuthStatus("Unable to load cloud notes. Verify the notes table and RLS policies.", "error");
     return;
   }
 
@@ -440,7 +447,7 @@ async function syncNotesToCloud() {
   if (!payload.length) return;
   const { error } = await state.auth.client.from("notes").upsert(payload, { onConflict: "id" });
   if (error) {
-    window.alert("Unable to sync notes. Please try again.");
+    setAuthStatus("Unable to sync notes. Verify the notes table and RLS policies.", "error");
   }
 }
 
@@ -449,13 +456,15 @@ async function handleSignIn() {
   const email = authEmail?.value?.trim();
   const password = authPassword?.value || "";
   if (!email || !password) {
-    window.alert("Enter both email and password.");
+    setAuthStatus("Enter both email and password.", "error");
     return;
   }
   const { error } = await state.auth.client.auth.signInWithPassword({ email, password });
   if (error) {
-    window.alert(error.message);
+    setAuthStatus(error.message, "error");
+    return;
   }
+  setAuthStatus("Signed in. Sync is active.", "success");
 }
 
 async function handleSignUp() {
@@ -463,14 +472,18 @@ async function handleSignUp() {
   const email = authEmail?.value?.trim();
   const password = authPassword?.value || "";
   if (!email || !password) {
-    window.alert("Enter both email and password.");
+    setAuthStatus("Enter both email and password.", "error");
     return;
   }
-  const { error } = await state.auth.client.auth.signUp({ email, password });
+  const { data, error } = await state.auth.client.auth.signUp({ email, password });
   if (error) {
-    window.alert(error.message);
+    setAuthStatus(error.message, "error");
+    return;
+  }
+  if (data.session) {
+    setAuthStatus("Account created and signed in.", "success");
   } else {
-    window.alert("Account created. Please sign in.");
+    setAuthStatus("Account created. Check your email to confirm, then sign in.", "success");
   }
 }
 
@@ -480,12 +493,14 @@ async function handleSignOut() {
   state.auth.user = null;
   state.auth.mode = "local";
   updateAuthUI();
+  setAuthStatus("Signed out. Notes are local only.", "info");
 }
 
 function handleGuestMode() {
   saveGuestMode(true);
   state.auth.mode = "guest";
   updateAuthUI();
+  setAuthStatus("Guest mode enabled. Notes stay on this device only.", "info");
 }
 
 function setNotesModalOpen(open) {
