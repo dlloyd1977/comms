@@ -1,4 +1,5 @@
 const DATA_URL = "data/kybalion.json";
+const APP_VERSION = "1.1.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 
@@ -13,6 +14,7 @@ const saveNoteBtn = document.getElementById("saveNoteBtn");
 const toggleNotesBtn = document.getElementById("toggleNotesBtn");
 const notesPanel = document.getElementById("notesPanel");
 const notesList = document.getElementById("notesList");
+const appVersionEl = document.getElementById("appVersion");
 
 const state = {
   data: null,
@@ -23,6 +25,10 @@ const state = {
   showPages: true,
   showRefs: true,
 };
+
+if (appVersionEl) {
+  appVersionEl.textContent = APP_VERSION;
+}
 
 function loadTags() {
   try {
@@ -269,6 +275,17 @@ function renderNotes() {
   });
 }
 
+function toggleNotesPanel() {
+  if (!notesPanel || !toggleNotesBtn) return;
+  const isActive = notesPanel.classList.toggle("active");
+  toggleNotesBtn.textContent = isActive ? "Hide Notes" : "View Notes";
+  toggleNotesBtn.setAttribute("aria-expanded", String(isActive));
+  toggleNotesBtn.setAttribute("aria-controls", "notesPanel");
+  if (isActive) {
+    notesPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 function saveSelectionAsNote() {
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed) return;
@@ -361,9 +378,11 @@ async function init() {
     });
 
     saveNoteBtn?.addEventListener("click", saveSelectionAsNote);
-    toggleNotesBtn?.addEventListener("click", () => {
-      notesPanel?.classList.toggle("active");
-    });
+    if (toggleNotesBtn) {
+      toggleNotesBtn.setAttribute("aria-expanded", "false");
+      toggleNotesBtn.setAttribute("aria-controls", "notesPanel");
+      toggleNotesBtn.addEventListener("click", toggleNotesPanel);
+    }
 
     printBtn?.addEventListener("click", () => window.print());
   } catch (error) {
