@@ -38,9 +38,6 @@
         </div>
         <div class="header-actions">
           <button class="primary" type="button" id="printBtn">Print / Save as PDF</button>
-          <button class="secondary" type="button" id="toggleNotesBtn" aria-expanded="false">
-            Notes
-          </button>
           <a class="secondary" href="#toc" id="tocJump">Jump to TOC</a>
         </div>
       </div>
@@ -63,6 +60,10 @@
           <input type="checkbox" id="toggleRefs" checked />
           <span>Show stanza references</span>
         </label>
+        <div class="notes-actions">
+          <button class="secondary" type="button" id="saveNoteBtn">Save highlight as Note</button>
+          <button class="secondary" type="button" id="toggleNotesBtn">View Notes</button>
+        </div>
       </div>
     </header>
 
@@ -75,25 +76,18 @@
         <nav id="tocList" aria-label="Table of Contents"></nav>
       </aside>
 
-      <aside class="notes" id="notesPanel">
-        <div class="notes-header">
-          <h2>Notes</h2>
-          <p>Highlighted snippets saved from the text.</p>
-        </div>
-        <div class="notes-actions">
-          <button class="secondary" type="button" id="clearNotesBtn">Clear notes</button>
-        </div>
-        <div id="notesList" class="notes-list"></div>
-      </aside>
-
       <section class="content" id="content">
-        <div class="loading" id="fallback" style="display: none;">
-          Loading failed. Please hard refresh (Shift+Reload). If it still fails, the
-          scripts may be blocked.
-        </div>
         <div class="loading" id="loading">Loading annotated text…</div>
       </section>
     </main>
+
+    <section class="notes-panel" id="notesPanel" aria-live="polite">
+      <div class="notes-header">
+        <h2>Notes</h2>
+        <p>Highlights saved from the text appear here.</p>
+      </div>
+      <div id="notesList" class="notes-list"></div>
+    </section>
 
     <footer class="page-footer">
       <p>
@@ -102,16 +96,6 @@
       </p>
     </footer>
 
-    <script>
-      setTimeout(() => {
-        if (!window.__KYBALION_READY__) {
-          const fallback = document.getElementById("fallback");
-          const loading = document.getElementById("loading");
-          if (loading) loading.style.display = "none";
-          if (fallback) fallback.style.display = "block";
-        }
-      }, 1500);
-    </script>
     <script src="app.js" type="module"></script>
   </body>
 </html>
