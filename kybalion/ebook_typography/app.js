@@ -20,6 +20,7 @@ const closeNotesBtn = document.getElementById("closeNotesBtn");
 const copyNotesBtn = document.getElementById("copyNotesBtn");
 const notesList = document.getElementById("notesList");
 const appVersionEl = document.getElementById("appVersion");
+const authOpenBtn = document.getElementById("authOpenBtn");
 const authFlow = document.getElementById("authFlow");
 const authChoiceSignInBtn = document.getElementById("authChoiceSignInBtn");
 const authChoiceSignUpBtn = document.getElementById("authChoiceSignUpBtn");
@@ -40,6 +41,7 @@ const authConfirmMessage = document.getElementById("authConfirmMessage");
 const authStatus = document.getElementById("authStatus");
 const authWarning = document.getElementById("authWarning");
 const notesContent = document.getElementById("notesContent");
+const authPanel = document.getElementById("authPanel");
 
 const state = {
   data: null,
@@ -405,6 +407,11 @@ function setNotesVisibility(show) {
   notesContent.classList.toggle("is-active", show);
 }
 
+function setAuthPanelVisible(show) {
+  if (!authPanel) return;
+  authPanel.classList.toggle("is-hidden", !show);
+}
+
 function setAuthStep(step) {
   if (!authFlow) return;
   authFlow.querySelectorAll(".auth-step").forEach((node) => {
@@ -558,6 +565,10 @@ function setNotesModalOpen(open) {
 function toggleNotesPanel() {
   if (!notesModal) return;
   const isOpen = notesModal.classList.contains("active");
+  if (!isOpen) {
+    setAuthPanelVisible(false);
+    setNotesVisibility(true);
+  }
   setNotesModalOpen(!isOpen);
 }
 
@@ -678,6 +689,12 @@ async function init() {
       toggleNotesBtn.setAttribute("aria-controls", "notesModal");
       toggleNotesBtn.addEventListener("click", toggleNotesPanel);
     }
+    authOpenBtn?.addEventListener("click", () => {
+      setAuthPanelVisible(true);
+      setNotesVisibility(false);
+      setAuthStep("choice");
+      setNotesModalOpen(true);
+    });
 
     closeNotesBtn?.addEventListener("click", () => setNotesModalOpen(false));
     notesModal?.addEventListener("click", (event) => {
@@ -701,7 +718,10 @@ async function init() {
     authBackFromSignInBtn?.addEventListener("click", () => setAuthStep("choice"));
     authBackFromSignUpBtn?.addEventListener("click", () => setAuthStep("choice"));
     authBackFromGuestBtn?.addEventListener("click", () => setAuthStep("choice"));
-    authConfirmBtn?.addEventListener("click", () => setNotesVisibility(true));
+    authConfirmBtn?.addEventListener("click", () => {
+      setNotesVisibility(true);
+      setAuthPanelVisible(false);
+    });
 
     await initializeSupabase();
 
