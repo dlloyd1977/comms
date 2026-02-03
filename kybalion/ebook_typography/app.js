@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.6.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -56,6 +56,7 @@ const annotationStatus = document.getElementById("annotationStatus");
 const annotationCount = document.getElementById("annotationCount");
 const typographyView = document.getElementById("typographyView");
 const standardView = document.getElementById("standardView");
+const standardContent = document.getElementById("standardContent");
 
 const preferences = loadPreferences();
 
@@ -273,45 +274,8 @@ function render() {
       text.className = "stanza-text";
       text.textContent = stanza.text;
 
-      const tagsWrap = document.createElement("div");
-      tagsWrap.className = "stanza-tags";
-
       const id = stanzaId(chapter.number, stanzaIndex);
-      const tags = state.tags[id] || [];
-      tags.forEach((tag) => {
-        const tagEl = document.createElement("span");
-        tagEl.className = "tag";
-        tagEl.textContent = tag;
-        tagsWrap.appendChild(tagEl);
-      });
-
-      const tagButton = document.createElement("button");
-      tagButton.type = "button";
-      tagButton.className = "tag-button";
-      tagButton.textContent = tags.length ? "Edit tags" : "Add tag";
-      tagButton.addEventListener("click", () => {
-        const currentTags = (state.tags[id] || []).join(", ");
-        const next = window.prompt("Enter tags (comma-separated):", currentTags);
-        if (next === null) return;
-        const cleaned = next
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean);
-        state.tags[id] = cleaned;
-        saveTags(state.tags);
-        rebuildTagFilter();
-        render();
-      });
-      tagsWrap.appendChild(tagButton);
-
-      const annotateButton = document.createElement("button");
-      annotateButton.type = "button";
-      annotateButton.className = "tag-button";
-      annotateButton.textContent = "Annotate";
-      annotateButton.addEventListener("click", () => {
-        openAnnotationModal(stanza.ref);
-      });
-      tagsWrap.appendChild(annotateButton);
+      const tagsWrap = createTagsWrap(id, stanza.ref);
 
       stanzaEl.append(header, text, tagsWrap);
       chapterEl.appendChild(stanzaEl);
@@ -323,6 +287,91 @@ function render() {
   applyHighlights();
   applySearchHighlights();
   renderNotes();
+  renderStandardView();
+}
+
+function createTagsWrap(id, ref) {
+  const tagsWrap = document.createElement("div");
+  tagsWrap.className = "stanza-tags";
+
+  const tags = state.tags[id] || [];
+  tags.forEach((tag) => {
+    const tagEl = document.createElement("span");
+    tagEl.className = "tag";
+    tagEl.textContent = tag;
+    tagsWrap.appendChild(tagEl);
+  });
+
+  const tagButton = document.createElement("button");
+  tagButton.type = "button";
+  tagButton.className = "tag-button";
+  tagButton.textContent = tags.length ? "Edit tags" : "Add tag";
+  tagButton.addEventListener("click", () => {
+    const currentTags = (state.tags[id] || []).join(", ");
+    const next = window.prompt("Enter tags (comma-separated):", currentTags);
+    if (next === null) return;
+    const cleaned = next
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    state.tags[id] = cleaned;
+    saveTags(state.tags);
+    rebuildTagFilter();
+    render();
+  });
+  tagsWrap.appendChild(tagButton);
+
+  const annotateButton = document.createElement("button");
+  annotateButton.type = "button";
+  annotateButton.className = "tag-button";
+  annotateButton.textContent = "Annotate";
+  annotateButton.addEventListener("click", () => {
+    openAnnotationModal(ref);
+  });
+  tagsWrap.appendChild(annotateButton);
+
+  return tagsWrap;
+}
+
+function renderStandardView() {
+  if (!state.data || !standardContent) return;
+  standardContent.innerHTML = "";
+
+  state.data.chapters.forEach((chapter) => {
+    const chapterEl = document.createElement("article");
+    chapterEl.className = "standard-chapter";
+
+    const heading = document.createElement("h2");
+    heading.textContent = chapter.title;
+    chapterEl.appendChild(heading);
+
+    chapter.stanzas.forEach((stanza, index) => {
+      const stanzaIndex = index + 1;
+      const stanzaEl = document.createElement("section");
+      stanzaEl.className = "stanza standard-stanza";
+      stanzaEl.dataset.stanzaRef = stanza.ref;
+      stanzaEl.id = `standard-${stanza.ref.replace(":", "-")}`;
+
+      stanza.chapterNumber = chapter.number;
+      stanza.index = stanzaIndex;
+
+      if (!stanzaMatchesFilters(stanza)) {
+        stanzaEl.style.display = "none";
+      }
+
+      const text = document.createElement("p");
+      text.className = "stanza-text";
+      text.textContent = stanza.text;
+
+      const id = stanzaId(chapter.number, stanzaIndex);
+      const tagsWrap = createTagsWrap(id, stanza.ref);
+
+      stanzaEl.append(text, tagsWrap);
+      chapterEl.appendChild(stanzaEl);
+    });
+
+    standardContent.appendChild(chapterEl);
+  });
 }
 
 function escapeRegExp(text) {
@@ -405,26 +454,29 @@ function applySearchHighlights() {
 function applyHighlights() {
   if (!state.notes.length) return;
   state.notes.forEach((note) => {
-    const stanzaEl = document.querySelector(`[data-stanza-ref="${note.ref}"] .stanza-text`);
-    if (!stanzaEl) return;
-    if (stanzaEl.querySelector(`[data-note-id="${note.id}"]`)) return;
-    const text = stanzaEl.textContent || "";
-    const index = text.indexOf(note.text);
-    if (index === -1) return;
-    const before = text.slice(0, index);
-    const after = text.slice(index + note.text.length);
-    stanzaEl.innerHTML = "";
-    if (before) {
-      stanzaEl.appendChild(document.createTextNode(before));
-    }
-    const mark = document.createElement("span");
-    mark.className = "highlight";
-    mark.dataset.noteId = note.id;
-    mark.textContent = note.text;
-    stanzaEl.appendChild(mark);
-    if (after) {
-      stanzaEl.appendChild(document.createTextNode(after));
-    }
+    const stanzaEls = document.querySelectorAll(
+      `[data-stanza-ref="${note.ref}"] .stanza-text`
+    );
+    stanzaEls.forEach((stanzaEl) => {
+      if (stanzaEl.querySelector(`[data-note-id="${note.id}"]`)) return;
+      const text = stanzaEl.textContent || "";
+      const index = text.indexOf(note.text);
+      if (index === -1) return;
+      const before = text.slice(0, index);
+      const after = text.slice(index + note.text.length);
+      stanzaEl.innerHTML = "";
+      if (before) {
+        stanzaEl.appendChild(document.createTextNode(before));
+      }
+      const mark = document.createElement("span");
+      mark.className = "highlight";
+      mark.dataset.noteId = note.id;
+      mark.textContent = note.text;
+      stanzaEl.appendChild(mark);
+      if (after) {
+        stanzaEl.appendChild(document.createTextNode(after));
+      }
+    });
   });
 }
 

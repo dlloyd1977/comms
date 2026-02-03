@@ -24,7 +24,7 @@
       content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
     />
     <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
-    <link rel="stylesheet" href="styles.css?v=1.5.0" />
+    <link rel="stylesheet" href="styles.css?v=1.6.0" />
   </head>
   <body
     data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
@@ -102,12 +102,7 @@
     </main>
 
     <section class="standard-view is-hidden" id="standardView" aria-hidden="true">
-      <iframe
-        class="standard-frame"
-        title="Standard view"
-        src="pg14209-images.html"
-        loading="lazy"
-      ></iframe>
+      <div class="standard-content" id="standardContent"></div>
     </section>
 
     <div class="notes-modal" id="notesModal" aria-hidden="true" role="dialog" aria-modal="true">
@@ -229,6 +224,6 @@
       <p class="version">Version <span id="appVersion"></span></p>
     </footer>
 
-    <script src="app.js?v=1.5.0" type="module"></script>
+    <script src="app.js?v=1.6.0" type="module"></script>
   </body>
 </html>
