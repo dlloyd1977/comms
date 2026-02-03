@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.7.0";
+const APP_VERSION = "1.7.1";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -58,6 +58,9 @@ const annotationCount = document.getElementById("annotationCount");
 const typographyView = document.getElementById("typographyView");
 const standardView = document.getElementById("standardView");
 const standardContent = document.getElementById("standardContent");
+const standardSaveHighlightBtn = document.getElementById("standardSaveHighlightBtn");
+const standardAddTagBtn = document.getElementById("standardAddTagBtn");
+const standardAnnotateBtn = document.getElementById("standardAnnotateBtn");
 
 const preferences = loadPreferences();
 
@@ -297,6 +300,34 @@ function render() {
   renderStandardView();
 }
 
+function getSelectedStanzaRef() {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed) return null;
+  const range = selection.getRangeAt(0);
+  const stanzaEl = range.startContainer?.parentElement?.closest?.(".stanza");
+  if (!stanzaEl || !stanzaEl.contains(range.endContainer)) {
+    return null;
+  }
+  return stanzaEl.dataset.stanzaRef || null;
+}
+
+function editTagsForRef(ref) {
+  const stanza = findStanzaByRef(ref);
+  if (!stanza) return;
+  const id = stanzaId(stanza.chapterNumber, stanza.index);
+  const currentTags = (state.tags[id] || []).join(", ");
+  const next = window.prompt("Enter tags (comma-separated):", currentTags);
+  if (next === null) return;
+  const cleaned = next
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
+  state.tags[id] = cleaned;
+  saveTags(state.tags);
+  rebuildTagFilter();
+  render();
+}
+
 function createTagsWrap(id, ref) {
   const tagsWrap = document.createElement("div");
   tagsWrap.className = "stanza-tags";
@@ -313,19 +344,7 @@ function createTagsWrap(id, ref) {
   tagButton.type = "button";
   tagButton.className = "tag-button";
   tagButton.textContent = tags.length ? "Edit tags" : "Add tag";
-  tagButton.addEventListener("click", () => {
-    const currentTags = (state.tags[id] || []).join(", ");
-    const next = window.prompt("Enter tags (comma-separated):", currentTags);
-    if (next === null) return;
-    const cleaned = next
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-    state.tags[id] = cleaned;
-    saveTags(state.tags);
-    rebuildTagFilter();
-    render();
-  });
+  tagButton.addEventListener("click", () => editTagsForRef(ref));
   tagsWrap.appendChild(tagButton);
 
   const annotateButton = document.createElement("button");
@@ -363,11 +382,7 @@ function renderStandardView() {
       text.className = "stanza-text";
       text.textContent = stanza.text;
 
-      const id = stanzaId(chapter.number, stanzaIndex);
-      const tagsWrap = createTagsWrap(id, stanza.ref);
-      tagsWrap.classList.add("standard-actions");
-
-      stanzaEl.append(text, tagsWrap);
+      stanzaEl.append(text);
       standardContent.appendChild(stanzaEl);
     });
   });
@@ -1136,6 +1151,23 @@ async function init() {
       state.showRefs = event.target.checked;
       render();
       savePreferencesLocal();
+    });
+    standardSaveHighlightBtn?.addEventListener("click", saveSelectionAsNote);
+    standardAddTagBtn?.addEventListener("click", () => {
+      const ref = getSelectedStanzaRef();
+      if (!ref) {
+        window.alert("Select text within a stanza first.");
+        return;
+      }
+      editTagsForRef(ref);
+    });
+    standardAnnotateBtn?.addEventListener("click", () => {
+      const ref = getSelectedStanzaRef();
+      if (!ref) {
+        window.alert("Select text within a stanza first.");
+        return;
+      }
+      openAnnotationModal(ref);
     });
     viewModeStandardBtn?.addEventListener("click", () => setViewMode("standard"));
     viewModeStanzaBtn?.addEventListener("click", () => setViewMode("typography"));
