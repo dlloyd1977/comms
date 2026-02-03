@@ -168,63 +168,32 @@ h1 {
   gap: 8px;
 }
 
-.view-switch {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  color: var(--ink);
-}
-
-.view-label {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.switch {
-  position: relative;
+.view-toggle-pill {
   display: inline-flex;
   align-items: center;
-  cursor: pointer;
-}
-
-.switch input {
-  position: absolute;
-  opacity: 0;
-  width: 1px;
-  height: 1px;
-}
-
-.switch-track {
-  width: 44px;
-  height: 24px;
+  padding: 4px;
   border-radius: 999px;
-  background: #d9d4ce;
+  background: #e7e1db;
   border: 1px solid var(--border);
-  position: relative;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  gap: 4px;
 }
 
-.switch-track::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease;
+.view-pill-button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
 }
 
-.switch input:checked + .switch-track {
-  background: #8fb1d1;
-  border-color: #7aa0c4;
-}
-
-.switch input:checked + .switch-track::after {
-  transform: translateX(20px);
+.view-pill-button.is-active {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(47, 95, 143, 0.25);
 }
 
 .search-row {
@@ -286,22 +255,18 @@ h1 {
 
 .standard-content {
   display: grid;
-  gap: 18px;
+  gap: 22px;
   color: var(--ink);
-  max-width: 880px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
 .standard-stanza {
-  margin-bottom: 18px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
 }
 
 .standard-stanza:last-child {
   margin-bottom: 0;
-  border-bottom: none;
-  padding-bottom: 0;
 }
 
 .standard-actions {
@@ -311,6 +276,12 @@ h1 {
 .standard-stanza:hover .standard-actions,
 .standard-stanza:focus-within .standard-actions {
   display: flex;
+}
+
+.standard-content .stanza-text {
+  font-size: 1.15rem;
+  line-height: 1.85;
+  color: var(--ink);
 }
 
 .toc {
