@@ -87,6 +87,10 @@
       </aside>
 
       <section class="content" id="content">
+        <div class="loading" id="fallback" style="display: none;">
+          Loading failed. Please hard refresh (Shift+Reload). If it still fails, the
+          scripts may be blocked.
+        </div>
         <div class="loading" id="loading">Loading annotated text…</div>
       </section>
     </main>
@@ -98,6 +102,16 @@
       </p>
     </footer>
 
+    <script>
+      setTimeout(() => {
+        if (!window.__KYBALION_READY__) {
+          const fallback = document.getElementById("fallback");
+          const loading = document.getElementById("loading");
+          if (loading) loading.style.display = "none";
+          if (fallback) fallback.style.display = "block";
+        }
+      }, 1500);
+    </script>
     <script src="app.js" type="module"></script>
   </body>
 </html>

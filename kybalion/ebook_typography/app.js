@@ -326,6 +326,7 @@ async function init() {
 
     rebuildTagFilter();
     render();
+    window.__KYBALION_READY__ = true;
   } catch (error) {
     showError(error instanceof Error ? error.message : "Unknown error");
     return;
