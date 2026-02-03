@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.5.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -14,7 +14,7 @@ const tagFilter = document.getElementById("tagFilter");
 const togglePages = document.getElementById("togglePages");
 const toggleRefs = document.getElementById("toggleRefs");
 const searchBtn = document.getElementById("searchBtn");
-const viewModeSelect = document.getElementById("viewModeSelect");
+const viewModeToggle = document.getElementById("viewModeToggle");
 const printBtn = document.getElementById("printBtn");
 const saveNoteBtn = document.getElementById("saveNoteBtn");
 const toggleNotesBtn = document.getElementById("toggleNotesBtn");
@@ -139,8 +139,8 @@ function savePreferencesLocal() {
 
 function setViewMode(mode) {
   state.viewMode = mode === "standard" ? "standard" : "typography";
-  if (viewModeSelect) {
-    viewModeSelect.value = state.viewMode;
+  if (viewModeToggle) {
+    viewModeToggle.checked = state.viewMode === "standard";
   }
   if (typographyView && standardView) {
     const showStandard = state.viewMode === "standard";
@@ -1035,8 +1035,8 @@ async function init() {
     if (toggleRefs) {
       toggleRefs.checked = state.showRefs;
     }
-    if (viewModeSelect) {
-      viewModeSelect.value = state.viewMode;
+    if (viewModeToggle) {
+      viewModeToggle.checked = state.viewMode === "standard";
     }
     render();
     setViewMode(state.viewMode);
@@ -1076,8 +1076,9 @@ async function init() {
       render();
       savePreferencesLocal();
     });
-    viewModeSelect?.addEventListener("change", (event) => {
-      setViewMode(event.target.value);
+    viewModeToggle?.addEventListener("change", (event) => {
+      const isStandard = event.target.checked;
+      setViewMode(isStandard ? "standard" : "typography");
     });
 
     saveNoteBtn?.addEventListener("click", saveSelectionAsNote);

@@ -24,7 +24,7 @@
       content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
     />
     <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
-    <link rel="stylesheet" href="styles.css?v=1.4.0" />
+    <link rel="stylesheet" href="styles.css?v=1.5.0" />
   </head>
   <body
     data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
@@ -61,12 +61,16 @@
             <option value="">All tags</option>
           </select>
         </label>
-        <label class="control">
+        <label class="control view-toggle">
           <span>View</span>
-          <select id="viewModeSelect">
-            <option value="typography">Typography / Stanza</option>
-            <option value="standard">Standard</option>
-          </select>
+          <div class="view-switch">
+            <span class="view-label">Typography / Stanza</span>
+            <label class="switch" aria-label="Toggle standard view">
+              <input type="checkbox" id="viewModeToggle" />
+              <span class="switch-track"></span>
+            </label>
+            <span class="view-label">Standard</span>
+          </div>
         </label>
         <label class="toggle">
           <input type="checkbox" id="togglePages" checked />
@@ -225,6 +229,6 @@
       <p class="version">Version <span id="appVersion"></span></p>
     </footer>
 
-    <script src="app.js?v=1.4.0" type="module"></script>
+    <script src="app.js?v=1.5.0" type="module"></script>
   </body>
 </html>
