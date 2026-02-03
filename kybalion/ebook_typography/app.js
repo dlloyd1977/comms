@@ -330,38 +330,48 @@ function findStanzaByRef(ref) {
 }
 
 async function init() {
-  const response = await fetch(DATA_URL, { cache: "no-store" });
-  state.data = await response.json();
+  try {
+    const response = await fetch(DATA_URL, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Failed to load data (${response.status})`);
+    }
+    state.data = await response.json();
 
-  rebuildTagFilter();
-  render();
-
-  searchInput.addEventListener("input", (event) => {
-    state.query = normalize(event.target.value || "");
-    applyFilters();
-  });
-
-  tagFilter.addEventListener("change", (event) => {
-    state.tag = event.target.value;
-    applyFilters();
-  });
-
-  togglePages.addEventListener("change", (event) => {
-    state.showPages = event.target.checked;
+    rebuildTagFilter();
     render();
-  });
 
-  toggleRefs.addEventListener("change", (event) => {
-    state.showRefs = event.target.checked;
-    render();
-  });
+    searchInput?.addEventListener("input", (event) => {
+      state.query = normalize(event.target.value || "");
+      applyFilters();
+    });
 
-  saveNoteBtn.addEventListener("click", saveSelectionAsNote);
-  toggleNotesBtn.addEventListener("click", () => {
-    notesPanel.classList.toggle("active");
-  });
+    tagFilter?.addEventListener("change", (event) => {
+      state.tag = event.target.value;
+      applyFilters();
+    });
 
-  printBtn.addEventListener("click", () => window.print());
+    togglePages?.addEventListener("change", (event) => {
+      state.showPages = event.target.checked;
+      render();
+    });
+
+    toggleRefs?.addEventListener("change", (event) => {
+      state.showRefs = event.target.checked;
+      render();
+    });
+
+    saveNoteBtn?.addEventListener("click", saveSelectionAsNote);
+    toggleNotesBtn?.addEventListener("click", () => {
+      notesPanel?.classList.toggle("active");
+    });
+
+    printBtn?.addEventListener("click", () => window.print());
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    if (contentEl) {
+      contentEl.innerHTML = `<div class="loading">Error loading book data: ${message}</div>`;
+    }
+  }
 }
 
 init();
