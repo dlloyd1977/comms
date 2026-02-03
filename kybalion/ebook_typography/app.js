@@ -312,6 +312,16 @@ function renderNotes() {
     const noteActions = document.createElement("div");
     noteActions.className = "note-actions";
 
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "note-delete";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", () => {
+      const nextNotes = state.notes.filter((entry) => entry.id !== note.id);
+      setNotes(nextNotes);
+      syncNotesToCloud();
+    });
+
     const copyBtn = document.createElement("button");
     copyBtn.type = "button";
     copyBtn.className = "note-copy";
@@ -329,7 +339,7 @@ function renderNotes() {
       }
     });
 
-    noteActions.appendChild(copyBtn);
+    noteActions.append(deleteBtn, copyBtn);
 
     const text = document.createElement("p");
     text.className = "note-text";
@@ -609,7 +619,7 @@ async function copyNotesToClipboard() {
     await navigator.clipboard.writeText(text);
     copyNotesBtn.textContent = "Copied!";
     setTimeout(() => {
-      copyNotesBtn.textContent = "Copy Notes";
+      copyNotesBtn.textContent = "Copy All Notes";
     }, 1500);
   } catch {
     window.alert("Unable to copy notes. Please try again.");
