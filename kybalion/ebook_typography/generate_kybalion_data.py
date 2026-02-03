@@ -45,25 +45,7 @@ def _split_into_stanzas(text: str) -> list[str]:
     if not text:
         return []
     sentences = re.split(r"(?<=[.!?])\s+", text)
-    stanzas: list[str] = []
-    current: list[str] = []
-    current_len = 0
-
-    for sentence in sentences:
-        sentence = sentence.strip()
-        if not sentence:
-            continue
-        if current and (current_len + len(sentence) > 520 or len(current) >= 3):
-            stanzas.append(" ".join(current).strip())
-            current = []
-            current_len = 0
-        current.append(sentence)
-        current_len += len(sentence)
-
-    if current:
-        stanzas.append(" ".join(current).strip())
-
-    return [s for s in stanzas if s]
+    return [s.strip() for s in sentences if s.strip()]
 
 
 class _PGParser(HTMLParser):
