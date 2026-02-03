@@ -37,19 +37,21 @@ def _force_stanza_break(line: str) -> bool:
 
 def _normalize_text(text: str) -> str:
     text = re.sub(r"(\w)-\s+(\w)", r"\1\2", text)
-    text = re.sub(r"\s+", " ", text)
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    text = re.sub(r"[ \t]+", " ", text)
+    text = re.sub(r"\s*\n\s*", "\n", text)
     return text.strip()
 
 
-def _split_numbered_list(text: str) -> list[str] | None:
-    if not re.search(r"\b\d+\.\s+", text):
+def _format_numbered_list(text: str) -> str | None:
+    if not re.search(r"\b(?:\d+|[IVXLCDM]+)\.\s+", text):
         return None
 
-    parts = re.split(r"\s*(?=\d+\.\s+)", text.strip())
+    parts = re.split(r"\s*(?=(?:\d+|[IVXLCDM]+)\.\s+)", text.strip())
     items = [p.strip() for p in parts if p.strip()]
     if len(items) <= 1:
         return None
-    return items
+    return "\n".join(items)
 
 
 def _split_into_stanzas(text: str) -> list[str]:
@@ -175,16 +177,10 @@ def _build_chapters(html: str) -> list[dict]:
             continue
 
         if tag == "p":
-            list_items = _split_numbered_list(text)
-            if list_items:
-                for item in list_items:
-                    current["raw"].append("<<BREAK>>")
-                    current["raw"].append(item)
-                    current["raw"].append("<<BREAK>>")
-            else:
-                current["raw"].append("<<BREAK>>")
-                current["raw"].append(text)
-                current["raw"].append("<<BREAK>>")
+            list_block = _format_numbered_list(text)
+            current["raw"].append("<<BREAK>>")
+            current["raw"].append(list_block if list_block else text)
+            current["raw"].append("<<BREAK>>")
 
     return chapters
 
