@@ -1,10 +1,11 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.3.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
+const PREFS_KEY = "kybalion.preferences";
 
 const contentEl = document.getElementById("content");
 const tocListEl = document.getElementById("tocList");
@@ -52,14 +53,16 @@ const annotationRef = document.getElementById("annotationRef");
 const annotationStatus = document.getElementById("annotationStatus");
 const annotationCount = document.getElementById("annotationCount");
 
+const preferences = loadPreferences();
+
 const state = {
   data: null,
   tags: loadTags(),
   notes: loadNotes(),
-  query: "",
-  tag: "",
-  showPages: true,
-  showRefs: true,
+  query: preferences.query || "",
+  tag: preferences.tag || "",
+  showPages: preferences.showPages ?? true,
+  showRefs: preferences.showRefs ?? true,
   auth: {
     client: null,
     user: null,
@@ -107,6 +110,25 @@ function loadGuestMode() {
 
 function saveGuestMode(value) {
   localStorage.setItem(NOTES_GUEST_KEY, value ? "true" : "false");
+}
+
+function loadPreferences() {
+  try {
+    return JSON.parse(localStorage.getItem(PREFS_KEY) || "{}") || {};
+  } catch {
+    return {};
+  }
+}
+
+function savePreferencesLocal() {
+  const payload = {
+    query: state.query,
+    tag: state.tag,
+    showPages: state.showPages,
+    showRefs: state.showRefs,
+  };
+  localStorage.setItem(PREFS_KEY, JSON.stringify(payload));
+  void syncPreferencesToCloud();
 }
 
 function stanzaId(chapterNumber, stanzaIndex) {
@@ -589,6 +611,7 @@ async function initializeSupabase() {
       saveGuestMode(false);
       state.auth.mode = "authenticated";
       void loadNotesFromCloud();
+      void loadPreferencesFromCloud();
     }
     updateAuthUI();
   });
@@ -596,6 +619,59 @@ async function initializeSupabase() {
   if (state.auth.user) {
     state.auth.mode = "authenticated";
     await loadNotesFromCloud();
+    await loadPreferencesFromCloud();
+  }
+}
+
+async function loadPreferencesFromCloud() {
+  if (!state.auth.client || !state.auth.user) return;
+  const { data, error } = await state.auth.client
+    .from("preferences")
+    .select("prefs")
+    .eq("user_id", state.auth.user.id)
+    .maybeSingle();
+
+  if (error) {
+    setAuthStatus("Unable to load preferences. Verify the preferences table and RLS policies.", "error");
+    return;
+  }
+  const prefs = data?.prefs;
+  if (!prefs) return;
+
+  if (typeof prefs.showPages === "boolean") {
+    state.showPages = prefs.showPages;
+    if (togglePages) togglePages.checked = state.showPages;
+  }
+  if (typeof prefs.showRefs === "boolean") {
+    state.showRefs = prefs.showRefs;
+    if (toggleRefs) toggleRefs.checked = state.showRefs;
+  }
+  if (typeof prefs.tag === "string") {
+    state.tag = prefs.tag;
+    if (tagFilter) tagFilter.value = state.tag;
+  }
+  if (typeof prefs.query === "string") {
+    state.query = prefs.query;
+    if (searchInput) searchInput.value = state.query;
+  }
+  savePreferencesLocal();
+  applyFilters();
+}
+
+async function syncPreferencesToCloud() {
+  if (!state.auth.client || !state.auth.user) return;
+  const payload = {
+    user_id: state.auth.user.id,
+    prefs: {
+      query: state.query,
+      tag: state.tag,
+      showPages: state.showPages,
+      showRefs: state.showRefs,
+    },
+  };
+  const { error } = await state.auth.client.from("preferences").upsert(payload, { onConflict: "user_id" });
+  if (error) {
+    setAuthStatus("Unable to sync preferences. Verify the preferences table and RLS policies.", "error");
   }
 }
 
@@ -891,6 +967,7 @@ function applyFilters() {
 function runSearch() {
   state.query = normalize(searchInput?.value || "");
   applyFilters();
+  savePreferencesLocal();
 }
 
 function findStanzaByRef(ref) {
@@ -919,27 +996,40 @@ async function init() {
     rebuildTagFilter();
     render();
 
-    searchInput?.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        runSearch();
+      if (searchInput) {
+        searchInput.value = state.query;
+        searchInput.addEventListener("input", () => {
+          if (!searchInput.value.trim() && state.query) {
+            state.query = "";
+            applyFilters();
+            savePreferencesLocal();
+          }
+        });
+        searchInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            runSearch();
+          }
+        });
       }
-    });
     searchBtn?.addEventListener("click", runSearch);
 
     tagFilter?.addEventListener("change", (event) => {
       state.tag = event.target.value;
       applyFilters();
+        savePreferencesLocal();
     });
 
     togglePages?.addEventListener("change", (event) => {
       state.showPages = event.target.checked;
       render();
+        savePreferencesLocal();
     });
 
     toggleRefs?.addEventListener("change", (event) => {
       state.showRefs = event.target.checked;
       render();
+        savePreferencesLocal();
     });
 
     saveNoteBtn?.addEventListener("click", saveSelectionAsNote);
