@@ -43,6 +43,7 @@ const authWarning = document.getElementById("authWarning");
 const notesContent = document.getElementById("notesContent");
 const authPanel = document.getElementById("authPanel");
 const notesTitle = document.getElementById("notesTitle");
+const userDisplay = document.getElementById("userDisplay");
 
 const state = {
   data: null,
@@ -356,6 +357,8 @@ function updateAuthUI() {
   if (!authStatus || !authWarning || !authSignOutBtn || !authGuestBtn) return;
   const { client, user, ready, mode } = state.auth;
 
+  updateUserDisplay(user);
+
   if (!ready || !client) {
     setAuthConfirmMessage("Sync not configured. Notes are local only.");
     setAuthStep("confirm");
@@ -387,6 +390,22 @@ function updateAuthUI() {
   setNotesVisibility(false);
   authWarning.style.display = "none";
   authSignOutBtn.style.display = "none";
+}
+
+function updateUserDisplay(user) {
+  if (!userDisplay || !authOpenBtn) return;
+  if (user) {
+    const label = user.email || "Signed in";
+    userDisplay.textContent = label;
+    userDisplay.classList.remove("is-hidden");
+    authOpenBtn.classList.add("is-hidden");
+    authOpenBtn.setAttribute("aria-hidden", "true");
+    return;
+  }
+  userDisplay.textContent = "";
+  userDisplay.classList.add("is-hidden");
+  authOpenBtn.classList.remove("is-hidden");
+  authOpenBtn.setAttribute("aria-hidden", "false");
 }
 
 function setAuthStatus(message, type = "info") {
@@ -513,9 +532,8 @@ async function handleSignIn() {
     setAuthStatus(error.message, "error");
     return;
   }
-  setAuthConfirmMessage("Signed in. Sync is active.");
-  setAuthStep("confirm");
-  setNotesVisibility(true);
+  setNotesModalOpen(false);
+  setAuthPanelVisible(false);
 }
 
 async function handleSignUp() {
@@ -532,9 +550,8 @@ async function handleSignUp() {
     return;
   }
   if (data.session) {
-    setAuthConfirmMessage("Account created and signed in.");
-    setAuthStep("confirm");
-    setNotesVisibility(true);
+    setNotesModalOpen(false);
+    setAuthPanelVisible(false);
   } else {
     setAuthConfirmMessage("Account created. Check your email to confirm, then sign in.");
     setAuthStep("confirm");
