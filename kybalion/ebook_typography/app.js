@@ -294,7 +294,7 @@ function renderNotes() {
     text.className = "note-text";
     text.textContent = note.text;
 
-    card.append(link, noteActions, text);
+    card.append(link, text, noteActions);
     notesList.appendChild(card);
   });
 }
