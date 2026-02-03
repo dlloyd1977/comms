@@ -11,6 +11,8 @@ const toggleRefs = document.getElementById("toggleRefs");
 const printBtn = document.getElementById("printBtn");
 const notesList = document.getElementById("notesList");
 const clearNotesBtn = document.getElementById("clearNotesBtn");
+const toggleNotesBtn = document.getElementById("toggleNotesBtn");
+const notesPanel = document.getElementById("notesPanel");
 
 const state = {
   data: null,
@@ -20,6 +22,7 @@ const state = {
   tag: "",
   showPages: true,
   showRefs: true,
+  showNotes: false,
 };
 
 function loadTags() {
@@ -237,6 +240,17 @@ function renderNotes() {
     });
 }
 
+function updateNotesVisibility() {
+  if (!notesPanel || !toggleNotesBtn) return;
+  if (state.showNotes) {
+    notesPanel.classList.add("is-visible");
+    toggleNotesBtn.setAttribute("aria-expanded", "true");
+  } else {
+    notesPanel.classList.remove("is-visible");
+    toggleNotesBtn.setAttribute("aria-expanded", "false");
+  }
+}
+
 function captureHighlight(event) {
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed) return;
@@ -323,6 +337,13 @@ async function init() {
     saveNotes(state.notes);
     renderNotes();
   });
+
+  toggleNotesBtn.addEventListener("click", () => {
+    state.showNotes = !state.showNotes;
+    updateNotesVisibility();
+  });
+
+  updateNotesVisibility();
 }
 
 init();
