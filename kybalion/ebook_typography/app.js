@@ -268,11 +268,33 @@ function renderNotes() {
       stanzaEl?.scrollIntoView({ behavior: "smooth" });
     });
 
+    const noteActions = document.createElement("div");
+    noteActions.className = "note-actions";
+
+    const copyBtn = document.createElement("button");
+    copyBtn.type = "button";
+    copyBtn.className = "note-copy";
+    copyBtn.textContent = "Copy";
+    copyBtn.addEventListener("click", async () => {
+      const payload = `Notes · ${note.ref}\n${note.text}`;
+      try {
+        await navigator.clipboard.writeText(payload);
+        copyBtn.textContent = "Copied";
+        setTimeout(() => {
+          copyBtn.textContent = "Copy";
+        }, 1200);
+      } catch {
+        window.alert("Unable to copy note. Please try again.");
+      }
+    });
+
+    noteActions.appendChild(copyBtn);
+
     const text = document.createElement("p");
     text.className = "note-text";
     text.textContent = note.text;
 
-    card.append(link, text);
+    card.append(link, noteActions, text);
     notesList.appendChild(card);
   });
 }
