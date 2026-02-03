@@ -284,12 +284,32 @@ h1 {
   color: var(--ink);
 }
 
-.standard-frame {
-  width: 100%;
-  min-height: 80vh;
+.standard-content {
+  display: grid;
+  gap: 28px;
+  color: var(--ink);
+}
+
+.standard-chapter {
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #ffffff;
+  padding: 24px 28px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+
+.standard-chapter h2 {
+  margin: 0 0 16px;
+  color: var(--ink);
+}
+
+.standard-stanza {
+  margin-bottom: 18px;
+}
+
+.standard-stanza:last-child {
+  margin-bottom: 0;
 }
 
 .toc {
@@ -543,8 +563,8 @@ h1 {
     padding: 18px;
   }
 
-  .standard-frame {
-    min-height: 70vh;
+  .standard-chapter {
+    padding: 20px;
   }
 }
 
