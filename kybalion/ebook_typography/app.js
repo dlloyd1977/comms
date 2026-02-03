@@ -994,42 +994,51 @@ async function init() {
     state.data = await response.json();
 
     rebuildTagFilter();
+    if (tagFilter) {
+      tagFilter.value = state.tag;
+    }
+    if (togglePages) {
+      togglePages.checked = state.showPages;
+    }
+    if (toggleRefs) {
+      toggleRefs.checked = state.showRefs;
+    }
     render();
 
-      if (searchInput) {
-        searchInput.value = state.query;
-        searchInput.addEventListener("input", () => {
-          if (!searchInput.value.trim() && state.query) {
-            state.query = "";
-            applyFilters();
-            savePreferencesLocal();
-          }
-        });
-        searchInput.addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            event.preventDefault();
-            runSearch();
-          }
-        });
-      }
+    if (searchInput) {
+      searchInput.value = state.query;
+      searchInput.addEventListener("input", () => {
+        if (!searchInput.value.trim() && state.query) {
+          state.query = "";
+          applyFilters();
+          savePreferencesLocal();
+        }
+      });
+      searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          runSearch();
+        }
+      });
+    }
     searchBtn?.addEventListener("click", runSearch);
 
     tagFilter?.addEventListener("change", (event) => {
       state.tag = event.target.value;
       applyFilters();
-        savePreferencesLocal();
+      savePreferencesLocal();
     });
 
     togglePages?.addEventListener("change", (event) => {
       state.showPages = event.target.checked;
       render();
-        savePreferencesLocal();
+      savePreferencesLocal();
     });
 
     toggleRefs?.addEventListener("change", (event) => {
       state.showRefs = event.target.checked;
       render();
-        savePreferencesLocal();
+      savePreferencesLocal();
     });
 
     saveNoteBtn?.addEventListener("click", saveSelectionAsNote);
