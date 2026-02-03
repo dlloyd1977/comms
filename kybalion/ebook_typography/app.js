@@ -56,9 +56,6 @@ function stanzaMatchesFilters(stanza) {
   return true;
 }
 
-function formatStanzaText(text) {
-  return text.replace(/([.!?])\s+/g, "$1\n");
-}
 
 function rebuildTagFilter() {
   const tags = new Set();
@@ -151,7 +148,7 @@ function render() {
 
       const text = document.createElement("p");
       text.className = "stanza-text";
-      text.textContent = formatStanzaText(stanza.text);
+      text.textContent = stanza.text;
 
       const tagsWrap = document.createElement("div");
       tagsWrap.className = "stanza-tags";
