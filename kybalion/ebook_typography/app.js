@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.2.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -251,6 +251,15 @@ function render() {
       });
       tagsWrap.appendChild(tagButton);
 
+      const annotateButton = document.createElement("button");
+      annotateButton.type = "button";
+      annotateButton.className = "tag-button";
+      annotateButton.textContent = "Annotate";
+      annotateButton.addEventListener("click", () => {
+        addAnnotationNote(stanza.ref);
+      });
+      tagsWrap.appendChild(annotateButton);
+
       stanzaEl.append(header, text, tagsWrap);
       chapterEl.appendChild(stanzaEl);
     });
@@ -388,9 +397,11 @@ function renderNotes() {
     const card = document.createElement("div");
     card.className = "note-card";
 
+    const noteLabel = note.label || "Notes";
+
     const link = document.createElement("a");
     link.href = `#${note.ref.replace(':', '-')}`;
-    link.textContent = `Notes · ${note.ref}`;
+    link.textContent = `${noteLabel} · ${note.ref}`;
     link.addEventListener("click", (event) => {
       event.preventDefault();
       const stanzaEl = document.querySelector(`[data-stanza-ref="${note.ref}"]`);
@@ -416,7 +427,7 @@ function renderNotes() {
     copyBtn.className = "note-copy";
     copyBtn.textContent = "Copy";
     copyBtn.addEventListener("click", async () => {
-      const payload = `Notes · ${note.ref}\n${note.text}`;
+      const payload = `${noteLabel} · ${note.ref}\n${note.text}`;
       try {
         await navigator.clipboard.writeText(payload);
         copyBtn.textContent = "Copied";
@@ -702,7 +713,7 @@ async function copyNotesToClipboard() {
     return;
   }
   const text = state.notes
-    .map((note) => `Notes · ${note.ref}\n${note.text}`)
+    .map((note) => `${note.label || "Notes"} · ${note.ref}\n${note.text}`)
     .join("\n\n");
   try {
     await navigator.clipboard.writeText(text);
@@ -744,10 +755,25 @@ function saveSelectionAsNote() {
     return;
   }
 
-  const nextNotes = [...state.notes, { id: noteId, ref, text: selectedText, label: "Notes" }];
+  const nextNotes = [...state.notes, { id: noteId, ref, text: selectedText, label: "Highlight" }];
   setNotes(nextNotes);
   syncNotesToCloud();
   selection.removeAllRanges();
+}
+
+function addAnnotationNote(ref) {
+  const raw = window.prompt("Add annotation (max 500 characters):", "");
+  if (raw === null) return;
+  const trimmed = raw.trim();
+  if (!trimmed) return;
+  if (trimmed.length > 500) {
+    window.alert("Annotation is too long. Please keep it to 500 characters or fewer.");
+    return;
+  }
+  const noteId = `note-${Date.now()}`;
+  const nextNotes = [...state.notes, { id: noteId, ref, text: trimmed, label: "Annotation" }];
+  setNotes(nextNotes);
+  syncNotesToCloud();
 }
 
 function applyFilters() {
