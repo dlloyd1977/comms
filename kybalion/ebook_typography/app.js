@@ -45,6 +45,12 @@ const notesContent = document.getElementById("notesContent");
 const authPanel = document.getElementById("authPanel");
 const notesTitle = document.getElementById("notesTitle");
 const userDisplay = document.getElementById("userDisplay");
+const annotationModal = document.getElementById("annotationModal");
+const annotationInput = document.getElementById("annotationInput");
+const annotationCloseBtn = document.getElementById("annotationCloseBtn");
+const annotationRef = document.getElementById("annotationRef");
+const annotationStatus = document.getElementById("annotationStatus");
+const annotationCount = document.getElementById("annotationCount");
 
 const state = {
   data: null,
@@ -59,6 +65,11 @@ const state = {
     user: null,
     ready: false,
     mode: "local",
+  },
+  annotation: {
+    ref: "",
+    id: "",
+    timer: null,
   },
 };
 
@@ -256,7 +267,7 @@ function render() {
       annotateButton.className = "tag-button";
       annotateButton.textContent = "Annotate";
       annotateButton.addEventListener("click", () => {
-        addAnnotationNote(stanza.ref);
+        openAnnotationModal(stanza.ref);
       });
       tagsWrap.appendChild(annotateButton);
 
@@ -762,18 +773,95 @@ function saveSelectionAsNote() {
 }
 
 function addAnnotationNote(ref) {
-  const raw = window.prompt("Add annotation (max 500 characters):", "");
-  if (raw === null) return;
-  const trimmed = raw.trim();
-  if (!trimmed) return;
-  if (trimmed.length > 500) {
-    window.alert("Annotation is too long. Please keep it to 500 characters or fewer.");
+  return;
+}
+
+function openAnnotationModal(ref) {
+  if (!annotationModal || !annotationInput || !annotationRef) return;
+  const existing = state.notes.find(
+    (note) => note.ref === ref && note.label === "Annotation"
+  );
+  state.annotation.ref = ref;
+  state.annotation.id = existing?.id || "";
+  annotationInput.value = existing?.text || "";
+  annotationRef.textContent = ref ? `Stanza ${ref}` : "Stanza";
+  updateAnnotationCount();
+  setAnnotationStatus("Saved.");
+  annotationModal.classList.add("active");
+  annotationModal.setAttribute("aria-hidden", "false");
+  annotationInput.focus();
+}
+
+function closeAnnotationModal() {
+  if (!annotationModal) return;
+  annotationModal.classList.remove("active");
+  annotationModal.setAttribute("aria-hidden", "true");
+  state.annotation.ref = "";
+  state.annotation.id = "";
+  if (state.annotation.timer) {
+    clearTimeout(state.annotation.timer);
+    state.annotation.timer = null;
+  }
+}
+
+function setAnnotationStatus(message) {
+  if (annotationStatus) {
+    annotationStatus.textContent = message;
+  }
+}
+
+function updateAnnotationCount() {
+  if (!annotationInput || !annotationCount) return;
+  const length = annotationInput.value.length;
+  annotationCount.textContent = `${length} / 500`;
+}
+
+function saveAnnotation() {
+  const ref = state.annotation.ref;
+  if (!ref || !annotationInput) return;
+  const trimmed = annotationInput.value.trim();
+  if (!trimmed) {
+    if (state.annotation.id) {
+      const nextNotes = state.notes.filter((entry) => entry.id !== state.annotation.id);
+      setNotes(nextNotes);
+      syncNotesToCloud();
+      state.annotation.id = "";
+    }
+    setAnnotationStatus("Saved.");
     return;
   }
-  const noteId = `note-${Date.now()}`;
-  const nextNotes = [...state.notes, { id: noteId, ref, text: trimmed, label: "Annotation" }];
-  setNotes(nextNotes);
+
+  if (trimmed.length > 500) {
+    setAnnotationStatus("Keep annotations to 500 characters.");
+    return;
+  }
+
+  if (state.annotation.id) {
+    const nextNotes = state.notes.map((entry) =>
+      entry.id === state.annotation.id
+        ? { ...entry, text: trimmed, label: "Annotation" }
+        : entry
+    );
+    setNotes(nextNotes);
+  } else {
+    const noteId = `note-${Date.now()}`;
+    const nextNotes = [...state.notes, { id: noteId, ref, text: trimmed, label: "Annotation" }];
+    state.annotation.id = noteId;
+    setNotes(nextNotes);
+  }
   syncNotesToCloud();
+  setAnnotationStatus("Saved.");
+}
+
+function scheduleAnnotationSave() {
+  if (state.annotation.timer) {
+    clearTimeout(state.annotation.timer);
+  }
+  setAnnotationStatus("Saving...");
+  state.annotation.timer = setTimeout(() => {
+    saveAnnotation();
+    state.annotation.timer = null;
+  }, 500);
 }
 
 function applyFilters() {
@@ -860,6 +948,20 @@ async function init() {
       toggleNotesBtn.setAttribute("aria-controls", "notesModal");
       toggleNotesBtn.addEventListener("click", toggleNotesPanel);
     }
+    annotationInput?.addEventListener("input", () => {
+      updateAnnotationCount();
+      scheduleAnnotationSave();
+    });
+    annotationCloseBtn?.addEventListener("click", () => {
+      saveAnnotation();
+      closeAnnotationModal();
+    });
+    annotationModal?.addEventListener("click", (event) => {
+      if (event.target === annotationModal) {
+        saveAnnotation();
+        closeAnnotationModal();
+      }
+    });
     authOpenBtn?.addEventListener("click", () => {
       setAuthPanelVisible(true);
       setNotesVisibility(false);
