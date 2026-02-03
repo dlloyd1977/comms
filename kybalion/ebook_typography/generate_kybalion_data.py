@@ -1,126 +1,25 @@
 #!/usr/bin/env python3
-"""Generate stanza-based JSON from the Kybalion PDF."""
+"""Generate stanza-based JSON from the Kybalion HTML edition."""
 from __future__ import annotations
 
 import json
 import re
+from html.parser import HTMLParser
 from pathlib import Path
-from typing import Iterable
 
-from PyPDF2 import PdfReader
-
-PDF_PATH = Path(__file__).parent / "the_kybalion_ebook.pdf"
+HTML_PATH = Path(__file__).parent / "pg14209-images.html"
 OUT_PATH = Path(__file__).parent / "data" / "kybalion.json"
 
-ROMAN_RE = re.compile(r"^[ivxlcdm]+", re.IGNORECASE)
-CHAPTER_RE = re.compile(r"^chapter\s+([ivxlcdm]+|\d+)\.?$", re.IGNORECASE)
-INTRO_RE = re.compile(r"^introduction\.?$", re.IGNORECASE)
-DOT_LEADER_RE = re.compile(r"\.{3,}|…")
-
-KNOWN_HEADERS = {
-    "the kybalion",
-    "the hermetic philosophy",
-    "the seven hermetic principles",
-    "mental transmutation",
-    "the all",
-    "the mental universe",
-    "the divine paradox",
-    "the all in all",
-    "the planes of correspondence",
-    "vibration",
-    "polarity",
-    "rhythm",
-    "causation",
-    "gender",
-    "mental gender",
-    "hermetic axioms",
-}
+CHAPTER_RE = re.compile(r"^chapter\s+([ivxlcdm]+|\d+)$", re.IGNORECASE)
+INTRO_RE = re.compile(r"^introduction$", re.IGNORECASE)
+START_RE = re.compile(r"\*\*\* START OF THE PROJECT GUTENBERG EBOOK", re.IGNORECASE)
+END_RE = re.compile(r"\*\*\* END OF THE PROJECT GUTENBERG EBOOK", re.IGNORECASE)
 
 
-def _strip_running_header(line: str) -> str:
-    cleaned = line.strip()
-    if not cleaned:
-        return cleaned
-
-    normalized = re.sub(r"[“”\"'’]", "", cleaned).lower().strip()
-    for header in KNOWN_HEADERS:
-        if normalized.startswith(header):
-            pattern = re.compile(rf"^{re.escape(header)}\s*\d*", re.IGNORECASE)
-            stripped = pattern.sub("", cleaned).strip()
-            return stripped if stripped else ""
-
-    return cleaned
-
-
-def _clean_line(line: str) -> str:
-    line = line.replace("\u00a0", " ")
-    line = " ".join(line.strip().split())
-    line = _strip_running_header(line)
-    return " ".join(line.strip().split())
-
-
-def _pull_page_label(lines: list[str]) -> str | None:
-    if not lines:
-        return None
-    first = lines[0]
-    if first.lower() == "the kybalion":
-        lines.pop(0)
-        if not lines:
-            return None
-        first = lines[0]
-
-    stripped = first.lstrip()
-    if not stripped:
-        return None
-
-    match = re.match(r"^([ivxlcdm]{2,})(?=[A-Za-z])", stripped, re.IGNORECASE)
-    if not match:
-        match = re.match(r"^([IVXLCDM])(?=[A-Z])", stripped)
-    if not match:
-        match = re.match(r"^(\d+)(?=[A-Za-z])", stripped)
-    if not match:
-        match = re.match(r"^([ivxlcdm]+)$", stripped, re.IGNORECASE)
-    if not match:
-        match = re.match(r"^(\d+)$", stripped)
-
-    if not match:
-        return None
-
-    label = match.group(1)
-    remainder = stripped[len(label):].lstrip()
-    if remainder:
-        lines[0] = remainder
-    else:
-        lines.pop(0)
-    return label
-
-
-def _pull_inline_page_label(lines: list[str]) -> str | None:
-    if not lines:
-        return None
-
-    for idx in range(min(2, len(lines))):
-        candidate = lines[idx].lstrip()
-        match = re.match(r"^([ivxlcdm]{2,})(?=[A-Za-z])", candidate, re.IGNORECASE)
-        if not match:
-            match = re.match(r"^(\d+)(?=[A-Za-z])", candidate)
-        if not match:
-            continue
-
-        label = match.group(1)
-        remainder = candidate[len(label):].lstrip()
-        lines[idx] = remainder
-        return label
-
-    return None
-
-
-def _is_heading_line(line: str) -> bool:
-    return bool(CHAPTER_RE.match(line) or INTRO_RE.match(line))
-
-
-def _is_toc_line(line: str) -> bool:
-    return bool(DOT_LEADER_RE.search(line))
+def _clean_text(text: str) -> str:
+    text = text.replace("\u00a0", " ")
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
 
 
 def _is_short_quote(line: str) -> bool:
@@ -167,94 +66,103 @@ def _split_into_stanzas(text: str) -> list[str]:
     return [s for s in stanzas if s]
 
 
-def _iter_pages(reader: PdfReader) -> Iterable[dict]:
-    for index, page in enumerate(reader.pages, start=1):
-        text = page.extract_text() or ""
-        cleaned_lines = []
-        for raw in text.splitlines():
-            cleaned = _clean_line(raw)
-            if cleaned:
-                cleaned_lines.append(cleaned)
-        label = _pull_page_label(cleaned_lines)
-        inline_label = _pull_inline_page_label(cleaned_lines)
-        if not label and inline_label:
-            label = inline_label
-        yield {"index": index, "label": label, "lines": cleaned_lines}
+class _PGParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.in_body = False
+        self.capture = False
+        self.current_tag = None
+        self.buffer: list[str] = []
+        self.items: list[tuple[str, str]] = []
+        self.in_content = False
+        self.end_reached = False
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "body":
+            self.in_body = True
+        if not self.in_body or not self.in_content or self.end_reached:
+            return
+        if tag in {"h3", "h5", "p"}:
+            self.current_tag = tag
+            self.buffer = []
+            self.capture = True
+        if tag == "br" and self.capture:
+            self.buffer.append(" ")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "body":
+            self.in_body = False
+        if not self.in_body or not self.in_content or self.end_reached:
+            return
+        if tag == self.current_tag and self.capture:
+            text = _clean_text("".join(self.buffer))
+            if text:
+                self.items.append((tag, text))
+            self.current_tag = None
+            self.capture = False
+
+    def handle_data(self, data: str) -> None:
+        if START_RE.search(data):
+            self.in_content = True
+        if END_RE.search(data):
+            self.end_reached = True
+            self.in_content = False
+        if self.capture and self.in_content and not self.end_reached:
+            self.buffer.append(data)
 
 
-def _build_chapters(reader: PdfReader) -> list[dict]:
-    pages = list(_iter_pages(reader))
-    all_lines: list[tuple[str, str]] = []
-    for page in pages:
-        page_label = page["label"] or str(page["index"])
-        for line in page["lines"]:
-            all_lines.append((page_label, line))
+def _extract_body_items(html: str) -> list[tuple[str, str]]:
+    parser = _PGParser()
+    parser.feed(html)
+    return parser.items
 
-    start_index = 0
-    for idx, (_, line) in enumerate(all_lines):
-        clean = line.strip().strip(".")
-        if INTRO_RE.match(clean):
-            start_index = idx
-            break
+
+def _build_chapters(html: str) -> list[dict]:
+    items = _extract_body_items(html)
 
     chapters: list[dict] = []
     current = None
-    pending_title = None
+    pending_title = False
     started = False
 
-    last_page_label = None
+    for tag, text in items:
+        upper = text.strip().upper()
 
-    for page_label, line in all_lines[start_index:]:
-        if _is_toc_line(line):
-            continue
-
-        clean = line.strip().strip(".")
-
-        if not started and INTRO_RE.match(clean):
-            started = True
-            current = {
-                "number": 0,
-                "title": "Introduction",
-                "raw": [f"<<PAGE:{page_label}>>"],
-            }
+        if tag == "h3" and INTRO_RE.match(text.strip().lower()):
+            current = {"number": 0, "title": "Introduction", "raw": []}
             chapters.append(current)
-            pending_title = None
-            last_page_label = page_label
+            pending_title = False
+            started = True
             continue
 
-        if CHAPTER_RE.match(clean):
+        if tag == "h3" and CHAPTER_RE.match(text.strip().lower()):
             started = True
-            match = CHAPTER_RE.match(clean)
+            match = CHAPTER_RE.match(text.strip().lower())
             chapter_id = match.group(1)
             number = int(chapter_id) if chapter_id.isdigit() else None
             if number is None:
                 roman_map = {
-                    "I": 1,
-                    "II": 2,
-                    "III": 3,
-                    "IV": 4,
-                    "V": 5,
-                    "VI": 6,
-                    "VII": 7,
-                    "VIII": 8,
-                    "IX": 9,
-                    "X": 10,
-                    "XI": 11,
-                    "XII": 12,
-                    "XIII": 13,
-                    "XIV": 14,
-                    "XV": 15,
+                    "i": 1,
+                    "ii": 2,
+                    "iii": 3,
+                    "iv": 4,
+                    "v": 5,
+                    "vi": 6,
+                    "vii": 7,
+                    "viii": 8,
+                    "ix": 9,
+                    "x": 10,
+                    "xi": 11,
+                    "xii": 12,
+                    "xiii": 13,
+                    "xiv": 14,
+                    "xv": 15,
                 }
-                number = roman_map.get(chapter_id.upper())
+                number = roman_map.get(chapter_id.lower())
 
-            current = {
-                "number": number or 0,
-                "title": f"Chapter {chapter_id}",
-                "raw": [f"<<PAGE:{page_label}>>"],
-            }
+            current = {"number": number or 0, "title": f"Chapter {chapter_id.upper()}", "raw": []}
             chapters.append(current)
             pending_title = True
-            last_page_label = page_label
             continue
 
         if not started:
@@ -263,24 +171,24 @@ def _build_chapters(reader: PdfReader) -> list[dict]:
         if current is None:
             continue
 
-        if page_label != last_page_label:
-            current["raw"].append(f"<<PAGE:{page_label}>>")
-            last_page_label = page_label
-
-        if pending_title:
-            pending_title = None
-            current["title"] = f"{current['title']} — {line.strip()}"
+        if pending_title and tag == "h5":
+            current["title"] = f"{current['title']} — {text.title()}"
+            pending_title = False
             continue
 
-        if line and current["raw"] and not current["raw"][-1].startswith("<<PAGE:"):
-            current["raw"].append(" ")
+        if tag == "h5":
+            current["raw"].append("<<BREAK>>")
+            current["raw"].append(text)
+            current["raw"].append("<<BREAK>>")
+            continue
 
-        if _force_stanza_break(line):
-            current["raw"].append("<<BREAK>>")
-            current["raw"].append(line)
-            current["raw"].append("<<BREAK>>")
-        else:
-            current["raw"].append(line)
+        if tag == "p":
+            if _force_stanza_break(text):
+                current["raw"].append("<<BREAK>>")
+                current["raw"].append(text)
+                current["raw"].append("<<BREAK>>")
+            else:
+                current["raw"].append(text)
 
     return chapters
 
@@ -288,17 +196,20 @@ def _build_chapters(reader: PdfReader) -> list[dict]:
 def _chapter_to_stanzas(chapter: dict) -> list[dict]:
     raw = " ".join(chapter["raw"]).strip()
     raw = raw.replace("<<BREAK>>", "\n<<BREAK>>\n")
-    tokens = [t.strip() for t in raw.split("<<PAGE:") if t.strip()]
+    has_pages = "<<PAGE:" in raw
+    tokens = [t.strip() for t in raw.split("<<PAGE:") if t.strip()] if has_pages else [raw]
 
     stanzas: list[dict] = []
     stanza_index = 1
 
     for token in tokens:
-        if ">>" not in token:
-            continue
-        label, rest = token.split(">>", 1)
-        page_label = label.strip()
-        chunk = rest.strip()
+        if has_pages and ">>" in token:
+            label, rest = token.split(">>", 1)
+            page_label = label.strip()
+            chunk = rest.strip()
+        else:
+            page_label = None
+            chunk = token.strip()
         if not chunk:
             continue
 
@@ -311,7 +222,7 @@ def _chapter_to_stanzas(chapter: dict) -> list[dict]:
                 stanzas.append(
                     {
                         "ref": f"{chapter['number']}:{stanza_index}",
-                        "page": page_label,
+                        "page": page_label if page_label else None,
                         "text": stanza,
                     }
                 )
@@ -321,8 +232,8 @@ def _chapter_to_stanzas(chapter: dict) -> list[dict]:
 
 
 def generate() -> dict:
-    reader = PdfReader(str(PDF_PATH))
-    chapters_raw = _build_chapters(reader)
+    html = HTML_PATH.read_text(encoding="utf-8", errors="ignore")
+    chapters_raw = _build_chapters(html)
 
     chapters = []
     for chapter in chapters_raw:

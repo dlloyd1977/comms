@@ -140,8 +140,12 @@ function render() {
 
       const page = document.createElement("span");
       page.className = "page-number";
-      page.textContent = `p. ${stanza.page}`;
-      page.style.display = state.showPages ? "inline" : "none";
+      if (stanza.page) {
+        page.textContent = `p. ${stanza.page}`;
+        page.style.display = state.showPages ? "inline" : "none";
+      } else {
+        page.style.display = "none";
+      }
 
       header.append(ref, page);
 
