@@ -44,8 +44,7 @@ def _normalize_text(text: str) -> str:
 def _split_into_stanzas(text: str) -> list[str]:
     if not text:
         return []
-    sentences = re.split(r"(?<=[.!?])\s+", text)
-    return [s.strip() for s in sentences if s.strip()]
+    return [text.strip()]
 
 
 class _PGParser(HTMLParser):
@@ -165,12 +164,9 @@ def _build_chapters(html: str) -> list[dict]:
             continue
 
         if tag == "p":
-            if _force_stanza_break(text):
-                current["raw"].append("<<BREAK>>")
-                current["raw"].append(text)
-                current["raw"].append("<<BREAK>>")
-            else:
-                current["raw"].append(text)
+            current["raw"].append("<<BREAK>>")
+            current["raw"].append(text)
+            current["raw"].append("<<BREAK>>")
 
     return chapters
 
