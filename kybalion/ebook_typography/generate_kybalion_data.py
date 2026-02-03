@@ -41,6 +41,17 @@ def _normalize_text(text: str) -> str:
     return text.strip()
 
 
+def _split_numbered_list(text: str) -> list[str] | None:
+    if not re.search(r"\b\d+\.\s+", text):
+        return None
+
+    parts = re.split(r"\s*(?=\d+\.\s+)", text.strip())
+    items = [p.strip() for p in parts if p.strip()]
+    if len(items) <= 1:
+        return None
+    return items
+
+
 def _split_into_stanzas(text: str) -> list[str]:
     if not text:
         return []
@@ -164,9 +175,16 @@ def _build_chapters(html: str) -> list[dict]:
             continue
 
         if tag == "p":
-            current["raw"].append("<<BREAK>>")
-            current["raw"].append(text)
-            current["raw"].append("<<BREAK>>")
+            list_items = _split_numbered_list(text)
+            if list_items:
+                for item in list_items:
+                    current["raw"].append("<<BREAK>>")
+                    current["raw"].append(item)
+                    current["raw"].append("<<BREAK>>")
+            else:
+                current["raw"].append("<<BREAK>>")
+                current["raw"].append(text)
+                current["raw"].append("<<BREAK>>")
 
     return chapters
 
