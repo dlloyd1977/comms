@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.3.0";
+const APP_VERSION = "1.3.1";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -632,17 +632,7 @@ async function initializeSupabase() {
 
 async function loadPreferencesFromCloud() {
   if (!state.auth.client || !state.auth.user) return;
-  const { data, error } = await state.auth.client
-    .from("preferences")
-    .select("prefs")
-    .eq("user_id", state.auth.user.id)
-    .maybeSingle();
-
-  if (error) {
-    setAuthStatus("Unable to load preferences. Verify the preferences table and RLS policies.", "error");
-    return;
-  }
-  const prefs = data?.prefs;
+  const prefs = state.auth.user.user_metadata?.preferences;
   if (!prefs) return;
 
   if (typeof prefs.showPages === "boolean") {
@@ -667,18 +657,21 @@ async function loadPreferencesFromCloud() {
 
 async function syncPreferencesToCloud() {
   if (!state.auth.client || !state.auth.user) return;
-  const payload = {
-    user_id: state.auth.user.id,
-    prefs: {
-      query: state.query,
-      tag: state.tag,
-      showPages: state.showPages,
-      showRefs: state.showRefs,
-    },
+  const nextPrefs = {
+    query: state.query,
+    tag: state.tag,
+    showPages: state.showPages,
+    showRefs: state.showRefs,
   };
-  const { error } = await state.auth.client.from("preferences").upsert(payload, { onConflict: "user_id" });
+  const { data, error } = await state.auth.client.auth.updateUser({
+    data: { preferences: nextPrefs },
+  });
   if (error) {
-    setAuthStatus("Unable to sync preferences. Verify the preferences table and RLS policies.", "error");
+    setAuthStatus("Unable to sync preferences. Verify profile permissions.", "error");
+    return;
+  }
+  if (data?.user) {
+    state.auth.user = data.user;
   }
 }
 
