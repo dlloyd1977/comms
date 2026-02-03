@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.3.1";
+const APP_VERSION = "1.4.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -14,6 +14,7 @@ const tagFilter = document.getElementById("tagFilter");
 const togglePages = document.getElementById("togglePages");
 const toggleRefs = document.getElementById("toggleRefs");
 const searchBtn = document.getElementById("searchBtn");
+const viewModeSelect = document.getElementById("viewModeSelect");
 const printBtn = document.getElementById("printBtn");
 const saveNoteBtn = document.getElementById("saveNoteBtn");
 const toggleNotesBtn = document.getElementById("toggleNotesBtn");
@@ -53,6 +54,8 @@ const annotationCloseBtn = document.getElementById("annotationCloseBtn");
 const annotationRef = document.getElementById("annotationRef");
 const annotationStatus = document.getElementById("annotationStatus");
 const annotationCount = document.getElementById("annotationCount");
+const typographyView = document.getElementById("typographyView");
+const standardView = document.getElementById("standardView");
 
 const preferences = loadPreferences();
 
@@ -64,6 +67,7 @@ const state = {
   tag: preferences.tag || "",
   showPages: preferences.showPages ?? true,
   showRefs: preferences.showRefs ?? true,
+  viewMode: preferences.viewMode || "typography",
   auth: {
     client: null,
     user: null,
@@ -127,9 +131,24 @@ function savePreferencesLocal() {
     tag: state.tag,
     showPages: state.showPages,
     showRefs: state.showRefs,
+    viewMode: state.viewMode,
   };
   localStorage.setItem(PREFS_KEY, JSON.stringify(payload));
   void syncPreferencesToCloud();
+}
+
+function setViewMode(mode) {
+  state.viewMode = mode === "standard" ? "standard" : "typography";
+  if (viewModeSelect) {
+    viewModeSelect.value = state.viewMode;
+  }
+  if (typographyView && standardView) {
+    const showStandard = state.viewMode === "standard";
+    typographyView.classList.toggle("is-hidden", showStandard);
+    standardView.classList.toggle("is-hidden", !showStandard);
+    standardView.setAttribute("aria-hidden", String(!showStandard));
+  }
+  savePreferencesLocal();
 }
 
 function stanzaId(chapterNumber, stanzaIndex) {
@@ -651,8 +670,12 @@ async function loadPreferencesFromCloud() {
     state.query = prefs.query;
     if (searchInput) searchInput.value = state.query;
   }
+  if (typeof prefs.viewMode === "string") {
+    state.viewMode = prefs.viewMode;
+  }
   savePreferencesLocal();
   applyFilters();
+  setViewMode(state.viewMode);
 }
 
 async function syncPreferencesToCloud() {
@@ -662,6 +685,7 @@ async function syncPreferencesToCloud() {
     tag: state.tag,
     showPages: state.showPages,
     showRefs: state.showRefs,
+    viewMode: state.viewMode,
   };
   const { data, error } = await state.auth.client.auth.updateUser({
     data: { preferences: nextPrefs },
@@ -1011,7 +1035,11 @@ async function init() {
     if (toggleRefs) {
       toggleRefs.checked = state.showRefs;
     }
+    if (viewModeSelect) {
+      viewModeSelect.value = state.viewMode;
+    }
     render();
+    setViewMode(state.viewMode);
 
     if (searchInput) {
       searchInput.value = state.query;
@@ -1047,6 +1075,9 @@ async function init() {
       state.showRefs = event.target.checked;
       render();
       savePreferencesLocal();
+    });
+    viewModeSelect?.addEventListener("change", (event) => {
+      setViewMode(event.target.value);
     });
 
     saveNoteBtn?.addEventListener("click", saveSelectionAsNote);
