@@ -8,7 +8,9 @@
   --accent-dark: #234a70;
   --border: #e2ddd7;
   --shadow: 0 12px 30px rgba(20, 20, 20, 0.08);
-}
+  max-height: 65vh;
+  overflow: auto;
+  padding-right: 6px;
 
 * {
   box-sizing: border-box;
@@ -177,8 +179,11 @@ h1 {
   color: var(--ink);
 }
 
-.notes {
+  display: none;
   position: sticky;
+.notes.is-visible {
+  display: block;
+}
   top: 24px;
   align-self: start;
   background: var(--panel);
