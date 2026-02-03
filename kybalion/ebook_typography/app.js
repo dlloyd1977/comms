@@ -156,6 +156,7 @@ function render() {
     const chapterButton = document.createElement("button");
     chapterButton.type = "button";
     chapterButton.textContent = chapter.title;
+    chapterButton.dataset.chapterId = chapterId;
     chapterButton.addEventListener("click", () => {
       document.getElementById(chapterId)?.scrollIntoView({ behavior: "smooth" });
     });
@@ -756,6 +757,19 @@ function applyFilters() {
     const stanza = findStanzaByRef(ref);
     if (!stanza) return;
     stanzaEl.style.display = stanzaMatchesFilters(stanza) ? "block" : "none";
+  });
+  document.querySelectorAll(".chapter").forEach((chapterEl) => {
+    const hasVisibleStanza = Array.from(
+      chapterEl.querySelectorAll(".stanza")
+    ).some((stanzaEl) => stanzaEl.style.display !== "none");
+    chapterEl.style.display = hasVisibleStanza ? "block" : "none";
+  });
+  document.querySelectorAll("#tocList button").forEach((tocButton) => {
+    const chapterId = tocButton.dataset.chapterId;
+    if (!chapterId) return;
+    const chapterEl = document.getElementById(chapterId);
+    if (!chapterEl) return;
+    tocButton.style.display = chapterEl.style.display === "none" ? "none" : "block";
   });
   applySearchHighlights();
 }
