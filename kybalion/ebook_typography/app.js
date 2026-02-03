@@ -46,6 +46,7 @@ const notesContent = document.getElementById("notesContent");
 const authPanel = document.getElementById("authPanel");
 const notesTitle = document.getElementById("notesTitle");
 const userDisplay = document.getElementById("userDisplay");
+const headerSignOutBtn = document.getElementById("headerSignOutBtn");
 const annotationModal = document.getElementById("annotationModal");
 const annotationInput = document.getElementById("annotationInput");
 const annotationCloseBtn = document.getElementById("annotationCloseBtn");
@@ -543,12 +544,18 @@ function updateUserDisplay(user) {
     userDisplay.classList.remove("is-hidden");
     authOpenBtn.classList.add("is-hidden");
     authOpenBtn.setAttribute("aria-hidden", "true");
+    if (headerSignOutBtn) {
+      headerSignOutBtn.classList.remove("is-hidden");
+    }
     return;
   }
   userDisplay.textContent = "";
   userDisplay.classList.add("is-hidden");
   authOpenBtn.classList.remove("is-hidden");
   authOpenBtn.setAttribute("aria-hidden", "false");
+  if (headerSignOutBtn) {
+    headerSignOutBtn.classList.add("is-hidden");
+  }
 }
 
 function setAuthStatus(message, type = "info") {
@@ -763,6 +770,14 @@ async function handleSignOut() {
   state.auth.mode = "local";
   updateAuthUI();
   setAuthConfirmMessage("Signed out. Notes are local only.");
+}
+
+async function handleHeaderSignOut() {
+  if (!state.auth.client) return;
+  savePreferencesLocal();
+  await syncNotesToCloud();
+  await syncPreferencesToCloud();
+  await handleSignOut();
 }
 
 function handleGuestMode() {
@@ -1061,6 +1076,7 @@ async function init() {
         closeAnnotationModal();
       }
     });
+    headerSignOutBtn?.addEventListener("click", handleHeaderSignOut);
     authOpenBtn?.addEventListener("click", () => {
       setAuthPanelVisible(true);
       setNotesVisibility(false);
