@@ -20,14 +20,26 @@ const closeNotesBtn = document.getElementById("closeNotesBtn");
 const copyNotesBtn = document.getElementById("copyNotesBtn");
 const notesList = document.getElementById("notesList");
 const appVersionEl = document.getElementById("appVersion");
+const authFlow = document.getElementById("authFlow");
+const authChoiceSignInBtn = document.getElementById("authChoiceSignInBtn");
+const authChoiceSignUpBtn = document.getElementById("authChoiceSignUpBtn");
+const authChoiceGuestBtn = document.getElementById("authChoiceGuestBtn");
 const authEmail = document.getElementById("authEmail");
 const authPassword = document.getElementById("authPassword");
+const authSignUpEmail = document.getElementById("authSignUpEmail");
+const authSignUpPassword = document.getElementById("authSignUpPassword");
 const authSignInBtn = document.getElementById("authSignInBtn");
 const authSignUpBtn = document.getElementById("authSignUpBtn");
 const authSignOutBtn = document.getElementById("authSignOutBtn");
 const authGuestBtn = document.getElementById("authGuestBtn");
+const authBackFromSignInBtn = document.getElementById("authBackFromSignInBtn");
+const authBackFromSignUpBtn = document.getElementById("authBackFromSignUpBtn");
+const authBackFromGuestBtn = document.getElementById("authBackFromGuestBtn");
+const authConfirmBtn = document.getElementById("authConfirmBtn");
+const authConfirmMessage = document.getElementById("authConfirmMessage");
 const authStatus = document.getElementById("authStatus");
 const authWarning = document.getElementById("authWarning");
+const notesContent = document.getElementById("notesContent");
 
 const state = {
   data: null,
@@ -342,33 +354,36 @@ function updateAuthUI() {
   const { client, user, ready, mode } = state.auth;
 
   if (!ready || !client) {
-    authStatus.textContent = "Sync not configured.";
-    authWarning.style.display = "block";
+    setAuthConfirmMessage("Sync not configured. Notes are local only.");
+    setAuthStep("confirm");
+    setNotesVisibility(true);
+    authWarning.style.display = "none";
     authSignOutBtn.style.display = "none";
-    authGuestBtn.style.display = "inline-flex";
     return;
   }
 
   if (user) {
-    authStatus.textContent = `Signed in as ${user.email || "user"}. Notes sync is active.`;
+    setAuthConfirmMessage(`Signed in as ${user.email || "user"}. Notes sync is active.`);
+    setAuthStep("confirm");
+    setNotesVisibility(true);
     authWarning.style.display = "none";
     authSignOutBtn.style.display = "inline-flex";
-    authGuestBtn.style.display = "none";
     return;
   }
 
   if (mode === "guest") {
-    authStatus.textContent = "Guest mode enabled. Notes stay on this device only.";
+    setAuthConfirmMessage("Guest mode enabled. Notes stay on this device only.");
+    setAuthStep("confirm");
+    setNotesVisibility(true);
     authWarning.style.display = "block";
     authSignOutBtn.style.display = "none";
-    authGuestBtn.style.display = "inline-flex";
     return;
   }
 
-  authStatus.textContent = "Sign in to sync notes across devices.";
-  authWarning.style.display = "block";
+  setAuthStep("choice");
+  setNotesVisibility(false);
+  authWarning.style.display = "none";
   authSignOutBtn.style.display = "none";
-  authGuestBtn.style.display = "inline-flex";
 }
 
 function setAuthStatus(message, type = "info") {
@@ -376,6 +391,26 @@ function setAuthStatus(message, type = "info") {
   authStatus.textContent = message;
   authStatus.classList.remove("is-info", "is-success", "is-error");
   authStatus.classList.add(`is-${type}`);
+}
+
+function setAuthConfirmMessage(message) {
+  if (authConfirmMessage) {
+    authConfirmMessage.textContent = message;
+  }
+  setAuthStatus(message, "info");
+}
+
+function setNotesVisibility(show) {
+  if (!notesContent) return;
+  notesContent.classList.toggle("is-active", show);
+}
+
+function setAuthStep(step) {
+  if (!authFlow) return;
+  authFlow.querySelectorAll(".auth-step").forEach((node) => {
+    const isMatch = node.dataset.step === step;
+    node.classList.toggle("is-active", isMatch);
+  });
 }
 
 async function initializeSupabase() {
@@ -464,13 +499,15 @@ async function handleSignIn() {
     setAuthStatus(error.message, "error");
     return;
   }
-  setAuthStatus("Signed in. Sync is active.", "success");
+  setAuthConfirmMessage("Signed in. Sync is active.");
+  setAuthStep("confirm");
+  setNotesVisibility(true);
 }
 
 async function handleSignUp() {
   if (!state.auth.client) return;
-  const email = authEmail?.value?.trim();
-  const password = authPassword?.value || "";
+  const email = authSignUpEmail?.value?.trim();
+  const password = authSignUpPassword?.value || "";
   if (!email || !password) {
     setAuthStatus("Enter both email and password.", "error");
     return;
@@ -481,9 +518,13 @@ async function handleSignUp() {
     return;
   }
   if (data.session) {
-    setAuthStatus("Account created and signed in.", "success");
+    setAuthConfirmMessage("Account created and signed in.");
+    setAuthStep("confirm");
+    setNotesVisibility(true);
   } else {
-    setAuthStatus("Account created. Check your email to confirm, then sign in.", "success");
+    setAuthConfirmMessage("Account created. Check your email to confirm, then sign in.");
+    setAuthStep("confirm");
+    setNotesVisibility(false);
   }
 }
 
@@ -493,14 +534,16 @@ async function handleSignOut() {
   state.auth.user = null;
   state.auth.mode = "local";
   updateAuthUI();
-  setAuthStatus("Signed out. Notes are local only.", "info");
+  setAuthConfirmMessage("Signed out. Notes are local only.");
 }
 
 function handleGuestMode() {
   saveGuestMode(true);
   state.auth.mode = "guest";
   updateAuthUI();
-  setAuthStatus("Guest mode enabled. Notes stay on this device only.", "info");
+  setAuthConfirmMessage("Guest mode enabled. Notes stay on this device only.");
+  setAuthStep("confirm");
+  setNotesVisibility(true);
 }
 
 function setNotesModalOpen(open) {
@@ -652,6 +695,13 @@ async function init() {
     authSignUpBtn?.addEventListener("click", handleSignUp);
     authSignOutBtn?.addEventListener("click", handleSignOut);
     authGuestBtn?.addEventListener("click", handleGuestMode);
+    authChoiceSignInBtn?.addEventListener("click", () => setAuthStep("signin"));
+    authChoiceSignUpBtn?.addEventListener("click", () => setAuthStep("signup"));
+    authChoiceGuestBtn?.addEventListener("click", () => setAuthStep("guest"));
+    authBackFromSignInBtn?.addEventListener("click", () => setAuthStep("choice"));
+    authBackFromSignUpBtn?.addEventListener("click", () => setAuthStep("choice"));
+    authBackFromGuestBtn?.addEventListener("click", () => setAuthStep("choice"));
+    authConfirmBtn?.addEventListener("click", () => setNotesVisibility(true));
 
     await initializeSupabase();
 
