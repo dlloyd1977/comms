@@ -24,7 +24,7 @@
       content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
     />
     <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
-    <link rel="stylesheet" href="styles.css?v=1.7.1" />
+    <link rel="stylesheet" href="styles.css?v=1.8.7" />
   </head>
   <body
     data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
@@ -98,6 +98,15 @@
           <button class="secondary" type="button" id="saveNoteBtn">Save highlight as Note</button>
           <button class="secondary" type="button" id="toggleNotesBtn">View Notes</button>
         </div>
+        <div class="standard-tools header-reader-tools" id="standardTools">
+          <span class="standard-tools-label">Reader tools</span>
+          <button class="secondary" type="button" id="standardSaveHighlightBtn">
+            Save highlight as Note
+          </button>
+          <button class="secondary" type="button" id="standardAddTagBtn">Add Tag</button>
+          <button class="secondary" type="button" id="standardAnnotateBtn">Annotate</button>
+          <button class="secondary" type="button" id="standardViewNotesBtn">View Notes</button>
+        </div>
       </div>
     </header>
 
@@ -107,7 +116,7 @@
           <h2>Table of Contents</h2>
           <p>Tap a chapter to jump to stanza references.</p>
         </div>
-        <nav id="tocList" aria-label="Table of Contents"></nav>
+        <nav id="tocList" class="toc-list" aria-label="Table of Contents"></nav>
       </aside>
 
       <section class="content" id="content">
@@ -116,15 +125,16 @@
     </main>
 
     <section class="standard-view is-hidden" id="standardView" aria-hidden="true">
-      <div class="standard-tools" id="standardTools">
-        <span class="standard-tools-label">Reader tools</span>
-        <button class="secondary" type="button" id="standardSaveHighlightBtn">
-          Save highlight as Note
-        </button>
-        <button class="secondary" type="button" id="standardAddTagBtn">Add Tag</button>
-        <button class="secondary" type="button" id="standardAnnotateBtn">Annotate</button>
+      <div class="standard-layout">
+        <aside class="toc standard-toc" id="standardToc">
+          <div class="toc-header">
+            <h2>Table of Contents</h2>
+            <p>Tap a chapter to jump to the text.</p>
+          </div>
+          <nav id="standardTocList" class="toc-list" aria-label="Standard Table of Contents"></nav>
+        </aside>
+        <div class="standard-content" id="standardContent"></div>
       </div>
-      <div class="standard-content" id="standardContent"></div>
     </section>
 
     <div class="notes-modal" id="notesModal" aria-hidden="true" role="dialog" aria-modal="true">
@@ -164,7 +174,36 @@
               </div>
               <div class="auth-actions">
                 <button class="secondary" type="button" id="authSignInBtn">Sign in</button>
+                <button class="secondary" type="button" id="authResetPasswordBtn">Reset Password</button>
                 <button class="secondary" type="button" id="authBackFromSignInBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="reset">
+              <p class="auth-step-title">Reset Password</p>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>Email</span>
+                  <input type="email" id="authResetEmail" placeholder="you@example.com" />
+                </label>
+              </div>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authSendResetBtn">Send Reset Link</button>
+                <button class="secondary" type="button" id="authBackFromResetBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="reset-password">
+              <p class="auth-step-title">Set New Password</p>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>New password</span>
+                  <input type="password" id="authNewPassword" placeholder="New password" />
+                </label>
+              </div>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authSetNewPasswordBtn">Update Password</button>
+                <button class="secondary" type="button" id="authBackFromNewPasswordBtn">Back</button>
               </div>
             </div>
 
@@ -246,6 +285,6 @@
       <p class="version">Version <span id="appVersion"></span></p>
     </footer>
 
-    <script src="app.js?v=1.7.1" type="module"></script>
+    <script src="app.js?v=1.8.7" type="module"></script>
   </body>
 </html>

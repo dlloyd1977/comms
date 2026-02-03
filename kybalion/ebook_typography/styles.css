@@ -25,6 +25,18 @@ body {
   color: var(--ink);
 }
 
+html {
+  scroll-padding-top: 200px;
+}
+
+body[data-view-mode="standard"] #typographyView {
+  display: none;
+}
+
+body[data-view-mode="standard"] #standardView {
+  display: block;
+}
+
 h1,
 h2,
 h3,
@@ -139,17 +151,36 @@ h1 {
 .controls {
   margin-top: 24px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px 24px;
+  align-items: end;
   color: var(--ink);
+}
+
+body[data-view-mode="typography"] .header-reader-tools {
+  display: none;
+}
+
+body[data-view-mode="standard"] .controls .control:not(.view-toggle),
+body[data-view-mode="standard"] .controls .toggle,
+body[data-view-mode="standard"] .controls .notes-actions,
+body[data-view-mode="standard"] #tocJump {
+  display: none;
+}
+
+body[data-view-mode="standard"] .controls {
+  grid-template-columns: auto 1fr;
+  justify-items: start;
 }
 
 .notes-actions {
   display: flex;
   gap: 10px;
-  align-items: flex-end;
+  align-items: center;
   flex-wrap: wrap;
   color: var(--ink);
+  grid-column: span 2;
+  justify-self: end;
 }
 
 .control {
@@ -254,6 +285,18 @@ h1 {
   background: #fdfbf7;
 }
 
+.standard-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 24px;
+  align-items: start;
+  padding-top: 20px;
+}
+
+.standard-toc {
+  max-height: calc(100vh - 140px);
+}
+
 .standard-tools {
   display: flex;
   flex-wrap: wrap;
@@ -264,8 +307,14 @@ h1 {
   border: 1px solid var(--border);
   border-radius: 16px;
   margin: 0 auto 20px;
-  max-width: 720px;
+  max-width: 960px;
   color: var(--ink);
+}
+
+.header-reader-tools {
+  margin: 0;
+  max-width: none;
+  justify-content: center;
 }
 
 .standard-tools-label {
@@ -275,15 +324,36 @@ h1 {
 }
 
 .standard-content {
-  display: grid;
-  gap: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
   color: var(--ink);
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
+}
+
+.standard-chapter {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--ink);
+}
+
+.standard-chapter-title {
+  font-size: 1.7rem;
+  margin: 28px 0 6px;
+  color: var(--ink);
+  letter-spacing: 0.01em;
 }
 
 .standard-stanza {
   margin-bottom: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
 }
 
 .standard-stanza:last-child {
@@ -296,6 +366,7 @@ h1 {
   letter-spacing: 0.01em;
   text-align: justify;
   color: var(--ink);
+  margin: 0;
 }
 
 .toc {
@@ -310,6 +381,17 @@ h1 {
   color: var(--ink);
   max-height: calc(100vh - 48px);
   overflow-y: auto;
+}
+
+body[data-view-mode="standard"] .toc {
+  max-height: calc(100vh - 280px);
+}
+
+#toc,
+#standardToc,
+.chapter,
+.standard-chapter {
+  scroll-margin-top: 200px;
 }
 
 .toc-header h2 {

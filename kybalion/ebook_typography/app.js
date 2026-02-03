@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.7.1";
+const APP_VERSION = "1.8.7";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -9,6 +9,7 @@ const PREFS_KEY = "kybalion.preferences";
 
 const contentEl = document.getElementById("content");
 const tocListEl = document.getElementById("tocList");
+const standardTocListEl = document.getElementById("standardTocList");
 const searchInput = document.getElementById("searchInput");
 const tagFilter = document.getElementById("tagFilter");
 const togglePages = document.getElementById("togglePages");
@@ -40,6 +41,13 @@ const authGuestBtn = document.getElementById("authGuestBtn");
 const authBackFromSignInBtn = document.getElementById("authBackFromSignInBtn");
 const authBackFromSignUpBtn = document.getElementById("authBackFromSignUpBtn");
 const authBackFromGuestBtn = document.getElementById("authBackFromGuestBtn");
+const authResetPasswordBtn = document.getElementById("authResetPasswordBtn");
+const authResetEmail = document.getElementById("authResetEmail");
+const authSendResetBtn = document.getElementById("authSendResetBtn");
+const authBackFromResetBtn = document.getElementById("authBackFromResetBtn");
+const authNewPassword = document.getElementById("authNewPassword");
+const authSetNewPasswordBtn = document.getElementById("authSetNewPasswordBtn");
+const authBackFromNewPasswordBtn = document.getElementById("authBackFromNewPasswordBtn");
 const authConfirmBtn = document.getElementById("authConfirmBtn");
 const authConfirmMessage = document.getElementById("authConfirmMessage");
 const authStatus = document.getElementById("authStatus");
@@ -61,6 +69,7 @@ const standardContent = document.getElementById("standardContent");
 const standardSaveHighlightBtn = document.getElementById("standardSaveHighlightBtn");
 const standardAddTagBtn = document.getElementById("standardAddTagBtn");
 const standardAnnotateBtn = document.getElementById("standardAnnotateBtn");
+const standardViewNotesBtn = document.getElementById("standardViewNotesBtn");
 
 const preferences = loadPreferences();
 
@@ -78,6 +87,8 @@ const state = {
     user: null,
     ready: false,
     mode: "local",
+    url: "",
+    broadcastChannel: null,
   },
   annotation: {
     ref: "",
@@ -145,6 +156,9 @@ function savePreferencesLocal() {
 function setViewMode(mode) {
   state.viewMode = mode === "standard" ? "standard" : "typography";
   const isStandard = state.viewMode === "standard";
+  if (document.body) {
+    document.body.dataset.viewMode = state.viewMode;
+  }
   if (viewModeStandardBtn) {
     viewModeStandardBtn.classList.toggle("is-active", isStandard);
     viewModeStandardBtn.setAttribute("aria-selected", String(isStandard));
@@ -156,6 +170,7 @@ function setViewMode(mode) {
   if (typographyView && standardView) {
     const showStandard = state.viewMode === "standard";
     typographyView.classList.toggle("is-hidden", showStandard);
+    typographyView.setAttribute("aria-hidden", String(showStandard));
     standardView.classList.toggle("is-hidden", !showStandard);
     standardView.setAttribute("aria-hidden", String(!showStandard));
   }
@@ -214,9 +229,14 @@ function render() {
   if (!state.data) return;
   contentEl.innerHTML = "";
   tocListEl.innerHTML = "";
+  if (standardTocListEl) {
+    standardTocListEl.innerHTML = "";
+  }
 
   state.data.chapters.forEach((chapter) => {
     const chapterId = `chapter-${chapter.number}`;
+    const standardChapterId = `standard-chapter-${chapter.number}`;
+
     const chapterButton = document.createElement("button");
     chapterButton.type = "button";
     chapterButton.textContent = chapter.title;
@@ -225,6 +245,17 @@ function render() {
       document.getElementById(chapterId)?.scrollIntoView({ behavior: "smooth" });
     });
     tocListEl.appendChild(chapterButton);
+
+    if (standardTocListEl) {
+      const standardButton = document.createElement("button");
+      standardButton.type = "button";
+      standardButton.textContent = chapter.title;
+      standardButton.dataset.chapterId = standardChapterId;
+      standardButton.addEventListener("click", () => {
+        document.getElementById(standardChapterId)?.scrollIntoView({ behavior: "smooth" });
+      });
+      standardTocListEl.appendChild(standardButton);
+    }
 
     const chapterEl = document.createElement("article");
     chapterEl.className = "chapter";
@@ -364,6 +395,15 @@ function renderStandardView() {
   standardContent.innerHTML = "";
 
   state.data.chapters.forEach((chapter) => {
+    const chapterEl = document.createElement("article");
+    chapterEl.className = "standard-chapter";
+    chapterEl.id = `standard-chapter-${chapter.number}`;
+
+    const title = document.createElement("h2");
+    title.className = "standard-chapter-title";
+    title.textContent = chapter.title;
+    chapterEl.appendChild(title);
+
     chapter.stanzas.forEach((stanza, index) => {
       const stanzaIndex = index + 1;
       const stanzaEl = document.createElement("section");
@@ -383,8 +423,10 @@ function renderStandardView() {
       text.textContent = stanza.text;
 
       stanzaEl.append(text);
-      standardContent.appendChild(stanzaEl);
+      chapterEl.appendChild(stanzaEl);
     });
+
+    standardContent.appendChild(chapterEl);
   });
 }
 
@@ -582,6 +624,137 @@ function getSupabaseConfig() {
   return { url, anonKey };
 }
 
+function clearAuthStorage(url) {
+  if (!url) return;
+  let ref = "";
+  try {
+    const host = new URL(url).host;
+    ref = host.split(".")[0];
+  } catch {
+    ref = "";
+  }
+
+  const prefixes = ref ? [`sb-${ref}-`] : ["sb-"];
+  const removeFrom = (store) => {
+    if (!store) return;
+    const keys = [];
+    for (let i = 0; i < store.length; i += 1) {
+      const key = store.key(i);
+      if (!key) continue;
+      if (prefixes.some((prefix) => key.startsWith(prefix))) {
+        keys.push(key);
+      }
+    }
+    keys.forEach((key) => store.removeItem(key));
+  };
+
+  removeFrom(window.localStorage);
+  removeFrom(window.sessionStorage);
+}
+
+/**
+ * Initialize BroadcastChannel for cross-tab session sync.
+ * Falls back to storage events for older browsers.
+ */
+function initAuthBroadcast() {
+  // BroadcastChannel for same-origin cross-tab communication
+  if (typeof BroadcastChannel !== "undefined") {
+    state.auth.broadcastChannel = new BroadcastChannel("kybalion_auth");
+    state.auth.broadcastChannel.onmessage = (event) => {
+      if (event.data?.type === "LOGOUT") {
+        handleRemoteLogout();
+      }
+      if (event.data?.type === "LOGIN") {
+        handleRemoteLogin();
+      }
+    };
+  }
+
+  // Fallback: listen for localStorage changes (cross-tab)
+  window.addEventListener("storage", (event) => {
+    if (event.key === "kybalion.logout_at" && event.newValue) {
+      handleRemoteLogout();
+    }
+    if (event.key === "kybalion.login_at" && event.newValue) {
+      handleRemoteLogin();
+    }
+  });
+
+  // Re-check auth state when user returns to this tab
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "visible" && state.auth.client && state.auth.ready) {
+      const { data } = await state.auth.client.auth.getSession();
+      const newUser = data.session?.user || null;
+      const wasLoggedIn = !!state.auth.user;
+      const nowLoggedIn = !!newUser;
+
+      // Session changed while tab was hidden
+      if (wasLoggedIn !== nowLoggedIn || state.auth.user?.id !== newUser?.id) {
+        state.auth.user = newUser;
+        if (!newUser) {
+          state.auth.mode = loadGuestMode() ? "guest" : "local";
+        } else {
+          state.auth.mode = "authenticated";
+        }
+        updateAuthUI();
+      }
+    }
+  });
+}
+
+/**
+ * Broadcast logout event to other tabs.
+ */
+function broadcastLogout() {
+  // BroadcastChannel (preferred)
+  if (state.auth.broadcastChannel) {
+    state.auth.broadcastChannel.postMessage({ type: "LOGOUT" });
+  }
+  // Storage event fallback
+  localStorage.setItem("kybalion.logout_at", Date.now().toString());
+}
+
+/**
+ * Broadcast login event to other tabs.
+ */
+function broadcastLogin() {
+  if (state.auth.broadcastChannel) {
+    state.auth.broadcastChannel.postMessage({ type: "LOGIN" });
+  }
+  localStorage.setItem("kybalion.login_at", Date.now().toString());
+}
+
+/**
+ * Handle logout triggered from another tab.
+ */
+function handleRemoteLogout() {
+  state.auth.user = null;
+  state.auth.mode = loadGuestMode() ? "guest" : "local";
+  clearAuthStorage(state.auth.url);
+  updateAuthUI();
+}
+
+/**
+ * Handle login triggered from another tab - re-check session.
+ */
+async function handleRemoteLogin() {
+  if (!state.auth.client || !state.auth.ready) return;
+  const { data } = await state.auth.client.auth.getSession();
+  const newUser = data.session?.user || null;
+  if (newUser && newUser.id !== state.auth.user?.id) {
+    state.auth.user = newUser;
+    state.auth.mode = "authenticated";
+    await loadNotesFromCloud();
+    await loadPreferencesFromCloud();
+    updateAuthUI();
+  }
+}
+
+function isPasswordRecoveryLink() {
+  const hash = window.location.hash || "";
+  return hash.includes("type=recovery");
+}
+
 function updateAuthUI() {
   if (!authStatus || !authWarning || !authSignOutBtn || !authGuestBtn) return;
   const { client, user, ready, mode } = state.auth;
@@ -689,21 +862,35 @@ async function initializeSupabase() {
     return;
   }
 
+  state.auth.url = url;
+  if (isPasswordRecoveryLink()) {
+    clearAuthStorage(url);
+  }
+
   state.auth.client = createClient(url, anonKey);
   state.auth.ready = true;
+  initAuthBroadcast();
 
   const { data } = await state.auth.client.auth.getSession();
   state.auth.user = data.session?.user || null;
   state.auth.mode = loadGuestMode() ? "guest" : "local";
   updateAuthUI();
 
-  state.auth.client.auth.onAuthStateChange((_event, session) => {
+  state.auth.client.auth.onAuthStateChange((event, session) => {
     state.auth.user = session?.user || null;
     if (state.auth.user) {
       saveGuestMode(false);
       state.auth.mode = "authenticated";
       void loadNotesFromCloud();
       void loadPreferencesFromCloud();
+    }
+    if (event === "PASSWORD_RECOVERY") {
+      setAuthPanelVisible(true);
+      setNotesVisibility(false);
+      setAuthStep("reset-password");
+    }
+    if (event === "SIGNED_OUT") {
+      clearAuthStorage(state.auth.url);
     }
     updateAuthUI();
   });
@@ -814,13 +1001,61 @@ async function handleSignIn() {
     setAuthStatus("Enter both email and password.", "error");
     return;
   }
+  setAuthStatus("Signing in...", "info");
   const { error } = await state.auth.client.auth.signInWithPassword({ email, password });
+  if (error) {
+    let message = error.message;
+    if (message.toLowerCase().includes("invalid login credentials")) {
+      message = "Invalid credentials. Confirm your email first or reset your password.";
+    } else if (message.toLowerCase().includes("email not confirmed")) {
+      message = "Email not confirmed. Check your inbox for the confirmation link.";
+    }
+    setAuthStatus(message, "error");
+    return;
+  }
+  broadcastLogin();
+  setNotesModalOpen(false);
+  setAuthPanelVisible(false);
+}
+
+async function handleSetNewPassword() {
+  if (!state.auth.client) return;
+  const nextPassword = authNewPassword?.value || "";
+  if (!nextPassword) {
+    setAuthStatus("Enter a new password.", "error");
+    return;
+  }
+  setAuthStatus("Updating password...", "info");
+  const { error } = await state.auth.client.auth.updateUser({ password: nextPassword });
   if (error) {
     setAuthStatus(error.message, "error");
     return;
   }
-  setNotesModalOpen(false);
-  setAuthPanelVisible(false);
+  clearAuthStorage(state.auth.url);
+  await state.auth.client.auth.signOut({ scope: "global" });
+  window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+  setAuthConfirmMessage("Password updated. Please sign in again.");
+  setAuthStep("signin");
+}
+
+async function handleResetPassword() {
+  if (!state.auth.client) return;
+  const email = authResetEmail?.value?.trim();
+  if (!email) {
+    setAuthStatus("Enter your email address.", "error");
+    return;
+  }
+  setAuthStatus("Sending reset link...", "info");
+  const { error } = await state.auth.client.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname,
+  });
+  if (error) {
+    setAuthStatus(error.message, "error");
+    return;
+  }
+  setAuthConfirmMessage("Password reset link sent. Check your email.");
+  setAuthStep("confirm");
+  setNotesVisibility(false);
 }
 
 async function handleSignUp() {
@@ -848,9 +1083,11 @@ async function handleSignUp() {
 
 async function handleSignOut() {
   if (!state.auth.client) return;
-  await state.auth.client.auth.signOut();
+  await state.auth.client.auth.signOut({ scope: "global" });
   state.auth.user = null;
   state.auth.mode = "local";
+  clearAuthStorage(state.auth.url);
+  broadcastLogout();
   updateAuthUI();
   setAuthConfirmMessage("Signed out. Notes are local only.");
 }
@@ -1058,7 +1295,7 @@ function applyFilters() {
     ).some((stanzaEl) => stanzaEl.style.display !== "none");
     chapterEl.style.display = hasVisibleStanza ? "block" : "none";
   });
-  document.querySelectorAll("#tocList button").forEach((tocButton) => {
+  document.querySelectorAll(".toc-list button").forEach((tocButton) => {
     const chapterId = tocButton.dataset.chapterId;
     if (!chapterId) return;
     const chapterEl = document.getElementById(chapterId);
@@ -1169,6 +1406,7 @@ async function init() {
       }
       openAnnotationModal(ref);
     });
+    standardViewNotesBtn?.addEventListener("click", toggleNotesPanel);
     viewModeStandardBtn?.addEventListener("click", () => setViewMode("standard"));
     viewModeStanzaBtn?.addEventListener("click", () => setViewMode("typography"));
 
@@ -1219,9 +1457,20 @@ async function init() {
     authChoiceSignInBtn?.addEventListener("click", () => setAuthStep("signin"));
     authChoiceSignUpBtn?.addEventListener("click", () => setAuthStep("signup"));
     authChoiceGuestBtn?.addEventListener("click", () => setAuthStep("guest"));
+    authResetPasswordBtn?.addEventListener("click", () => {
+      // Pre-populate reset email from sign-in form if available
+      if (authEmail?.value?.trim() && authResetEmail) {
+        authResetEmail.value = authEmail.value.trim();
+      }
+      setAuthStep("reset");
+    });
+    authSendResetBtn?.addEventListener("click", handleResetPassword);
+    authSetNewPasswordBtn?.addEventListener("click", handleSetNewPassword);
     authBackFromSignInBtn?.addEventListener("click", () => setAuthStep("choice"));
     authBackFromSignUpBtn?.addEventListener("click", () => setAuthStep("choice"));
     authBackFromGuestBtn?.addEventListener("click", () => setAuthStep("choice"));
+    authBackFromResetBtn?.addEventListener("click", () => setAuthStep("signin"));
+    authBackFromNewPasswordBtn?.addEventListener("click", () => setAuthStep("signin"));
     authConfirmBtn?.addEventListener("click", () => {
       setNotesVisibility(true);
       setAuthPanelVisible(false);
