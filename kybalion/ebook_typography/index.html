@@ -81,13 +81,21 @@
       </section>
     </main>
 
-    <section class="notes-panel" id="notesPanel" aria-live="polite">
-      <div class="notes-header">
-        <h2>Notes</h2>
-        <p>Highlights saved from the text appear here.</p>
+    <div class="notes-modal" id="notesModal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="notes-modal-card" role="document">
+        <div class="notes-header">
+          <div>
+            <h2>Notes</h2>
+            <p>Highlights saved from the text appear here.</p>
+          </div>
+          <div class="notes-modal-actions">
+            <button class="secondary" type="button" id="copyNotesBtn">Copy Notes</button>
+            <button class="secondary" type="button" id="closeNotesBtn">Close</button>
+          </div>
+        </div>
+        <div id="notesList" class="notes-list"></div>
       </div>
-      <div id="notesList" class="notes-list"></div>
-    </section>
+    </div>
 
     <footer class="page-footer">
       <p>
