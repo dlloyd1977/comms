@@ -12,7 +12,9 @@ const toggleRefs = document.getElementById("toggleRefs");
 const printBtn = document.getElementById("printBtn");
 const saveNoteBtn = document.getElementById("saveNoteBtn");
 const toggleNotesBtn = document.getElementById("toggleNotesBtn");
-const notesPanel = document.getElementById("notesPanel");
+const notesModal = document.getElementById("notesModal");
+const closeNotesBtn = document.getElementById("closeNotesBtn");
+const copyNotesBtn = document.getElementById("copyNotesBtn");
 const notesList = document.getElementById("notesList");
 const appVersionEl = document.getElementById("appVersion");
 
@@ -275,14 +277,38 @@ function renderNotes() {
   });
 }
 
+function setNotesModalOpen(open) {
+  if (!notesModal || !toggleNotesBtn) return;
+  notesModal.classList.toggle("active", open);
+  notesModal.setAttribute("aria-hidden", String(!open));
+  toggleNotesBtn.textContent = open ? "Hide Notes" : "View Notes";
+  toggleNotesBtn.setAttribute("aria-expanded", String(open));
+  toggleNotesBtn.setAttribute("aria-controls", "notesModal");
+}
+
 function toggleNotesPanel() {
-  if (!notesPanel || !toggleNotesBtn) return;
-  const isActive = notesPanel.classList.toggle("active");
-  toggleNotesBtn.textContent = isActive ? "Hide Notes" : "View Notes";
-  toggleNotesBtn.setAttribute("aria-expanded", String(isActive));
-  toggleNotesBtn.setAttribute("aria-controls", "notesPanel");
-  if (isActive) {
-    notesPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (!notesModal) return;
+  const isOpen = notesModal.classList.contains("active");
+  setNotesModalOpen(!isOpen);
+}
+
+async function copyNotesToClipboard() {
+  if (!copyNotesBtn) return;
+  if (!state.notes.length) {
+    window.alert("No notes to copy yet.");
+    return;
+  }
+  const text = state.notes
+    .map((note) => `Notes · ${note.ref}\n${note.text}`)
+    .join("\n\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    copyNotesBtn.textContent = "Copied!";
+    setTimeout(() => {
+      copyNotesBtn.textContent = "Copy Notes";
+    }, 1500);
+  } catch {
+    window.alert("Unable to copy notes. Please try again.");
   }
 }
 
@@ -380,9 +406,22 @@ async function init() {
     saveNoteBtn?.addEventListener("click", saveSelectionAsNote);
     if (toggleNotesBtn) {
       toggleNotesBtn.setAttribute("aria-expanded", "false");
-      toggleNotesBtn.setAttribute("aria-controls", "notesPanel");
+      toggleNotesBtn.setAttribute("aria-controls", "notesModal");
       toggleNotesBtn.addEventListener("click", toggleNotesPanel);
     }
+
+    closeNotesBtn?.addEventListener("click", () => setNotesModalOpen(false));
+    notesModal?.addEventListener("click", (event) => {
+      if (event.target === notesModal) {
+        setNotesModalOpen(false);
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        setNotesModalOpen(false);
+      }
+    });
+    copyNotesBtn?.addEventListener("click", copyNotesToClipboard);
 
     printBtn?.addEventListener("click", () => window.print());
   } catch (error) {
