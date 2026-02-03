@@ -25,6 +25,16 @@ const state = {
   showNotes: false,
 };
 
+function showError(message) {
+  const target = contentEl || document.body;
+  if (!target) return;
+  target.innerHTML = "";
+  const box = document.createElement("div");
+  box.className = "loading";
+  box.textContent = `Error loading page: ${message}`;
+  target.appendChild(box);
+}
+
 function loadTags() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
@@ -302,11 +312,24 @@ function findStanzaByRef(ref) {
 }
 
 async function init() {
-  const response = await fetch(DATA_URL, { cache: "no-store" });
-  state.data = await response.json();
+  try {
+    if (!contentEl || !tocListEl) {
+      showError("Missing page elements. Please hard refresh.");
+      return;
+    }
 
-  rebuildTagFilter();
-  render();
+    const response = await fetch(DATA_URL, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Data load failed (${response.status})`);
+    }
+    state.data = await response.json();
+
+    rebuildTagFilter();
+    render();
+  } catch (error) {
+    showError(error instanceof Error ? error.message : "Unknown error");
+    return;
+  }
 
   if (searchInput) {
     searchInput.addEventListener("input", (event) => {
