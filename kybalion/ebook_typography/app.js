@@ -286,6 +286,14 @@ function applyHighlights() {
   });
 }
 
+function removeHighlight(noteId) {
+  if (!noteId) return;
+  document.querySelectorAll(`[data-note-id="${noteId}"]`).forEach((mark) => {
+    const text = document.createTextNode(mark.textContent || "");
+    mark.replaceWith(text);
+  });
+}
+
 function renderNotes() {
   notesList.innerHTML = "";
   if (!state.notes.length) {
@@ -317,6 +325,7 @@ function renderNotes() {
     deleteBtn.className = "note-delete";
     deleteBtn.textContent = "Delete";
     deleteBtn.addEventListener("click", () => {
+      removeHighlight(note.id);
       const nextNotes = state.notes.filter((entry) => entry.id !== note.id);
       setNotes(nextNotes);
       syncNotesToCloud();
