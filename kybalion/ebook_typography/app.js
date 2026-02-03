@@ -98,7 +98,7 @@ function rebuildTagFilter() {
 }
 
 function render() {
-  if (!state.data) return;
+  if (!state.data || !contentEl || !tocListEl) return;
   contentEl.innerHTML = "";
   tocListEl.innerHTML = "";
   renderNotes();
@@ -308,40 +308,57 @@ async function init() {
   rebuildTagFilter();
   render();
 
-  searchInput.addEventListener("input", (event) => {
-    state.query = normalize(event.target.value || "");
-    applyFilters();
-  });
+  if (searchInput) {
+    searchInput.addEventListener("input", (event) => {
+      state.query = normalize(event.target.value || "");
+      applyFilters();
+    });
+  }
 
-  tagFilter.addEventListener("change", (event) => {
-    state.tag = event.target.value;
-    applyFilters();
-  });
+  if (tagFilter) {
+    tagFilter.addEventListener("change", (event) => {
+      state.tag = event.target.value;
+      applyFilters();
+    });
+  }
 
-  togglePages.addEventListener("change", (event) => {
-    state.showPages = event.target.checked;
-    render();
-  });
+  if (togglePages) {
+    togglePages.addEventListener("change", (event) => {
+      state.showPages = event.target.checked;
+      render();
+    });
+  }
 
-  toggleRefs.addEventListener("change", (event) => {
-    state.showRefs = event.target.checked;
-    render();
-  });
+  if (toggleRefs) {
+    toggleRefs.addEventListener("change", (event) => {
+      state.showRefs = event.target.checked;
+      render();
+    });
+  }
 
-  printBtn.addEventListener("click", () => window.print());
-  contentEl.addEventListener("mouseup", captureHighlight);
-  contentEl.addEventListener("touchend", captureHighlight);
+  if (printBtn) {
+    printBtn.addEventListener("click", () => window.print());
+  }
 
-  clearNotesBtn.addEventListener("click", () => {
-    state.notes = [];
-    saveNotes(state.notes);
-    renderNotes();
-  });
+  if (contentEl) {
+    contentEl.addEventListener("mouseup", captureHighlight);
+    contentEl.addEventListener("touchend", captureHighlight);
+  }
 
-  toggleNotesBtn.addEventListener("click", () => {
-    state.showNotes = !state.showNotes;
-    updateNotesVisibility();
-  });
+  if (clearNotesBtn) {
+    clearNotesBtn.addEventListener("click", () => {
+      state.notes = [];
+      saveNotes(state.notes);
+      renderNotes();
+    });
+  }
+
+  if (toggleNotesBtn) {
+    toggleNotesBtn.addEventListener("click", () => {
+      state.showNotes = !state.showNotes;
+      updateNotesVisibility();
+    });
+  }
 
   updateNotesVisibility();
 }
