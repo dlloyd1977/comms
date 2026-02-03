@@ -429,6 +429,33 @@ h1 {
   margin-bottom: 12px;
 }
 
+.auth-flow {
+  display: grid;
+  gap: 12px;
+  color: var(--ink);
+}
+
+.auth-step {
+  display: none;
+  gap: 12px;
+  color: var(--ink);
+}
+
+.auth-step.is-active {
+  display: grid;
+}
+
+.auth-step-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.auth-confirm {
+  margin: 0;
+  color: var(--ink);
+}
+
 .auth-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -482,6 +509,14 @@ h1 {
   margin: 0;
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+.notes-content {
+  display: none;
+}
+
+.notes-content.is-active {
+  display: block;
 }
 
 .note-card {

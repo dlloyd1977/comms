@@ -97,28 +97,81 @@
           </div>
         </div>
         <div class="auth-panel" id="authPanel">
-          <div class="auth-row">
-            <label class="control auth-control">
-              <span>Email</span>
-              <input type="email" id="authEmail" placeholder="you@example.com" />
-            </label>
-            <label class="control auth-control">
-              <span>Password</span>
-              <input type="password" id="authPassword" placeholder="Password" />
-            </label>
+          <div class="auth-flow" id="authFlow">
+            <div class="auth-step is-active" data-step="choice">
+              <p class="auth-step-title">Choose how you want to continue</p>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authChoiceSignInBtn">Sign in</button>
+                <button class="secondary" type="button" id="authChoiceSignUpBtn">Create account</button>
+                <button class="secondary" type="button" id="authChoiceGuestBtn">Continue as Guest</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="signin">
+              <p class="auth-step-title">Sign in</p>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>Email</span>
+                  <input type="email" id="authEmail" placeholder="you@example.com" />
+                </label>
+                <label class="control auth-control">
+                  <span>Password</span>
+                  <input type="password" id="authPassword" placeholder="Password" />
+                </label>
+              </div>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authSignInBtn">Sign in</button>
+                <button class="secondary" type="button" id="authBackFromSignInBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="signup">
+              <p class="auth-step-title">Create account</p>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>Email</span>
+                  <input type="email" id="authSignUpEmail" placeholder="you@example.com" />
+                </label>
+                <label class="control auth-control">
+                  <span>Password</span>
+                  <input type="password" id="authSignUpPassword" placeholder="Password" />
+                </label>
+              </div>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authSignUpBtn">Create account</button>
+                <button class="secondary" type="button" id="authBackFromSignUpBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="guest">
+              <p class="auth-step-title">Continue as Guest</p>
+              <p class="auth-warning">
+                Guest mode keeps notes only on this device and may be cleared by the browser.
+              </p>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authGuestBtn">Continue as Guest</button>
+                <button class="secondary" type="button" id="authBackFromGuestBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="confirm">
+              <p class="auth-step-title">All set</p>
+              <p class="auth-confirm" id="authConfirmMessage"></p>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authConfirmBtn">Continue to Notes</button>
+                <button class="secondary" type="button" id="authSignOutBtn">Sign out</button>
+              </div>
+            </div>
           </div>
-          <div class="auth-actions">
-            <button class="secondary" type="button" id="authSignInBtn">Sign in</button>
-            <button class="secondary" type="button" id="authSignUpBtn">Create account</button>
-            <button class="secondary" type="button" id="authSignOutBtn">Sign out</button>
-            <button class="secondary" type="button" id="authGuestBtn">Continue as Guest</button>
-          </div>
-          <p class="auth-status" id="authStatus">Sync not configured.</p>
+
+          <p class="auth-status is-info" id="authStatus">Sync not configured.</p>
           <p class="auth-warning" id="authWarning">
             Guest mode keeps notes only on this device and may be cleared by the browser.
           </p>
         </div>
-        <div id="notesList" class="notes-list"></div>
+        <div class="notes-content" id="notesContent">
+          <div id="notesList" class="notes-list"></div>
+        </div>
       </div>
     </div>
 
