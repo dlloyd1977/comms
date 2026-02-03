@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.6.1";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -338,13 +338,6 @@ function renderStandardView() {
   standardContent.innerHTML = "";
 
   state.data.chapters.forEach((chapter) => {
-    const chapterEl = document.createElement("article");
-    chapterEl.className = "standard-chapter";
-
-    const heading = document.createElement("h2");
-    heading.textContent = chapter.title;
-    chapterEl.appendChild(heading);
-
     chapter.stanzas.forEach((stanza, index) => {
       const stanzaIndex = index + 1;
       const stanzaEl = document.createElement("section");
@@ -365,12 +358,11 @@ function renderStandardView() {
 
       const id = stanzaId(chapter.number, stanzaIndex);
       const tagsWrap = createTagsWrap(id, stanza.ref);
+      tagsWrap.classList.add("standard-actions");
 
       stanzaEl.append(text, tagsWrap);
-      chapterEl.appendChild(stanzaEl);
+      standardContent.appendChild(stanzaEl);
     });
-
-    standardContent.appendChild(chapterEl);
   });
 }
 
