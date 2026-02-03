@@ -26,7 +26,7 @@
     <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
     <link rel="stylesheet" href="styles.css?v=1.1.0" />
   </head>
-  <body>
+  <body data-supabase-url="" data-supabase-anon-key="">
     <header class="page-header">
       <div class="header-content">
         <div>
@@ -92,6 +92,28 @@
             <button class="secondary" type="button" id="copyNotesBtn">Copy Notes</button>
             <button class="secondary" type="button" id="closeNotesBtn">Close</button>
           </div>
+        </div>
+        <div class="auth-panel" id="authPanel">
+          <div class="auth-row">
+            <label class="control auth-control">
+              <span>Email</span>
+              <input type="email" id="authEmail" placeholder="you@example.com" />
+            </label>
+            <label class="control auth-control">
+              <span>Password</span>
+              <input type="password" id="authPassword" placeholder="Password" />
+            </label>
+          </div>
+          <div class="auth-actions">
+            <button class="secondary" type="button" id="authSignInBtn">Sign in</button>
+            <button class="secondary" type="button" id="authSignUpBtn">Create account</button>
+            <button class="secondary" type="button" id="authSignOutBtn">Sign out</button>
+            <button class="secondary" type="button" id="authGuestBtn">Continue as Guest</button>
+          </div>
+          <p class="auth-status" id="authStatus">Sync not configured.</p>
+          <p class="auth-warning" id="authWarning">
+            Guest mode keeps notes only on this device and may be cleared by the browser.
+          </p>
         </div>
         <div id="notesList" class="notes-list"></div>
       </div>
