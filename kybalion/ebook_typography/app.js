@@ -9,10 +9,10 @@ const tagFilter = document.getElementById("tagFilter");
 const togglePages = document.getElementById("togglePages");
 const toggleRefs = document.getElementById("toggleRefs");
 const printBtn = document.getElementById("printBtn");
-const notesList = document.getElementById("notesList");
-const clearNotesBtn = document.getElementById("clearNotesBtn");
+const saveNoteBtn = document.getElementById("saveNoteBtn");
 const toggleNotesBtn = document.getElementById("toggleNotesBtn");
 const notesPanel = document.getElementById("notesPanel");
+const notesList = document.getElementById("notesList");
 
 const state = {
   data: null,
@@ -22,18 +22,7 @@ const state = {
   tag: "",
   showPages: true,
   showRefs: true,
-  showNotes: false,
 };
-
-function showError(message) {
-  const target = contentEl || document.body;
-  if (!target) return;
-  target.innerHTML = "";
-  const box = document.createElement("div");
-  box.className = "loading";
-  box.textContent = `Error loading page: ${message}`;
-  target.appendChild(box);
-}
 
 function loadTags() {
   try {
@@ -108,10 +97,9 @@ function rebuildTagFilter() {
 }
 
 function render() {
-  if (!state.data || !contentEl || !tocListEl) return;
+  if (!state.data) return;
   contentEl.innerHTML = "";
   tocListEl.innerHTML = "";
-  renderNotes();
 
   state.data.chapters.forEach((chapter) => {
     const chapterId = `chapter-${chapter.number}`;
@@ -149,6 +137,7 @@ function render() {
       const stanzaEl = document.createElement("section");
       stanzaEl.className = "stanza";
       stanzaEl.dataset.stanzaRef = stanza.ref;
+      stanzaEl.id = stanza.ref.replace(":", "-");
 
       stanza.chapterNumber = chapter.number;
       stanza.index = stanzaIndex;
@@ -217,72 +206,101 @@ function render() {
 
     contentEl.appendChild(chapterEl);
   });
+
+  applyHighlights();
+  renderNotes();
+}
+
+function applyHighlights() {
+  if (!state.notes.length) return;
+  state.notes.forEach((note) => {
+    const stanzaEl = document.querySelector(`[data-stanza-ref="${note.ref}"] .stanza-text`);
+    if (!stanzaEl) return;
+    if (stanzaEl.querySelector(`[data-note-id="${note.id}"]`)) return;
+    const text = stanzaEl.textContent || "";
+    const index = text.indexOf(note.text);
+    if (index === -1) return;
+    const before = text.slice(0, index);
+    const after = text.slice(index + note.text.length);
+    stanzaEl.innerHTML = "";
+    if (before) {
+      stanzaEl.appendChild(document.createTextNode(before));
+    }
+    const mark = document.createElement("span");
+    mark.className = "highlight";
+    mark.dataset.noteId = note.id;
+    mark.textContent = note.text;
+    stanzaEl.appendChild(mark);
+    if (after) {
+      stanzaEl.appendChild(document.createTextNode(after));
+    }
+  });
 }
 
 function renderNotes() {
-  if (!notesList) return;
   notesList.innerHTML = "";
   if (!state.notes.length) {
-    const empty = document.createElement("div");
-    empty.className = "note-empty";
-    empty.textContent = "No notes yet. Highlight text to save a note.";
+    const empty = document.createElement("p");
+    empty.className = "note-text";
+    empty.textContent = "No notes saved yet.";
     notesList.appendChild(empty);
     return;
   }
 
-  state.notes
-    .slice()
-    .reverse()
-    .forEach((note) => {
-      const card = document.createElement("div");
-      card.className = "note-card";
+  state.notes.forEach((note) => {
+    const card = document.createElement("div");
+    card.className = "note-card";
 
-      const meta = document.createElement("div");
-      meta.className = "note-meta";
-      meta.textContent = `Notes • ${note.ref}`;
-
-      const text = document.createElement("div");
-      text.className = "note-text";
-      text.textContent = note.text;
-
-      card.append(meta, text);
-      notesList.appendChild(card);
+    const link = document.createElement("a");
+    link.href = `#${note.ref.replace(':', '-')}`;
+    link.textContent = `Notes · ${note.ref}`;
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      const stanzaEl = document.querySelector(`[data-stanza-ref="${note.ref}"]`);
+      stanzaEl?.scrollIntoView({ behavior: "smooth" });
     });
+
+    const text = document.createElement("p");
+    text.className = "note-text";
+    text.textContent = note.text;
+
+    card.append(link, text);
+    notesList.appendChild(card);
+  });
 }
 
-function updateNotesVisibility() {
-  if (!notesPanel || !toggleNotesBtn) return;
-  if (state.showNotes) {
-    notesPanel.classList.add("is-visible");
-    toggleNotesBtn.setAttribute("aria-expanded", "true");
-  } else {
-    notesPanel.classList.remove("is-visible");
-    toggleNotesBtn.setAttribute("aria-expanded", "false");
-  }
-}
-
-function captureHighlight(event) {
+function saveSelectionAsNote() {
   const selection = window.getSelection();
   if (!selection || selection.isCollapsed) return;
   const range = selection.getRangeAt(0);
-  const stanzaEl = range.commonAncestorContainer?.parentElement?.closest?.(".stanza");
-  if (!stanzaEl) return;
+  const stanzaEl = range.startContainer?.parentElement?.closest?.(".stanza");
+  if (!stanzaEl || !stanzaEl.contains(range.endContainer)) {
+    window.alert("Please select text within a single stanza.");
+    return;
+  }
 
-  const text = selection.toString().trim();
-  if (!text) return;
+  const selectedText = selection.toString().trim();
+  if (!selectedText) return;
 
-  const stanzaRef = stanzaEl.dataset.stanzaRef || "";
-  state.notes.push({ text, ref: stanzaRef, createdAt: Date.now() });
+  const noteId = `note-${Date.now()}`;
+  const ref = stanzaEl.dataset.stanzaRef || "";
+
+  const highlight = document.createElement("span");
+  highlight.className = "highlight";
+  highlight.dataset.noteId = noteId;
+  highlight.textContent = selectedText;
+
+  try {
+    range.deleteContents();
+    range.insertNode(highlight);
+  } catch {
+    window.alert("Unable to highlight that selection. Please try a shorter selection.");
+    return;
+  }
+
+  state.notes.push({ id: noteId, ref, text: selectedText, label: "Notes" });
   saveNotes(state.notes);
   renderNotes();
-
-  const highlight = document.createElement("mark");
-  highlight.className = "highlighted";
-  try {
-    range.surroundContents(highlight);
-  } catch {
-    // Ignore if selection spans multiple elements
-  }
   selection.removeAllRanges();
 }
 
@@ -312,79 +330,38 @@ function findStanzaByRef(ref) {
 }
 
 async function init() {
-  try {
-    if (!contentEl || !tocListEl) {
-      showError("Missing page elements. Please hard refresh.");
-      return;
-    }
+  const response = await fetch(DATA_URL, { cache: "no-store" });
+  state.data = await response.json();
 
-    const response = await fetch(DATA_URL, { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Data load failed (${response.status})`);
-    }
-    state.data = await response.json();
+  rebuildTagFilter();
+  render();
 
-    rebuildTagFilter();
+  searchInput.addEventListener("input", (event) => {
+    state.query = normalize(event.target.value || "");
+    applyFilters();
+  });
+
+  tagFilter.addEventListener("change", (event) => {
+    state.tag = event.target.value;
+    applyFilters();
+  });
+
+  togglePages.addEventListener("change", (event) => {
+    state.showPages = event.target.checked;
     render();
-    window.__KYBALION_READY__ = true;
-  } catch (error) {
-    showError(error instanceof Error ? error.message : "Unknown error");
-    return;
-  }
+  });
 
-  if (searchInput) {
-    searchInput.addEventListener("input", (event) => {
-      state.query = normalize(event.target.value || "");
-      applyFilters();
-    });
-  }
+  toggleRefs.addEventListener("change", (event) => {
+    state.showRefs = event.target.checked;
+    render();
+  });
 
-  if (tagFilter) {
-    tagFilter.addEventListener("change", (event) => {
-      state.tag = event.target.value;
-      applyFilters();
-    });
-  }
+  saveNoteBtn.addEventListener("click", saveSelectionAsNote);
+  toggleNotesBtn.addEventListener("click", () => {
+    notesPanel.classList.toggle("active");
+  });
 
-  if (togglePages) {
-    togglePages.addEventListener("change", (event) => {
-      state.showPages = event.target.checked;
-      render();
-    });
-  }
-
-  if (toggleRefs) {
-    toggleRefs.addEventListener("change", (event) => {
-      state.showRefs = event.target.checked;
-      render();
-    });
-  }
-
-  if (printBtn) {
-    printBtn.addEventListener("click", () => window.print());
-  }
-
-  if (contentEl) {
-    contentEl.addEventListener("mouseup", captureHighlight);
-    contentEl.addEventListener("touchend", captureHighlight);
-  }
-
-  if (clearNotesBtn) {
-    clearNotesBtn.addEventListener("click", () => {
-      state.notes = [];
-      saveNotes(state.notes);
-      renderNotes();
-    });
-  }
-
-  if (toggleNotesBtn) {
-    toggleNotesBtn.addEventListener("click", () => {
-      state.showNotes = !state.showNotes;
-      updateNotesVisibility();
-    });
-  }
-
-  updateNotesVisibility();
+  printBtn.addEventListener("click", () => window.print());
 }
 
 init();
