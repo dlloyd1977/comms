@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Kybalion — Annotated Facilitator Edition</title>
+    <meta
+      name="description"
+      content="Annotated, stanza-based edition of The Kybalion with hyperlinked table of contents, tagging, and printable layout."
+    />
+    <link rel="canonical" href="https://comms.davidelloyd.com/kybalion/ebook_typography/" />
+    <meta property="og:title" content="The Kybalion — Annotated Facilitator Edition" />
+    <meta
+      property="og:description"
+      content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://comms.davidelloyd.com/kybalion/ebook_typography/" />
+    <meta property="og:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The Kybalion — Annotated Facilitator Edition" />
+    <meta
+      name="twitter:description"
+      content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
+    />
+    <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <div class="header-content">
+        <div>
+          <p class="eyebrow">Annotated Facilitator Edition</p>
+          <h1>The Kybalion</h1>
+          <p class="subtitle">
+            Stanza-based reference text with hyperlinked TOC, tags, and print-ready layout.
+          </p>
+        </div>
+        <div class="header-actions">
+          <button class="primary" type="button" id="printBtn">Print / Save as PDF</button>
+          <a class="secondary" href="#toc" id="tocJump">Jump to TOC</a>
+        </div>
+      </div>
+      <div class="controls">
+        <label class="control">
+          <span>Search</span>
+          <input type="search" id="searchInput" placeholder="Search the text..." />
+        </label>
+        <label class="control">
+          <span>Tag filter</span>
+          <select id="tagFilter">
+            <option value="">All tags</option>
+          </select>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="togglePages" checked />
+          <span>Show page numbers</span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="toggleRefs" checked />
+          <span>Show stanza references</span>
+        </label>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="toc" id="toc">
+        <div class="toc-header">
+          <h2>Table of Contents</h2>
+          <p>Tap a chapter to jump to stanza references.</p>
+        </div>
+        <nav id="tocList" aria-label="Table of Contents"></nav>
+      </aside>
+
+      <section class="content" id="content">
+        <div class="loading" id="loading">Loading annotated text…</div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <p>
+        Text sourced from the provided PDF and segmented into stanza references for study and discussion.
+        Use Print / Save as PDF for downloadable copies.
+      </p>
+    </footer>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
