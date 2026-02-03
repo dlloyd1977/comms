@@ -36,28 +36,67 @@ def _force_stanza_break(line: str) -> bool:
 
 
 def _normalize_text(text: str) -> str:
+    text = text.replace("<<NL>>", "__NL__")
     text = re.sub(r"(\w)-\s+(\w)", r"\1\2", text)
-    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    text = text.replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
     text = re.sub(r"[ \t]+", " ", text)
-    text = re.sub(r"\s*\n\s*", "\n", text)
+    text = text.replace("__NL__", "\n")
+    text = re.sub(r"\b([A-Z])\.\s+([A-Z])\.", r"\1.\2.", text)
     return text.strip()
 
 
 def _format_numbered_list(text: str) -> str | None:
-    if not re.search(r"\b(?:\d+|[IVXLCDM]+)\.\s+", text):
+    if not re.match(r"^\s*(?:\d+|[IVXLCDM]+)\.\s+", text):
         return None
 
     parts = re.split(r"\s*(?=(?:\d+|[IVXLCDM]+)\.\s+)", text.strip())
     items = [p.strip() for p in parts if p.strip()]
+    if len(items) < 2:
+        return None
     if len(items) <= 1:
         return None
-    return "\n".join(items)
+    return "<<NL>>".join(items)
 
 
 def _split_into_stanzas(text: str) -> list[str]:
     if not text:
         return []
-    return [text.strip()]
+
+    if "\n" in text:
+        return [text.strip()]
+
+    sentences = _split_sentences(text)
+    if not sentences:
+        return []
+
+    if len(sentences) >= 5:
+        return _group_sentences(sentences, max_len=650, max_sentences=2)
+
+    return _group_sentences(sentences, max_len=650, max_sentences=4)
+
+
+def _split_sentences(text: str) -> list[str]:
+    marked = re.sub(r"([.!?][\"”’']?)\s+(?=[A-Z“\"(])", r"\1<<SPLIT>>", text)
+    return [s.strip() for s in marked.split("<<SPLIT>>") if s.strip()]
+
+
+def _group_sentences(sentences: list[str], max_len: int, max_sentences: int) -> list[str]:
+    stanzas: list[str] = []
+    current: list[str] = []
+    current_len = 0
+
+    for sentence in sentences:
+        if current and (current_len + len(sentence) > max_len or len(current) >= max_sentences):
+            stanzas.append(" ".join(current).strip())
+            current = []
+            current_len = 0
+        current.append(sentence)
+        current_len += len(sentence)
+
+    if current:
+        stanzas.append(" ".join(current).strip())
+
+    return stanzas
 
 
 class _PGParser(HTMLParser):
@@ -210,7 +249,21 @@ def _chapter_to_stanzas(chapter: dict) -> list[dict]:
             normalized = _normalize_text(part)
             if not normalized:
                 continue
-            for stanza in _split_into_stanzas(normalized):
+
+            if "\n" in normalized:
+                part_stanzas = [normalized]
+            else:
+                sentences = _split_sentences(normalized)
+
+                if len(sentences) >= 7:
+                    part_stanzas = [" ".join(sentences[:4]).strip()]
+                    part_stanzas += _group_sentences(sentences[4:], max_len=650, max_sentences=2)
+                elif len(sentences) >= 5:
+                    part_stanzas = _group_sentences(sentences, max_len=650, max_sentences=2)
+                else:
+                    part_stanzas = _group_sentences(sentences, max_len=900, max_sentences=4)
+
+            for stanza in part_stanzas:
                 stanzas.append(
                     {
                         "ref": f"{chapter['number']}:{stanza_index}",
