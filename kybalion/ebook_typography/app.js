@@ -1038,6 +1038,12 @@ function applyFilters() {
     ).some((stanzaEl) => stanzaEl.style.display !== "none");
     chapterEl.style.display = hasVisibleStanza ? "block" : "none";
   });
+  document.querySelectorAll(".standard-chapter").forEach((chapterEl) => {
+    const hasVisibleStanza = Array.from(
+      chapterEl.querySelectorAll(".stanza")
+    ).some((stanzaEl) => stanzaEl.style.display !== "none");
+    chapterEl.style.display = hasVisibleStanza ? "block" : "none";
+  });
   document.querySelectorAll("#tocList button").forEach((tocButton) => {
     const chapterId = tocButton.dataset.chapterId;
     if (!chapterId) return;
