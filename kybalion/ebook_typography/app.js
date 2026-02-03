@@ -12,6 +12,7 @@ const searchInput = document.getElementById("searchInput");
 const tagFilter = document.getElementById("tagFilter");
 const togglePages = document.getElementById("togglePages");
 const toggleRefs = document.getElementById("toggleRefs");
+const searchBtn = document.getElementById("searchBtn");
 const printBtn = document.getElementById("printBtn");
 const saveNoteBtn = document.getElementById("saveNoteBtn");
 const toggleNotesBtn = document.getElementById("toggleNotesBtn");
@@ -257,7 +258,85 @@ function render() {
   });
 
   applyHighlights();
+  applySearchHighlights();
   renderNotes();
+}
+
+function escapeRegExp(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function clearSearchHighlights() {
+  document.querySelectorAll(".search-highlight").forEach((mark) => {
+    const text = document.createTextNode(mark.textContent || "");
+    mark.replaceWith(text);
+  });
+}
+
+function applySearchHighlights() {
+  clearSearchHighlights();
+  const query = state.query.trim();
+  if (!query) return;
+  const keywords = query.split(/\s+/).filter(Boolean);
+  if (!keywords.length) return;
+  const pattern = keywords.map((word) => escapeRegExp(word)).join("|");
+  const regex = new RegExp(pattern, "gi");
+
+  document.querySelectorAll(".stanza").forEach((stanzaEl) => {
+    if (stanzaEl.style.display === "none") return;
+    const textEl = stanzaEl.querySelector(".stanza-text");
+    if (!textEl) return;
+
+    const walker = document.createTreeWalker(
+      textEl,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: (node) => {
+          if (!node.nodeValue || !node.nodeValue.trim()) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (node.parentElement?.closest(".highlight")) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (node.parentElement?.closest(".search-highlight")) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      },
+      false
+    );
+
+    const textNodes = [];
+    while (walker.nextNode()) {
+      textNodes.push(walker.currentNode);
+    }
+
+    textNodes.forEach((node) => {
+      const text = node.nodeValue || "";
+      regex.lastIndex = 0;
+      if (!regex.test(text)) return;
+      regex.lastIndex = 0;
+      const fragment = document.createDocumentFragment();
+      let lastIndex = 0;
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        const start = match.index;
+        if (start > lastIndex) {
+          fragment.appendChild(document.createTextNode(text.slice(lastIndex, start)));
+        }
+        const span = document.createElement("span");
+        span.className = "search-highlight";
+        span.textContent = match[0];
+        fragment.appendChild(span);
+        lastIndex = start + match[0].length;
+      }
+      if (lastIndex < text.length) {
+        fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+      node.replaceWith(fragment);
+    });
+  });
 }
 
 function applyHighlights() {
@@ -678,6 +757,12 @@ function applyFilters() {
     if (!stanza) return;
     stanzaEl.style.display = stanzaMatchesFilters(stanza) ? "block" : "none";
   });
+  applySearchHighlights();
+}
+
+function runSearch() {
+  state.query = normalize(searchInput?.value || "");
+  applyFilters();
 }
 
 function findStanzaByRef(ref) {
@@ -706,10 +791,13 @@ async function init() {
     rebuildTagFilter();
     render();
 
-    searchInput?.addEventListener("input", (event) => {
-      state.query = normalize(event.target.value || "");
-      applyFilters();
+    searchInput?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        runSearch();
+      }
     });
+    searchBtn?.addEventListener("click", runSearch);
 
     tagFilter?.addEventListener("change", (event) => {
       state.tag = event.target.value;
