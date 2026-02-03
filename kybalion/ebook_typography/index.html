@@ -24,7 +24,7 @@
       content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
     />
     <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
-    <link rel="stylesheet" href="styles.css?v=1.6.1" />
+    <link rel="stylesheet" href="styles.css?v=1.7.0" />
   </head>
   <body
     data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
@@ -61,17 +61,31 @@
             <option value="">All tags</option>
           </select>
         </label>
-        <label class="control view-toggle">
+        <div class="control view-toggle" aria-label="View mode">
           <span>View</span>
-          <div class="view-switch">
-            <span class="view-label">Typography / Stanza</span>
-            <label class="switch" aria-label="Toggle standard view">
-              <input type="checkbox" id="viewModeToggle" />
-              <span class="switch-track"></span>
-            </label>
-            <span class="view-label">Standard</span>
+          <div class="view-toggle-pill" role="tablist" aria-label="View mode">
+            <button
+              class="view-pill-button is-active"
+              type="button"
+              id="viewModeStandardBtn"
+              data-mode="standard"
+              role="tab"
+              aria-selected="true"
+            >
+              Standard
+            </button>
+            <button
+              class="view-pill-button"
+              type="button"
+              id="viewModeStanzaBtn"
+              data-mode="typography"
+              role="tab"
+              aria-selected="false"
+            >
+              Stanza
+            </button>
           </div>
-        </label>
+        </div>
         <label class="toggle">
           <input type="checkbox" id="togglePages" checked />
           <span>Show page numbers</span>
@@ -224,6 +238,6 @@
       <p class="version">Version <span id="appVersion"></span></p>
     </footer>
 
-    <script src="app.js?v=1.6.1" type="module"></script>
+    <script src="app.js?v=1.7.0" type="module"></script>
   </body>
 </html>

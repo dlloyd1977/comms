@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.6.1";
+const APP_VERSION = "1.7.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -14,7 +14,8 @@ const tagFilter = document.getElementById("tagFilter");
 const togglePages = document.getElementById("togglePages");
 const toggleRefs = document.getElementById("toggleRefs");
 const searchBtn = document.getElementById("searchBtn");
-const viewModeToggle = document.getElementById("viewModeToggle");
+const viewModeStandardBtn = document.getElementById("viewModeStandardBtn");
+const viewModeStanzaBtn = document.getElementById("viewModeStanzaBtn");
 const printBtn = document.getElementById("printBtn");
 const saveNoteBtn = document.getElementById("saveNoteBtn");
 const toggleNotesBtn = document.getElementById("toggleNotesBtn");
@@ -68,7 +69,7 @@ const state = {
   tag: preferences.tag || "",
   showPages: preferences.showPages ?? true,
   showRefs: preferences.showRefs ?? true,
-  viewMode: preferences.viewMode || "typography",
+  viewMode: preferences.viewMode || "standard",
   auth: {
     client: null,
     user: null,
@@ -140,8 +141,14 @@ function savePreferencesLocal() {
 
 function setViewMode(mode) {
   state.viewMode = mode === "standard" ? "standard" : "typography";
-  if (viewModeToggle) {
-    viewModeToggle.checked = state.viewMode === "standard";
+  const isStandard = state.viewMode === "standard";
+  if (viewModeStandardBtn) {
+    viewModeStandardBtn.classList.toggle("is-active", isStandard);
+    viewModeStandardBtn.setAttribute("aria-selected", String(isStandard));
+  }
+  if (viewModeStanzaBtn) {
+    viewModeStanzaBtn.classList.toggle("is-active", !isStandard);
+    viewModeStanzaBtn.setAttribute("aria-selected", String(!isStandard));
   }
   if (typographyView && standardView) {
     const showStandard = state.viewMode === "standard";
@@ -1085,8 +1092,12 @@ async function init() {
     if (toggleRefs) {
       toggleRefs.checked = state.showRefs;
     }
-    if (viewModeToggle) {
-      viewModeToggle.checked = state.viewMode === "standard";
+    if (viewModeStandardBtn && viewModeStanzaBtn) {
+      const isStandard = state.viewMode === "standard";
+      viewModeStandardBtn.classList.toggle("is-active", isStandard);
+      viewModeStandardBtn.setAttribute("aria-selected", String(isStandard));
+      viewModeStanzaBtn.classList.toggle("is-active", !isStandard);
+      viewModeStanzaBtn.setAttribute("aria-selected", String(!isStandard));
     }
     render();
     setViewMode(state.viewMode);
@@ -1126,10 +1137,8 @@ async function init() {
       render();
       savePreferencesLocal();
     });
-    viewModeToggle?.addEventListener("change", (event) => {
-      const isStandard = event.target.checked;
-      setViewMode(isStandard ? "standard" : "typography");
-    });
+    viewModeStandardBtn?.addEventListener("click", () => setViewMode("standard"));
+    viewModeStanzaBtn?.addEventListener("click", () => setViewMode("typography"));
 
     saveNoteBtn?.addEventListener("click", saveSelectionAsNote);
     if (toggleNotesBtn) {
