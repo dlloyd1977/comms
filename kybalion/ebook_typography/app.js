@@ -42,6 +42,7 @@ const authStatus = document.getElementById("authStatus");
 const authWarning = document.getElementById("authWarning");
 const notesContent = document.getElementById("notesContent");
 const authPanel = document.getElementById("authPanel");
+const notesTitle = document.getElementById("notesTitle");
 
 const state = {
   data: null,
@@ -410,6 +411,12 @@ function setNotesVisibility(show) {
 function setAuthPanelVisible(show) {
   if (!authPanel) return;
   authPanel.classList.toggle("is-hidden", !show);
+  if (notesModal) {
+    notesModal.classList.toggle("auth-only", show);
+  }
+  if (notesTitle) {
+    notesTitle.textContent = show ? "Account" : "Notes";
+  }
 }
 
 function setAuthStep(step) {
