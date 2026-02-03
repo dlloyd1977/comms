@@ -24,7 +24,7 @@
       content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
     />
     <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
-    <link rel="stylesheet" href="styles.css?v=1.7.0" />
+    <link rel="stylesheet" href="styles.css?v=1.7.1" />
   </head>
   <body
     data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
@@ -116,6 +116,14 @@
     </main>
 
     <section class="standard-view is-hidden" id="standardView" aria-hidden="true">
+      <div class="standard-tools" id="standardTools">
+        <span class="standard-tools-label">Reader tools</span>
+        <button class="secondary" type="button" id="standardSaveHighlightBtn">
+          Save highlight as Note
+        </button>
+        <button class="secondary" type="button" id="standardAddTagBtn">Add Tag</button>
+        <button class="secondary" type="button" id="standardAnnotateBtn">Annotate</button>
+      </div>
       <div class="standard-content" id="standardContent"></div>
     </section>
 
@@ -238,6 +246,6 @@
       <p class="version">Version <span id="appVersion"></span></p>
     </footer>
 
-    <script src="app.js?v=1.7.0" type="module"></script>
+    <script src="app.js?v=1.7.1" type="module"></script>
   </body>
 </html>

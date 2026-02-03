@@ -251,6 +251,27 @@ h1 {
 .standard-view {
   padding: 24px 40px 40px;
   color: var(--ink);
+  background: #fdfbf7;
+}
+
+.standard-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin: 0 auto 20px;
+  max-width: 720px;
+  color: var(--ink);
+}
+
+.standard-tools-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-right: 4px;
 }
 
 .standard-content {
@@ -269,18 +290,11 @@ h1 {
   margin-bottom: 0;
 }
 
-.standard-actions {
-  display: none;
-}
-
-.standard-stanza:hover .standard-actions,
-.standard-stanza:focus-within .standard-actions {
-  display: flex;
-}
-
 .standard-content .stanza-text {
-  font-size: 1.15rem;
-  line-height: 1.85;
+  font-size: 1.2rem;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+  text-align: justify;
   color: var(--ink);
 }
 
