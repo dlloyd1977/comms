@@ -429,6 +429,10 @@ h1 {
   margin-bottom: 12px;
 }
 
+.auth-panel.is-hidden {
+  display: none;
+}
+
 .auth-flow {
   display: grid;
   gap: 12px;
