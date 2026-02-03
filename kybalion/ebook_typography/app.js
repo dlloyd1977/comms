@@ -1,5 +1,6 @@
 const DATA_URL = "data/kybalion.json";
 const STORAGE_KEY = "kybalion.tags";
+const NOTES_KEY = "kybalion.notes";
 
 const contentEl = document.getElementById("content");
 const tocListEl = document.getElementById("tocList");
@@ -8,10 +9,13 @@ const tagFilter = document.getElementById("tagFilter");
 const togglePages = document.getElementById("togglePages");
 const toggleRefs = document.getElementById("toggleRefs");
 const printBtn = document.getElementById("printBtn");
+const notesList = document.getElementById("notesList");
+const clearNotesBtn = document.getElementById("clearNotesBtn");
 
 const state = {
   data: null,
   tags: loadTags(),
+  notes: loadNotes(),
   query: "",
   tag: "",
   showPages: true,
@@ -28,6 +32,18 @@ function loadTags() {
 
 function saveTags(tags) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(tags));
+}
+
+function loadNotes() {
+  try {
+    return JSON.parse(localStorage.getItem(NOTES_KEY) || "[]") || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveNotes(notes) {
+  localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
 }
 
 function stanzaId(chapterNumber, stanzaIndex) {
@@ -82,6 +98,7 @@ function render() {
   if (!state.data) return;
   contentEl.innerHTML = "";
   tocListEl.innerHTML = "";
+  renderNotes();
 
   state.data.chapters.forEach((chapter) => {
     const chapterId = `chapter-${chapter.number}`;
@@ -189,6 +206,62 @@ function render() {
   });
 }
 
+function renderNotes() {
+  if (!notesList) return;
+  notesList.innerHTML = "";
+  if (!state.notes.length) {
+    const empty = document.createElement("div");
+    empty.className = "note-empty";
+    empty.textContent = "No notes yet. Highlight text to save a note.";
+    notesList.appendChild(empty);
+    return;
+  }
+
+  state.notes
+    .slice()
+    .reverse()
+    .forEach((note) => {
+      const card = document.createElement("div");
+      card.className = "note-card";
+
+      const meta = document.createElement("div");
+      meta.className = "note-meta";
+      meta.textContent = `Notes • ${note.ref}`;
+
+      const text = document.createElement("div");
+      text.className = "note-text";
+      text.textContent = note.text;
+
+      card.append(meta, text);
+      notesList.appendChild(card);
+    });
+}
+
+function captureHighlight(event) {
+  const selection = window.getSelection();
+  if (!selection || selection.isCollapsed) return;
+  const range = selection.getRangeAt(0);
+  const stanzaEl = range.commonAncestorContainer?.parentElement?.closest?.(".stanza");
+  if (!stanzaEl) return;
+
+  const text = selection.toString().trim();
+  if (!text) return;
+
+  const stanzaRef = stanzaEl.dataset.stanzaRef || "";
+  state.notes.push({ text, ref: stanzaRef, createdAt: Date.now() });
+  saveNotes(state.notes);
+  renderNotes();
+
+  const highlight = document.createElement("mark");
+  highlight.className = "highlighted";
+  try {
+    range.surroundContents(highlight);
+  } catch {
+    // Ignore if selection spans multiple elements
+  }
+  selection.removeAllRanges();
+}
+
 function applyFilters() {
   if (!state.data) return;
   document.querySelectorAll(".stanza").forEach((stanzaEl) => {
@@ -242,6 +315,14 @@ async function init() {
   });
 
   printBtn.addEventListener("click", () => window.print());
+  contentEl.addEventListener("mouseup", captureHighlight);
+  contentEl.addEventListener("touchend", captureHighlight);
+
+  clearNotesBtn.addEventListener("click", () => {
+    state.notes = [];
+    saveNotes(state.notes);
+    renderNotes();
+  });
 }
 
 init();
