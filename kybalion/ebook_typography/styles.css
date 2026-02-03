@@ -286,30 +286,31 @@ h1 {
 
 .standard-content {
   display: grid;
-  gap: 28px;
+  gap: 18px;
   color: var(--ink);
-}
-
-.standard-chapter {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 24px 28px;
-  box-shadow: var(--shadow);
-  color: var(--ink);
-}
-
-.standard-chapter h2 {
-  margin: 0 0 16px;
-  color: var(--ink);
+  max-width: 880px;
+  margin: 0 auto;
 }
 
 .standard-stanza {
   margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .standard-stanza:last-child {
   margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.standard-actions {
+  display: none;
+}
+
+.standard-stanza:hover .standard-actions,
+.standard-stanza:focus-within .standard-actions {
+  display: flex;
 }
 
 .toc {
