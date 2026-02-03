@@ -413,6 +413,10 @@ h1 {
   color: var(--ink);
 }
 
+.notes-modal.auth-only .notes-modal-actions {
+  display: none;
+}
+
 .notes-list {
   display: grid;
   gap: 12px;
