@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.8.7";
+const APP_VERSION = "1.8.8";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -101,28 +101,43 @@ if (appVersionEl) {
   appVersionEl.textContent = APP_VERSION;
 }
 
-function loadTags() {
+function getScopedKey(baseKey, userId) {
+  if (userId) return `${baseKey}.${userId}`;
+  return baseKey;
+}
+
+function getStorageUserId() {
+  return state?.auth?.user?.id || null;
+}
+
+function loadTags(userId = null) {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
+    const key = getScopedKey(STORAGE_KEY, userId);
+    return JSON.parse(localStorage.getItem(key) || "{}") || {};
   } catch {
     return {};
   }
 }
 
-function saveTags(tags) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tags));
+function saveTags(tags, userId = null) {
+  const scopedUserId = userId ?? getStorageUserId();
+  const key = getScopedKey(STORAGE_KEY, scopedUserId);
+  localStorage.setItem(key, JSON.stringify(tags));
 }
 
-function loadNotes() {
+function loadNotes(userId = null) {
   try {
-    return JSON.parse(localStorage.getItem(NOTES_KEY) || "[]") || [];
+    const key = getScopedKey(NOTES_KEY, userId);
+    return JSON.parse(localStorage.getItem(key) || "[]") || [];
   } catch {
     return [];
   }
 }
 
-function saveNotes(notes) {
-  localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+function saveNotes(notes, userId = null) {
+  const scopedUserId = userId ?? getStorageUserId();
+  const key = getScopedKey(NOTES_KEY, scopedUserId);
+  localStorage.setItem(key, JSON.stringify(notes));
 }
 
 function loadGuestMode() {
@@ -133,15 +148,17 @@ function saveGuestMode(value) {
   localStorage.setItem(NOTES_GUEST_KEY, value ? "true" : "false");
 }
 
-function loadPreferences() {
+function loadPreferences(userId = null) {
   try {
-    return JSON.parse(localStorage.getItem(PREFS_KEY) || "{}") || {};
+    const key = getScopedKey(PREFS_KEY, userId);
+    return JSON.parse(localStorage.getItem(key) || "{}") || {};
   } catch {
     return {};
   }
 }
 
 function savePreferencesLocal() {
+  const userId = getStorageUserId();
   const payload = {
     query: state.query,
     tag: state.tag,
@@ -149,11 +166,12 @@ function savePreferencesLocal() {
     showRefs: state.showRefs,
     viewMode: state.viewMode,
   };
-  localStorage.setItem(PREFS_KEY, JSON.stringify(payload));
+  const key = getScopedKey(PREFS_KEY, userId);
+  localStorage.setItem(key, JSON.stringify(payload));
   void syncPreferencesToCloud();
 }
 
-function setViewMode(mode) {
+function updateViewModeUI(mode) {
   state.viewMode = mode === "standard" ? "standard" : "typography";
   const isStandard = state.viewMode === "standard";
   if (document.body) {
@@ -174,7 +192,32 @@ function setViewMode(mode) {
     standardView.classList.toggle("is-hidden", !showStandard);
     standardView.setAttribute("aria-hidden", String(!showStandard));
   }
+}
+
+function setViewMode(mode) {
+  updateViewModeUI(mode);
   savePreferencesLocal();
+}
+
+function applyLocalStateForUser(userId) {
+  const prefs = loadPreferences(userId);
+  state.tags = loadTags(userId);
+  state.notes = loadNotes(userId);
+
+  state.query = typeof prefs.query === "string" ? prefs.query : "";
+  state.tag = typeof prefs.tag === "string" ? prefs.tag : "";
+  state.showPages = typeof prefs.showPages === "boolean" ? prefs.showPages : true;
+  state.showRefs = typeof prefs.showRefs === "boolean" ? prefs.showRefs : true;
+  state.viewMode = typeof prefs.viewMode === "string" ? prefs.viewMode : "standard";
+
+  if (searchInput) searchInput.value = state.query;
+  if (tagFilter) tagFilter.value = state.tag;
+  if (togglePages) togglePages.checked = state.showPages;
+  if (toggleRefs) toggleRefs.checked = state.showRefs;
+
+  updateViewModeUI(state.viewMode);
+  render();
+  applyFilters();
 }
 
 function stanzaId(chapterNumber, stanzaIndex) {
@@ -731,6 +774,7 @@ function handleRemoteLogout() {
   state.auth.user = null;
   state.auth.mode = loadGuestMode() ? "guest" : "local";
   clearAuthStorage(state.auth.url);
+  applyLocalStateForUser(null);
   updateAuthUI();
 }
 
@@ -744,6 +788,7 @@ async function handleRemoteLogin() {
   if (newUser && newUser.id !== state.auth.user?.id) {
     state.auth.user = newUser;
     state.auth.mode = "authenticated";
+    applyLocalStateForUser(newUser.id);
     await loadNotesFromCloud();
     await loadPreferencesFromCloud();
     updateAuthUI();
@@ -874,10 +919,16 @@ async function initializeSupabase() {
   const { data } = await state.auth.client.auth.getSession();
   state.auth.user = data.session?.user || null;
   state.auth.mode = loadGuestMode() ? "guest" : "local";
+  applyLocalStateForUser(state.auth.user?.id || null);
   updateAuthUI();
 
   state.auth.client.auth.onAuthStateChange((event, session) => {
+    const previousUserId = state.auth.user?.id || null;
     state.auth.user = session?.user || null;
+    const nextUserId = state.auth.user?.id || null;
+    if (previousUserId !== nextUserId) {
+      applyLocalStateForUser(nextUserId);
+    }
     if (state.auth.user) {
       saveGuestMode(false);
       state.auth.mode = "authenticated";
@@ -1088,6 +1139,7 @@ async function handleSignOut() {
   state.auth.mode = "local";
   clearAuthStorage(state.auth.url);
   broadcastLogout();
+  applyLocalStateForUser(null);
   updateAuthUI();
   setAuthConfirmMessage("Signed out. Notes are local only.");
 }
