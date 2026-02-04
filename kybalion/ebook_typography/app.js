@@ -1,11 +1,17 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.9.0";
+const APP_VERSION = "1.11.1";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
 const PREFS_KEY = "kybalion.preferences";
+const LAYOUT_KEY = "kybalion.layout.controls";
+const LAYOUT_POS_KEY = "kybalion.layout.positions";
+const ADMIN_EMAILS = (document.body?.dataset.adminEmails || "")
+  .split(",")
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean);
 
 const contentEl = document.getElementById("content");
 const tocListEl = document.getElementById("tocList");
@@ -18,6 +24,9 @@ const searchBtn = document.getElementById("searchBtn");
 const viewModeStandardBtn = document.getElementById("viewModeStandardBtn");
 const viewModeStanzaBtn = document.getElementById("viewModeStanzaBtn");
 const printBtn = document.getElementById("printBtn");
+const tocJump = document.getElementById("tocJump");
+const layoutEditBtn = document.getElementById("layoutEditBtn");
+const layoutResetBtn = document.getElementById("layoutResetBtn");
 const saveNoteBtn = document.getElementById("saveNoteBtn");
 const toggleNotesBtn = document.getElementById("toggleNotesBtn");
 const notesModal = document.getElementById("notesModal");
@@ -70,6 +79,17 @@ const standardSaveHighlightBtn = document.getElementById("standardSaveHighlightB
 const standardAddTagBtn = document.getElementById("standardAddTagBtn");
 const standardAnnotateBtn = document.getElementById("standardAnnotateBtn");
 const standardViewNotesBtn = document.getElementById("standardViewNotesBtn");
+const standardTools = document.getElementById("standardTools");
+const notesActions = document.querySelector(".notes-actions");
+const togglePagesWrap = togglePages?.closest?.(".toggle") || null;
+const toggleRefsWrap = toggleRefs?.closest?.(".toggle") || null;
+
+let defaultLayoutOrder = [];
+let defaultLayoutPositions = null;
+let dragItem = null;
+let dragState = null;
+let layoutPositions = {};
+let layoutResizeObserver = null;
 
 const preferences = loadPreferences();
 
@@ -108,6 +128,254 @@ function updateStickyOffsets() {
   const base = Math.ceil(rect.height);
   const offset = Math.max(120, base + 12);
   document.documentElement.style.setProperty("--header-offset", `${offset}px`);
+}
+
+function isAdminUser(user) {
+  if (!user?.email) return false;
+  return ADMIN_EMAILS.includes(user.email.toLowerCase());
+}
+
+function updateLayoutAdminUI() {
+  const isAdmin = isAdminUser(state.auth.user);
+  [layoutEditBtn, layoutResetBtn].forEach((btn) => {
+    if (!btn) return;
+    btn.classList.toggle("is-hidden", !isAdmin);
+    btn.setAttribute("aria-hidden", String(!isAdmin));
+  });
+  if (!isAdmin) {
+    setLayoutEditing(false);
+  }
+}
+
+function getLayoutContainer() {
+  return document.querySelector(".controls");
+}
+
+function getLayoutItems() {
+  const container = getLayoutContainer();
+  if (!container) return [];
+  return Array.from(container.querySelectorAll(":scope > [data-layout-key]"));
+}
+
+function getLayoutPositionsFromDom() {
+  const container = getLayoutContainer();
+  if (!container) return {};
+  const containerRect = container.getBoundingClientRect();
+  const positions = {};
+
+  getLayoutItems().forEach((item) => {
+    const key = item.dataset.layoutKey;
+    if (!key) return;
+    const rect = item.getBoundingClientRect();
+    positions[key] = {
+      left: Math.max(0, Math.round(rect.left - containerRect.left)),
+      top: Math.max(0, Math.round(rect.top - containerRect.top)),
+      width: Math.max(80, Math.round(rect.width)),
+      height: Math.max(40, Math.round(rect.height)),
+    };
+  });
+
+  return positions;
+}
+
+function loadLayoutPositions() {
+  try {
+    const raw = localStorage.getItem(LAYOUT_POS_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLayoutPositions() {
+  const positions = getLayoutPositionsFromDom();
+  layoutPositions = positions;
+  localStorage.setItem(LAYOUT_POS_KEY, JSON.stringify(positions));
+  updateLayoutContainerHeight();
+}
+
+function applyLayoutPositions(positions) {
+  if (!document.body) return;
+  const container = getLayoutContainer();
+  if (!container) return;
+
+  document.body.classList.add("layout-freeform");
+
+  getLayoutItems().forEach((item) => {
+    const key = item.dataset.layoutKey;
+    if (!key) return;
+    const pos = positions[key] || defaultLayoutPositions?.[key];
+    if (!pos) return;
+    item.style.left = `${pos.left}px`;
+    item.style.top = `${pos.top}px`;
+    item.style.width = `${pos.width}px`;
+    item.style.height = `${pos.height}px`;
+  });
+
+  updateLayoutContainerHeight();
+}
+
+function clearLayoutPositions() {
+  layoutPositions = {};
+  localStorage.removeItem(LAYOUT_POS_KEY);
+  document.body?.classList.remove("layout-freeform");
+  const container = getLayoutContainer();
+  if (container) {
+    container.style.minHeight = "";
+  }
+  getLayoutItems().forEach((item) => {
+    item.style.removeProperty("left");
+    item.style.removeProperty("top");
+    item.style.removeProperty("width");
+    item.style.removeProperty("height");
+  });
+}
+
+function updateLayoutContainerHeight() {
+  const container = getLayoutContainer();
+  if (!container) return;
+  let maxBottom = 0;
+  getLayoutItems().forEach((item) => {
+    const top = parseFloat(item.style.top || "0");
+    const height = parseFloat(item.style.height || `${item.getBoundingClientRect().height}`);
+    maxBottom = Math.max(maxBottom, top + height);
+  });
+  if (maxBottom > 0) {
+    container.style.minHeight = `${Math.ceil(maxBottom + 12)}px`;
+  }
+}
+
+function applyLayoutOrder(order) {
+  const container = getLayoutContainer();
+  if (!container || !Array.isArray(order) || !order.length) return;
+  const items = getLayoutItems();
+  const byKey = new Map(items.map((el) => [el.dataset.layoutKey, el]));
+
+  order.forEach((key) => {
+    const el = byKey.get(key);
+    if (el) container.appendChild(el);
+  });
+
+  items.forEach((el) => {
+    if (!order.includes(el.dataset.layoutKey)) {
+      container.appendChild(el);
+    }
+  });
+}
+
+function loadLayoutOrder() {
+  try {
+    const raw = localStorage.getItem(LAYOUT_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLayoutOrder() {
+  const order = getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean);
+  localStorage.setItem(LAYOUT_KEY, JSON.stringify(order));
+}
+
+function setLayoutEditing(enabled) {
+  if (!document.body) return;
+  if (enabled && !isAdminUser(state.auth.user)) {
+    return;
+  }
+  document.body.classList.toggle("layout-editing", enabled);
+  if (layoutEditBtn) {
+    layoutEditBtn.classList.toggle("is-active", enabled);
+    layoutEditBtn.textContent = enabled ? "Exit layout edit" : "Edit layout";
+  }
+  if (enabled) {
+    if (!Object.keys(layoutPositions).length) {
+      layoutPositions = getLayoutPositionsFromDom();
+      applyLayoutPositions(layoutPositions);
+      saveLayoutPositions();
+    }
+    document.body.classList.add("layout-freeform");
+    if (!layoutResizeObserver && "ResizeObserver" in window) {
+      layoutResizeObserver = new ResizeObserver(() => saveLayoutPositions());
+      getLayoutItems().forEach((item) => layoutResizeObserver.observe(item));
+    }
+  } else if (layoutResizeObserver) {
+    layoutResizeObserver.disconnect();
+    layoutResizeObserver = null;
+    saveLayoutPositions();
+  }
+}
+
+function handleLayoutPointerDown(event) {
+  if (!document.body?.classList.contains("layout-editing")) return;
+  const item = event.currentTarget;
+  if (!item) return;
+  const rect = item.getBoundingClientRect();
+  const isResizeCorner =
+    event.clientX > rect.right - 16 && event.clientY > rect.bottom - 16;
+  if (isResizeCorner) return;
+
+  const container = getLayoutContainer();
+  if (!container) return;
+  const containerRect = container.getBoundingClientRect();
+  const startLeft = parseFloat(item.style.left || "0");
+  const startTop = parseFloat(item.style.top || "0");
+
+  dragItem = item;
+  dragState = {
+    startX: event.clientX,
+    startY: event.clientY,
+    startLeft,
+    startTop,
+    maxLeft: Math.max(0, containerRect.width - rect.width),
+    maxTop: Math.max(0, containerRect.height - rect.height),
+  };
+
+  item.classList.add("is-dragging");
+  item.setPointerCapture(event.pointerId);
+}
+
+function handleLayoutPointerMove(event) {
+  if (!document.body?.classList.contains("layout-editing")) return;
+  if (!dragItem || !dragState) return;
+  const deltaX = event.clientX - dragState.startX;
+  const deltaY = event.clientY - dragState.startY;
+  const nextLeft = Math.min(Math.max(0, dragState.startLeft + deltaX), dragState.maxLeft);
+  const nextTop = Math.min(Math.max(0, dragState.startTop + deltaY), dragState.maxTop);
+  dragItem.style.left = `${Math.round(nextLeft)}px`;
+  dragItem.style.top = `${Math.round(nextTop)}px`;
+  updateLayoutContainerHeight();
+}
+
+function handleLayoutPointerUp(event) {
+  if (!document.body?.classList.contains("layout-editing")) return;
+  if (!dragItem) return;
+  dragItem.classList.remove("is-dragging");
+  dragItem.releasePointerCapture?.(event.pointerId);
+  dragItem = null;
+  dragState = null;
+  saveLayoutPositions();
+}
+
+function setDisabledState(container, disabled) {
+  if (!container) return;
+  container.classList.toggle("is-disabled", disabled);
+  container.setAttribute("aria-disabled", String(disabled));
+
+  const applyDisabled = (element) => {
+    if (!element) return;
+    if (element.matches?.("button, input, select, textarea")) {
+      element.disabled = disabled;
+    } else if (element.matches?.("a")) {
+      element.setAttribute("tabindex", disabled ? "-1" : "0");
+    }
+  };
+
+  applyDisabled(container);
+  container
+    .querySelectorAll("button, input, select, textarea, a")
+    .forEach((el) => applyDisabled(el));
 }
 
 function getScopedKey(baseKey, userId) {
@@ -200,6 +468,15 @@ function updateViewModeUI(mode) {
     typographyView.setAttribute("aria-hidden", String(showStandard));
     standardView.classList.toggle("is-hidden", !showStandard);
     standardView.setAttribute("aria-hidden", String(!showStandard));
+  }
+
+  setDisabledState(togglePagesWrap, isStandard);
+  setDisabledState(toggleRefsWrap, isStandard);
+  setDisabledState(notesActions, isStandard);
+  setDisabledState(standardTools, false);
+
+  if (tocJump) {
+    tocJump.href = isStandard ? "#standardToc" : "#toc";
   }
 }
 
@@ -815,6 +1092,7 @@ function updateAuthUI() {
 
   updateUserDisplay(user);
   updateStickyOffsets();
+  updateLayoutAdminUI();
 
   if (!ready || !client) {
     setAuthConfirmMessage("Sync not configured. Notes are local only.");
@@ -1415,6 +1693,45 @@ async function init() {
     }
     render();
     setViewMode(state.viewMode);
+    updateLayoutAdminUI();
+
+    const layoutContainer = getLayoutContainer();
+    if (layoutContainer) {
+      defaultLayoutOrder = getLayoutItems()
+        .map((el) => el.dataset.layoutKey)
+        .filter(Boolean);
+      defaultLayoutPositions = getLayoutPositionsFromDom();
+
+      const savedOrder = loadLayoutOrder();
+      if (savedOrder.length) {
+        applyLayoutOrder(savedOrder);
+      }
+
+      layoutPositions = loadLayoutPositions();
+      if (Object.keys(layoutPositions).length) {
+        applyLayoutPositions(layoutPositions);
+      }
+
+      getLayoutItems().forEach((item) => {
+        item.addEventListener("pointerdown", handleLayoutPointerDown);
+        item.addEventListener("pointermove", handleLayoutPointerMove);
+        item.addEventListener("pointerup", handleLayoutPointerUp);
+        item.addEventListener("pointercancel", handleLayoutPointerUp);
+      });
+    }
+
+    layoutEditBtn?.addEventListener("click", () => {
+      const enabled = document.body?.classList.contains("layout-editing");
+      setLayoutEditing(!enabled);
+    });
+
+    layoutResetBtn?.addEventListener("click", () => {
+      if (!defaultLayoutOrder.length) return;
+      clearLayoutPositions();
+      applyLayoutOrder(defaultLayoutOrder);
+      saveLayoutOrder();
+      setLayoutEditing(false);
+    });
 
     if (searchInput) {
       searchInput.value = state.query;
@@ -1541,6 +1858,14 @@ async function init() {
     await initializeSupabase();
 
     updateStickyOffsets();
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(() => updateStickyOffsets());
+    }
+    const headerEl = document.querySelector(".page-header");
+    if (headerEl && "ResizeObserver" in window) {
+      const headerObserver = new ResizeObserver(() => updateStickyOffsets());
+      headerObserver.observe(headerEl);
+    }
     window.addEventListener("resize", () => {
       updateStickyOffsets();
     });
