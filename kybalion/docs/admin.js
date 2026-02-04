@@ -73,7 +73,10 @@ const setUIState = (user, member) => {
   const email = getUserEmail(user);
   const isSignedIn = Boolean(email);
   const isActive = Boolean(member);
-  const isAdmin = member?.group === "admin" || adminEmails.includes(email);
+  // Check admin from database group OR from hardcoded admin emails list
+  const isAdmin = (member?.group === "admin") || (isSignedIn && adminEmails.includes(email));
+
+  console.log("setUIState:", { email, isSignedIn, isActive, isAdmin, memberGroup: member?.group, adminEmails });
 
   // User display
   if (userDisplay) {
@@ -94,6 +97,7 @@ const setUIState = (user, member) => {
   // Upload button (show only for admins)
   if (headerUploadBtn) {
     headerUploadBtn.classList.toggle("is-hidden", !isAdmin);
+    console.log("headerUploadBtn visibility:", !isAdmin ? "hidden" : "visible");
   }
 
   // New folder button (show only for admins)
