@@ -355,6 +355,27 @@ h1 {
   font-size: 0.9rem;
 }
 
+.access-panel {
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+
+.access-panel h2 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 1.2rem;
+}
+
+.access-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .upload-panel.is-disabled {
   opacity: 0.6;
 }

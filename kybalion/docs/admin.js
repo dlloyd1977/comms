@@ -9,6 +9,7 @@ const adminEmails = (body.dataset.adminEmails || "")
   .filter(Boolean);
 const docsBucket = body.dataset.docsBucket || "kybalion-docs";
 const docsPrefix = body.dataset.docsPrefix || "";
+const membersTable = body.dataset.membersTable || "active_members";
 
 const authOpenBtn = document.getElementById("authOpenBtn");
 const userDisplay = document.getElementById("userDisplay");
@@ -23,6 +24,8 @@ const uploadInput = document.getElementById("uploadInput");
 const uploadBtn = document.getElementById("uploadBtn");
 const uploadStatus = document.getElementById("uploadStatus");
 const docTableBody = document.querySelector(".doc-table tbody");
+const docsContent = document.querySelector("[data-docs-content]");
+const accessGate = document.getElementById("accessGate");
 let chooseFileBtn = null;
 let fileNameEl = null;
 
@@ -66,9 +69,10 @@ const formatFileSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const setAdminState = (user) => {
+const setAdminState = (user, isAdmin = null) => {
   const email = user?.email?.toLowerCase() || "";
-  const isAdmin = adminEmails.includes(email);
+  // Use passed isAdmin if provided, else fall back to email list
+  const adminAccess = isAdmin !== null ? isAdmin : adminEmails.includes(email);
 
   if (userDisplay) {
     userDisplay.textContent = email ? `Signed in as ${email}` : "";
@@ -88,41 +92,79 @@ const setAdminState = (user) => {
   }
 
   if (authWarning) {
-    authWarning.classList.toggle("is-hidden", !email || isAdmin);
+    authWarning.classList.toggle("is-hidden", !email || adminAccess);
   }
 
   if (uploadPanel) {
     uploadPanel.classList.remove("is-hidden");
-    uploadPanel.classList.toggle("is-disabled", !isAdmin);
+    uploadPanel.classList.toggle("is-disabled", !adminAccess);
   }
 
   if (uploadInput) {
-    uploadInput.disabled = !isAdmin;
+    uploadInput.disabled = !adminAccess;
   }
 
   if (uploadBtn) {
-    uploadBtn.disabled = !isAdmin;
+    uploadBtn.disabled = !adminAccess;
   }
 
   if (chooseFileBtn) {
-    chooseFileBtn.disabled = !isAdmin;
+    chooseFileBtn.disabled = !adminAccess;
   }
 
-  if (uploadStatus && !isAdmin) {
+  if (uploadStatus && !adminAccess) {
     uploadStatus.textContent = "Admin access required to upload.";
   }
 
   if (authStatus) {
     if (!email) {
       authStatus.textContent = "Sign in to upload or edit documents.";
-    } else if (isAdmin) {
+    } else if (adminAccess) {
       authStatus.textContent = "Admin access granted. You can upload files.";
     } else {
       authStatus.textContent = "Signed in, but not an admin.";
     }
   }
 
-  return isAdmin;
+  return adminAccess;
+};
+
+const getUserEmail = (user) => (user?.email || "").toLowerCase();
+
+const getActiveMember = async (user) => {
+  if (!user) return false;
+  const email = getUserEmail(user);
+  if (!email) return false;
+  const { data, error } = await supabase
+    .from(membersTable)
+    .select("status, group")
+    .eq("email", email)
+    .maybeSingle();
+  if (error) return false;
+  return data?.status === "active" ? data : null;
+};
+
+const setAccessState = (canView) => {
+  if (docsContent) {
+    docsContent.classList.toggle("is-hidden", !canView);
+  }
+  if (accessGate) {
+    accessGate.classList.toggle("is-hidden", canView);
+  }
+  if (!canView) {
+    uploadPanel?.classList.add("is-hidden");
+  }
+};
+
+const updateMemberAccess = async (user) => {
+  const member = await getActiveMember(user);
+  const isActive = Boolean(member);
+  const isAdmin = member?.group === "admin" || adminEmails.includes(getUserEmail(user));
+  setAdminState(user, isAdmin);
+  setAccessState(isActive);
+  if (!isActive && authStatus) {
+    authStatus.textContent = "Access restricted to active members.";
+  }
 };
 
 const appendRow = ({ name, modified, size, url }) => {
@@ -238,7 +280,7 @@ if (uploadInput) {
 }
 
 supabase.auth.onAuthStateChange((_event, session) => {
-  setAdminState(session?.user || null);
+  void updateMemberAccess(session?.user || null);
 });
 
-getCurrentUser().then(setAdminState);
+getCurrentUser().then((user) => updateMemberAccess(user));
