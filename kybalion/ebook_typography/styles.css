@@ -100,6 +100,56 @@ h1 {
   flex-wrap: wrap;
 }
 
+.menu-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  max-height: 70vh;
+  overflow: auto;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 12px;
+  z-index: 40;
+  color: var(--ink);
+}
+
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-title {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.menu-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.menu-link:hover {
+  background: #f1f5fb;
+  color: var(--accent-dark);
+}
+
 .user-display {
   display: inline-flex;
   align-items: center;

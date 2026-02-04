@@ -78,6 +78,9 @@ const typographyView = document.getElementById("typographyView");
 const standardView = document.getElementById("standardView");
 const standardContent = document.getElementById("standardContent");
 const standardSaveHighlightBtn = document.getElementById("standardSaveHighlightBtn");
+const menuBtn = document.getElementById("menuBtn");
+const menuPanel = document.getElementById("menuPanel");
+const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
 const standardAddTagBtn = document.getElementById("standardAddTagBtn");
 const standardAnnotateBtn = document.getElementById("standardAnnotateBtn");
 const standardViewNotesBtn = document.getElementById("standardViewNotesBtn");
@@ -157,6 +160,20 @@ function updateLayoutAdminUI() {
   if (!isAdmin) {
     setLayoutEditing(false);
   }
+}
+
+function updateMenuAdminUI() {
+  const isAdmin = isAdminUser(state.auth.user);
+  adminMenuLinks.forEach((link) => {
+    link.classList.toggle("is-hidden", !isAdmin);
+    link.setAttribute("aria-hidden", String(!isAdmin));
+  });
+}
+
+function setMenuOpen(open) {
+  if (!menuBtn || !menuPanel) return;
+  menuPanel.classList.toggle("is-hidden", !open);
+  menuBtn.setAttribute("aria-expanded", String(open));
 }
 
 function getLayoutContainer() {
@@ -1105,6 +1122,7 @@ function updateAuthUI() {
   updateUserDisplay(user);
   updateStickyOffsets();
   updateLayoutAdminUI();
+  updateMenuAdminUI();
 
   if (!ready || !client) {
     setAuthConfirmMessage("Sync not configured. Notes are local only.");
@@ -1829,6 +1847,22 @@ async function init() {
       setAuthStep("choice");
       setNotesModalOpen(true);
     });
+    if (menuBtn && menuPanel) {
+      menuBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const isOpen = !menuPanel.classList.contains("is-hidden");
+        setMenuOpen(!isOpen);
+      });
+      menuPanel.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+      document.addEventListener("click", () => setMenuOpen(false));
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          setMenuOpen(false);
+        }
+      });
+    }
 
     closeNotesBtn?.addEventListener("click", () => setNotesModalOpen(false));
     notesModal?.addEventListener("click", (event) => {
