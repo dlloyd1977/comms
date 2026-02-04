@@ -7,7 +7,13 @@
     <meta name="description" content="General Kybalion course materials." />
     <link rel="stylesheet" href="../styles.css" />
   </head>
-  <body>
+  <body
+    data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
+    data-supabase-anon-key="sb_publishable_pGN0njb-9XysERIUFiYtPg_NbAQuZGT"
+    data-admin-emails="davidelloydjr@gmail.com"
+    data-docs-bucket="kybalion-docs"
+    data-docs-prefix="general/"
+  >
     <header class="page-header">
       <div class="header-content">
         <div class="brand">
@@ -18,11 +24,48 @@
         <div class="header-actions">
           <a class="button secondary" href="../">Back to Library</a>
           <a class="button primary" href="/kybalion/">Kybalion Home</a>
+          <button class="button secondary" type="button" id="authOpenBtn">Admin Sign In</button>
+          <span class="user-display is-hidden" id="userDisplay" aria-live="polite"></span>
+          <button class="button secondary is-hidden" type="button" id="headerSignOutBtn">Log out</button>
         </div>
       </div>
     </header>
 
     <main class="page">
+      <section class="section">
+        <div class="panel auth-panel">
+          <div class="auth-header">
+            <h2>Admin</h2>
+            <p class="auth-status" id="authStatus">
+              Sign in to upload or edit documents.
+            </p>
+          </div>
+          <form class="auth-form" id="authForm">
+            <label>
+              Email
+              <input type="email" id="authEmail" autocomplete="email" required />
+            </label>
+            <label>
+              Password
+              <input type="password" id="authPassword" autocomplete="current-password" required />
+            </label>
+            <div class="auth-actions">
+              <button class="button primary" type="submit">Sign in</button>
+            </div>
+          </form>
+          <p class="auth-warning is-hidden" id="authWarning">
+            Only admins can upload files.
+          </p>
+          <div class="upload-panel is-hidden" id="uploadPanel">
+            <div class="upload-row">
+              <input type="file" id="uploadInput" />
+              <button class="button primary" type="button" id="uploadBtn">Upload</button>
+            </div>
+            <p class="upload-note">Uploads go to the General folder.</p>
+            <p class="upload-status" id="uploadStatus">No upload in progress.</p>
+          </div>
+        </div>
+      </section>
       <section class="section">
         <div class="doc-toolbar">
           <h2>Documents</h2>
@@ -53,5 +96,6 @@
         </table>
       </section>
     </main>
+    <script type="module" src="../admin.js"></script>
   </body>
 </html>
