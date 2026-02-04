@@ -31,24 +31,58 @@ let fileNameEl = null;
 
 const uploadRow = uploadInput?.closest(".upload-row");
 if (uploadRow && uploadInput) {
+  // Enable multiple file and folder selection
   uploadInput.classList.add("file-input-hidden");
+  uploadInput.setAttribute("multiple", "");
+  uploadInput.setAttribute("webkitdirectory", "");
+  
   chooseFileBtn = document.createElement("button");
   chooseFileBtn.type = "button";
   chooseFileBtn.className = "button secondary file-choose-btn";
-  chooseFileBtn.textContent = "Choose File";
+  chooseFileBtn.textContent = "Choose Files";
+
+  // Add folder button
+  const chooseFolderBtn = document.createElement("button");
+  chooseFolderBtn.type = "button";
+  chooseFolderBtn.className = "button secondary file-choose-btn";
+  chooseFolderBtn.textContent = "Choose Folder";
 
   fileNameEl = document.createElement("span");
   fileNameEl.className = "file-name";
-  fileNameEl.textContent = "No file chosen";
+  fileNameEl.textContent = "No files chosen";
+
+  // Create a separate input for files only (no webkitdirectory)
+  const fileOnlyInput = document.createElement("input");
+  fileOnlyInput.type = "file";
+  fileOnlyInput.multiple = true;
+  fileOnlyInput.classList.add("file-input-hidden");
+  fileOnlyInput.id = "fileOnlyInput";
+  uploadRow.appendChild(fileOnlyInput);
 
   uploadRow.insertBefore(chooseFileBtn, uploadInput);
+  uploadRow.insertBefore(chooseFolderBtn, uploadInput);
   if (uploadBtn) {
     uploadRow.insertBefore(fileNameEl, uploadBtn);
   } else {
     uploadRow.appendChild(fileNameEl);
   }
 
-  chooseFileBtn.addEventListener("click", () => uploadInput.click());
+  // Choose Files button - opens file picker (multiple files)
+  chooseFileBtn.addEventListener("click", () => fileOnlyInput.click());
+  
+  // Choose Folder button - opens folder picker
+  chooseFolderBtn.addEventListener("click", () => uploadInput.click());
+
+  // Sync file selection from fileOnlyInput to display
+  fileOnlyInput.addEventListener("change", () => {
+    if (fileOnlyInput.files && fileOnlyInput.files.length > 0) {
+      const count = fileOnlyInput.files.length;
+      fileNameEl.textContent = count === 1 
+        ? fileOnlyInput.files[0].name 
+        : `${count} files selected`;
+      uploadStatus.textContent = "Ready to upload.";
+    }
+  });
 }
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -261,9 +295,16 @@ const handleSignOut = async () => {
 const handleUpload = async () => {
   if (!uploadInput) return;
 
-  if (!uploadInput.files || uploadInput.files.length === 0) {
-    uploadInput.click();
-    uploadStatus.textContent = "Choose a file to upload.";
+  // Check both inputs for files
+  const fileOnlyInput = document.getElementById("fileOnlyInput");
+  const filesToUpload = (fileOnlyInput?.files?.length > 0) 
+    ? Array.from(fileOnlyInput.files) 
+    : (uploadInput.files?.length > 0) 
+      ? Array.from(uploadInput.files) 
+      : [];
+
+  if (filesToUpload.length === 0) {
+    uploadStatus.textContent = "Choose files or a folder to upload.";
     return;
   }
 
@@ -274,44 +315,46 @@ const handleUpload = async () => {
     return;
   }
 
-  const file = uploadInput.files[0];
-  const path = `${docsPrefix}${file.name}`;
-  uploadStatus.textContent = `Uploading ${file.name}…`;
+  const total = filesToUpload.length;
+  let uploaded = 0;
+  let failed = 0;
 
-  const { data, error } = await supabase.storage
-    .from(docsBucket)
-    .upload(path, file, { upsert: true });
+  for (const file of filesToUpload) {
+    // Use relative path for folder uploads, or just filename
+    const fileName = file.webkitRelativePath || file.name;
+    const path = `${docsPrefix}${fileName}`;
+    uploadStatus.textContent = `Uploading ${uploaded + 1}/${total}: ${file.name}…`;
 
-  if (error) {
-    if (error.message?.toLowerCase().includes("bucket not found")) {
-      uploadStatus.textContent = "Upload failed: bucket not found. Create the kybalion-docs bucket in Supabase.";
+    const { error } = await supabase.storage
+      .from(docsBucket)
+      .upload(path, file, { upsert: true });
+
+    if (error) {
+      console.error(`Upload failed for ${file.name}:`, error.message);
+      failed++;
     } else {
-      uploadStatus.textContent = `Upload failed: ${error.message}`;
+      uploaded++;
     }
-    return;
   }
 
-  const { data: publicUrlData } = supabase.storage
-    .from(docsBucket)
-    .getPublicUrl(data.path);
-
-  appendRow({
-    name: file.name,
-    modified: formatTimestamp(new Date()),
-    size: formatFileSize(file.size),
-    url: publicUrlData.publicUrl,
-  });
-
-  uploadStatus.textContent = "Upload complete. Refreshing…";
+  // Clear inputs
   uploadInput.value = "";
+  if (fileOnlyInput) fileOnlyInput.value = "";
   if (fileNameEl) {
-    fileNameEl.textContent = "No file chosen";
+    fileNameEl.textContent = "No files chosen";
   }
 
-  // Refresh page after short delay so user sees success message
+  // Show result and refresh once
+  if (failed > 0) {
+    uploadStatus.textContent = `Uploaded ${uploaded}/${total} files. ${failed} failed. Refreshing…`;
+  } else {
+    uploadStatus.textContent = `Uploaded ${uploaded} file${uploaded !== 1 ? 's' : ''}. Refreshing…`;
+  }
+
+  // Single refresh after all uploads complete
   setTimeout(() => {
     window.location.reload();
-  }, 1000);
+  }, 1500);
 };
 
 if (authForm) {
@@ -329,9 +372,14 @@ if (uploadBtn) {
 if (uploadInput) {
   uploadInput.addEventListener("change", () => {
     if (uploadInput.files && uploadInput.files.length > 0) {
-      uploadStatus.textContent = "Ready to upload.";
+      const count = uploadInput.files.length;
       if (fileNameEl) {
-        fileNameEl.textContent = uploadInput.files[0].name;
+        fileNameEl.textContent = count === 1 
+          ? uploadInput.files[0].name 
+          : `${count} files selected`;
+      }
+      if (uploadStatus) {
+        uploadStatus.textContent = "Ready to upload.";
       }
     }
   });
