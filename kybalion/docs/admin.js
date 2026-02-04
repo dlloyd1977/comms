@@ -252,8 +252,16 @@ const handleUpload = async () => {
     url: publicUrlData.publicUrl,
   });
 
-  uploadStatus.textContent = "Upload complete.";
+  uploadStatus.textContent = "Upload complete. Refreshing…";
   uploadInput.value = "";
+  if (fileNameEl) {
+    fileNameEl.textContent = "No file chosen";
+  }
+
+  // Refresh page after short delay so user sees success message
+  setTimeout(() => {
+    window.location.reload();
+  }, 1000);
 };
 
 if (authForm) {
