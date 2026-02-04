@@ -1462,9 +1462,10 @@ function handleGuestMode() {
 }
 
 function setNotesModalOpen(open) {
-  if (!notesModal || !toggleNotesBtn) return;
+  if (!notesModal) return;
   notesModal.classList.toggle("active", open);
   notesModal.setAttribute("aria-hidden", String(!open));
+  if (!toggleNotesBtn) return;
   toggleNotesBtn.textContent = open ? "Hide Notes" : "View Notes";
   toggleNotesBtn.setAttribute("aria-expanded", String(open));
   toggleNotesBtn.setAttribute("aria-controls", "notesModal");
