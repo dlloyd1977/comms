@@ -11,82 +11,27 @@ const docsBucket = body.dataset.docsBucket || "kybalion-docs";
 const docsPrefix = body.dataset.docsPrefix || "";
 const membersTable = body.dataset.membersTable || "active_members";
 
+// Header elements
 const authOpenBtn = document.getElementById("authOpenBtn");
 const userDisplay = document.getElementById("userDisplay");
 const headerSignOutBtn = document.getElementById("headerSignOutBtn");
-const authForm = document.getElementById("authForm");
-const authEmail = document.getElementById("authEmail");
-const authPassword = document.getElementById("authPassword");
-const authStatus = document.getElementById("authStatus");
-const authWarning = document.getElementById("authWarning");
-const uploadPanel = document.getElementById("uploadPanel");
+const headerUploadBtn = document.getElementById("headerUploadBtn");
+const headerNewFolderBtn = document.getElementById("headerNewFolderBtn");
 const uploadInput = document.getElementById("uploadInput");
-const uploadBtn = document.getElementById("uploadBtn");
 const uploadStatus = document.getElementById("uploadStatus");
+
+// Content elements
 const docTableBody = document.querySelector(".doc-table tbody");
 const docsContent = document.querySelector("[data-docs-content]");
 const accessGate = document.getElementById("accessGate");
-let chooseFileBtn = null;
-let fileNameEl = null;
+const emptyState = document.getElementById("emptyState");
 
-const uploadRow = uploadInput?.closest(".upload-row");
-if (uploadRow && uploadInput) {
-  // Enable multiple file and folder selection
-  uploadInput.classList.add("file-input-hidden");
-  uploadInput.setAttribute("multiple", "");
-  uploadInput.setAttribute("webkitdirectory", "");
-  
-  chooseFileBtn = document.createElement("button");
-  chooseFileBtn.type = "button";
-  chooseFileBtn.className = "button secondary file-choose-btn";
-  chooseFileBtn.textContent = "Choose Files";
-
-  // Add folder button
-  const chooseFolderBtn = document.createElement("button");
-  chooseFolderBtn.type = "button";
-  chooseFolderBtn.className = "button secondary file-choose-btn";
-  chooseFolderBtn.textContent = "Choose Folder";
-
-  fileNameEl = document.createElement("span");
-  fileNameEl.className = "file-name";
-  fileNameEl.textContent = "No files chosen";
-
-  // Create a separate input for files only (no webkitdirectory)
-  const fileOnlyInput = document.createElement("input");
-  fileOnlyInput.type = "file";
-  fileOnlyInput.multiple = true;
-  fileOnlyInput.classList.add("file-input-hidden");
-  fileOnlyInput.id = "fileOnlyInput";
-  uploadRow.appendChild(fileOnlyInput);
-
-  uploadRow.insertBefore(chooseFileBtn, uploadInput);
-  uploadRow.insertBefore(chooseFolderBtn, uploadInput);
-  if (uploadBtn) {
-    uploadRow.insertBefore(fileNameEl, uploadBtn);
-  } else {
-    uploadRow.appendChild(fileNameEl);
-  }
-
-  // Choose Files button - opens file picker (multiple files)
-  chooseFileBtn.addEventListener("click", () => fileOnlyInput.click());
-  
-  // Choose Folder button - opens folder picker
-  chooseFolderBtn.addEventListener("click", () => uploadInput.click());
-
-  // Sync file selection from fileOnlyInput to display
-  fileOnlyInput.addEventListener("change", () => {
-    if (fileOnlyInput.files && fileOnlyInput.files.length > 0) {
-      const count = fileOnlyInput.files.length;
-      fileNameEl.textContent = count === 1 
-        ? fileOnlyInput.files[0].name 
-        : `${count} files selected`;
-      uploadStatus.textContent = "Ready to upload.";
-    }
-  });
-}
+// Auth modal elements
+let authModal = null;
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Utility functions
 const formatTimestamp = (date) =>
   date.toLocaleString("en-US", {
     year: "numeric",
@@ -103,119 +48,94 @@ const formatFileSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const setAdminState = (user, isAdmin = null) => {
-  const email = user?.email?.toLowerCase() || "";
-  // Use passed isAdmin if provided, else fall back to email list
-  const adminAccess = isAdmin !== null ? isAdmin : adminEmails.includes(email);
-
-  if (userDisplay) {
-    userDisplay.textContent = email ? `Signed in as ${email}` : "";
-    userDisplay.classList.toggle("is-hidden", !email);
-  }
-
-  if (authOpenBtn) {
-    authOpenBtn.classList.toggle("is-hidden", Boolean(email));
-  }
-
-  if (headerSignOutBtn) {
-    headerSignOutBtn.classList.toggle("is-hidden", !email);
-  }
-
-  if (authForm) {
-    authForm.classList.toggle("is-hidden", Boolean(email));
-  }
-
-  if (authWarning) {
-    authWarning.classList.toggle("is-hidden", !email || adminAccess);
-  }
-
-  if (uploadPanel) {
-    uploadPanel.classList.remove("is-hidden");
-    uploadPanel.classList.toggle("is-disabled", !adminAccess);
-  }
-
-  if (uploadInput) {
-    uploadInput.disabled = !adminAccess;
-  }
-
-  if (uploadBtn) {
-    uploadBtn.disabled = !adminAccess;
-  }
-
-  if (chooseFileBtn) {
-    chooseFileBtn.disabled = !adminAccess;
-  }
-
-  if (uploadStatus && !adminAccess) {
-    uploadStatus.textContent = "Admin access required to upload.";
-  }
-
-  if (authStatus) {
-    if (!email) {
-      authStatus.textContent = "Sign in to upload or edit documents.";
-    } else if (adminAccess) {
-      authStatus.textContent = "Admin access granted. You can upload files.";
-    } else {
-      authStatus.textContent = "Signed in, but not an admin.";
-    }
-  }
-
-  return adminAccess;
-};
-
 const getUserEmail = (user) => (user?.email || "").toLowerCase();
 
+const getCurrentUser = async () => {
+  const { data } = await supabase.auth.getSession();
+  return data?.session?.user || null;
+};
+
+// Member and admin state
 const getActiveMember = async (user) => {
-  if (!user) return false;
+  if (!user) return null;
   const email = getUserEmail(user);
-  if (!email) return false;
+  if (!email) return null;
   const { data, error } = await supabase
     .from(membersTable)
     .select("status, group")
     .eq("email", email)
     .maybeSingle();
-  if (error) return false;
+  if (error) return null;
   return data?.status === "active" ? data : null;
 };
 
-const setAccessState = (canView) => {
+const setUIState = (user, member) => {
+  const email = getUserEmail(user);
+  const isSignedIn = Boolean(email);
+  const isActive = Boolean(member);
+  const isAdmin = member?.group === "admin" || adminEmails.includes(email);
+
+  // User display
+  if (userDisplay) {
+    userDisplay.textContent = email ? `Signed in as ${email}` : "";
+    userDisplay.classList.toggle("is-hidden", !isSignedIn);
+  }
+
+  // Auth button (show when not signed in)
+  if (authOpenBtn) {
+    authOpenBtn.classList.toggle("is-hidden", isSignedIn);
+  }
+
+  // Sign out button (show when signed in)
+  if (headerSignOutBtn) {
+    headerSignOutBtn.classList.toggle("is-hidden", !isSignedIn);
+  }
+
+  // Upload button (show only for admins)
+  if (headerUploadBtn) {
+    headerUploadBtn.classList.toggle("is-hidden", !isAdmin);
+  }
+
+  // New folder button (show only for admins)
+  if (headerNewFolderBtn) {
+    headerNewFolderBtn.classList.toggle("is-hidden", !isAdmin);
+  }
+
+  // Content visibility (show for active members)
   if (docsContent) {
-    docsContent.classList.toggle("is-hidden", !canView);
+    docsContent.classList.toggle("is-hidden", !isActive);
   }
+
+  // Access gate (show when not active member)
   if (accessGate) {
-    accessGate.classList.toggle("is-hidden", canView);
+    accessGate.classList.toggle("is-hidden", isActive);
   }
-  if (!canView) {
-    uploadPanel?.classList.add("is-hidden");
-  }
+
+  return { isSignedIn, isActive, isAdmin };
 };
 
 const updateMemberAccess = async (user) => {
   const member = await getActiveMember(user);
-  const isActive = Boolean(member);
-  const isAdmin = member?.group === "admin" || adminEmails.includes(getUserEmail(user));
-  setAdminState(user, isAdmin);
-  setAccessState(isActive);
-  if (!isActive && authStatus) {
-    authStatus.textContent = "Access restricted to active members.";
-  }
-  // Load docs from bucket if user has access
+  const { isActive } = setUIState(user, member);
+  
   if (isActive) {
     await loadDocsFromBucket();
   }
 };
 
-const appendRow = ({ name, modified, size, url }) => {
+// Document loading
+const appendRow = ({ name, modified, size, url, isFolder }) => {
   if (!docTableBody) return;
 
   const row = document.createElement("tr");
+  const icon = isFolder ? "📁" : "";
   row.innerHTML = `
-    <td><a class="doc-link" href="${url}">${name}</a></td>
+    <td><a class="doc-link" href="${url}">${icon} ${name}</a></td>
     <td>${modified}</td>
     <td>David Lloyd</td>
     <td>${size}</td>
   `;
-  docTableBody.prepend(row);
+  docTableBody.appendChild(row);
 };
 
 const loadDocsFromBucket = async () => {
@@ -230,100 +150,135 @@ const loadDocsFromBucket = async () => {
     return;
   }
 
-  // Clear existing rows (except header)
   docTableBody.innerHTML = "";
-
-  const emptyState = document.getElementById("emptyState");
   let fileCount = 0;
 
   for (const file of files) {
-    // Skip folders (they have no metadata)
-    if (!file.metadata) continue;
+    const isFolder = !file.metadata;
+    
+    if (isFolder) {
+      // It's a folder - show it
+      appendRow({
+        name: file.name,
+        modified: "—",
+        size: "—",
+        url: `#folder-${file.name}`,
+        isFolder: true,
+      });
+      fileCount++;
+    } else {
+      // It's a file
+      const { data: publicUrlData } = supabase.storage
+        .from(docsBucket)
+        .getPublicUrl(`${docsPrefix}${file.name}`);
 
-    fileCount++;
+      const modified = file.updated_at
+        ? formatTimestamp(new Date(file.updated_at))
+        : "—";
 
-    const { data: publicUrlData } = supabase.storage
-      .from(docsBucket)
-      .getPublicUrl(`${docsPrefix}${file.name}`);
-
-    const modified = file.updated_at
-      ? formatTimestamp(new Date(file.updated_at))
-      : "—";
-
-    appendRow({
-      name: file.name,
-      modified,
-      size: formatFileSize(file.metadata?.size),
-      url: publicUrlData.publicUrl,
-    });
+      appendRow({
+        name: file.name,
+        modified,
+        size: formatFileSize(file.metadata?.size),
+        url: publicUrlData.publicUrl,
+        isFolder: false,
+      });
+      fileCount++;
+    }
   }
 
-  // Show/hide empty state
   if (emptyState) {
     emptyState.classList.toggle("is-hidden", fileCount > 0);
   }
 };
 
-const getCurrentUser = async () => {
-  const { data } = await supabase.auth.getSession();
-  return data?.session?.user || null;
-};
+// Auth modal
+const createAuthModal = () => {
+  if (authModal) return authModal;
 
-const handleSignIn = async (event) => {
-  event.preventDefault();
-  if (!authEmail || !authPassword) return;
+  authModal = document.createElement("div");
+  authModal.className = "auth-modal is-hidden";
+  authModal.innerHTML = `
+    <div class="auth-modal-backdrop"></div>
+    <div class="auth-modal-content panel">
+      <h2>Admin Sign In</h2>
+      <form class="auth-form" id="authModalForm">
+        <label>
+          Email
+          <input type="email" id="authModalEmail" autocomplete="email" required />
+        </label>
+        <label>
+          Password
+          <input type="password" id="authModalPassword" autocomplete="current-password" required />
+        </label>
+        <p class="auth-status" id="authModalStatus"></p>
+        <div class="auth-actions">
+          <button class="button secondary" type="button" id="authModalCancel">Cancel</button>
+          <button class="button primary" type="submit">Sign in</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(authModal);
 
-  authStatus.textContent = "Signing in…";
-  const { error } = await supabase.auth.signInWithPassword({
-    email: authEmail.value.trim(),
-    password: authPassword.value,
+  const form = authModal.querySelector("#authModalForm");
+  const cancelBtn = authModal.querySelector("#authModalCancel");
+  const backdrop = authModal.querySelector(".auth-modal-backdrop");
+
+  const closeModal = () => authModal.classList.add("is-hidden");
+
+  cancelBtn.addEventListener("click", closeModal);
+  backdrop.addEventListener("click", closeModal);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = authModal.querySelector("#authModalEmail").value.trim();
+    const password = authModal.querySelector("#authModalPassword").value;
+    const status = authModal.querySelector("#authModalStatus");
+
+    status.textContent = "Signing in…";
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      status.textContent = `Sign-in failed: ${error.message}`;
+    } else {
+      status.textContent = "Signed in.";
+      form.reset();
+      closeModal();
+    }
   });
 
-  if (error) {
-    authStatus.textContent = `Sign-in failed: ${error.message}`;
-    return;
-  }
-
-  authStatus.textContent = "Signed in.";
-  authForm.reset();
+  return authModal;
 };
 
-const handleSignOut = async () => {
-  await supabase.auth.signOut();
+const showAuthModal = () => {
+  const modal = createAuthModal();
+  modal.classList.remove("is-hidden");
+  modal.querySelector("#authModalEmail")?.focus();
 };
 
+// Upload handling
 const handleUpload = async () => {
-  if (!uploadInput) return;
-
-  // Check both inputs for files
-  const fileOnlyInput = document.getElementById("fileOnlyInput");
-  const filesToUpload = (fileOnlyInput?.files?.length > 0) 
-    ? Array.from(fileOnlyInput.files) 
-    : (uploadInput.files?.length > 0) 
-      ? Array.from(uploadInput.files) 
-      : [];
-
-  if (filesToUpload.length === 0) {
-    uploadStatus.textContent = "Choose files or a folder to upload.";
-    return;
-  }
+  if (!uploadInput?.files?.length) return;
 
   const user = await getCurrentUser();
-  const isAdmin = setAdminState(user);
+  const member = await getActiveMember(user);
+  const isAdmin = member?.group === "admin" || adminEmails.includes(getUserEmail(user));
+
   if (!isAdmin) {
-    uploadStatus.textContent = "Admin access required to upload.";
+    showStatus("Admin access required to upload.");
     return;
   }
 
-  const total = filesToUpload.length;
+  const files = Array.from(uploadInput.files);
+  const total = files.length;
   let uploaded = 0;
   let failed = 0;
 
-  for (const file of filesToUpload) {
-    // Use relative path for folder uploads, or just filename
+  for (const file of files) {
     const fileName = file.webkitRelativePath || file.name;
     const path = `${docsPrefix}${fileName}`;
-    uploadStatus.textContent = `Uploading ${uploaded + 1}/${total}: ${file.name}…`;
+    showStatus(`Uploading ${uploaded + 1}/${total}: ${file.name}…`);
 
     const { error } = await supabase.storage
       .from(docsBucket)
@@ -337,56 +292,84 @@ const handleUpload = async () => {
     }
   }
 
-  // Clear inputs
   uploadInput.value = "";
-  if (fileOnlyInput) fileOnlyInput.value = "";
-  if (fileNameEl) {
-    fileNameEl.textContent = "No files chosen";
-  }
 
-  // Show result and refresh once
   if (failed > 0) {
-    uploadStatus.textContent = `Uploaded ${uploaded}/${total} files. ${failed} failed. Refreshing…`;
+    showStatus(`Uploaded ${uploaded}/${total} files. ${failed} failed. Refreshing…`);
   } else {
-    uploadStatus.textContent = `Uploaded ${uploaded} file${uploaded !== 1 ? 's' : ''}. Refreshing…`;
+    showStatus(`Uploaded ${uploaded} file${uploaded !== 1 ? "s" : ""}. Refreshing…`);
   }
 
-  // Single refresh after all uploads complete
-  setTimeout(() => {
-    window.location.reload();
-  }, 1500);
+  setTimeout(() => window.location.reload(), 1500);
 };
 
-if (authForm) {
-  authForm.addEventListener("submit", handleSignIn);
+const showStatus = (message) => {
+  if (uploadStatus) {
+    uploadStatus.textContent = message;
+    uploadStatus.classList.remove("is-hidden");
+  }
+};
+
+// New folder handling
+const handleNewFolder = async () => {
+  const folderName = prompt("Enter folder name:");
+  if (!folderName || !folderName.trim()) return;
+
+  const user = await getCurrentUser();
+  const member = await getActiveMember(user);
+  const isAdmin = member?.group === "admin" || adminEmails.includes(getUserEmail(user));
+
+  if (!isAdmin) {
+    showStatus("Admin access required to create folders.");
+    return;
+  }
+
+  // Create a placeholder file to make the folder exist
+  const placeholderPath = `${docsPrefix}${folderName.trim()}/.folder`;
+  showStatus(`Creating folder: ${folderName}…`);
+
+  const { error } = await supabase.storage
+    .from(docsBucket)
+    .upload(placeholderPath, new Blob([""]), { upsert: true });
+
+  if (error) {
+    showStatus(`Failed to create folder: ${error.message}`);
+    return;
+  }
+
+  showStatus(`Folder "${folderName}" created. Refreshing…`);
+  setTimeout(() => window.location.reload(), 1000);
+};
+
+// Event listeners
+if (authOpenBtn) {
+  authOpenBtn.addEventListener("click", showAuthModal);
 }
 
 if (headerSignOutBtn) {
-  headerSignOutBtn.addEventListener("click", handleSignOut);
-}
-
-if (uploadBtn) {
-  uploadBtn.addEventListener("click", handleUpload);
-}
-
-if (uploadInput) {
-  uploadInput.addEventListener("change", () => {
-    if (uploadInput.files && uploadInput.files.length > 0) {
-      const count = uploadInput.files.length;
-      if (fileNameEl) {
-        fileNameEl.textContent = count === 1 
-          ? uploadInput.files[0].name 
-          : `${count} files selected`;
-      }
-      if (uploadStatus) {
-        uploadStatus.textContent = "Ready to upload.";
-      }
-    }
+  headerSignOutBtn.addEventListener("click", async () => {
+    await supabase.auth.signOut();
   });
 }
 
+if (headerUploadBtn) {
+  headerUploadBtn.addEventListener("click", () => {
+    uploadInput?.click();
+  });
+}
+
+if (uploadInput) {
+  uploadInput.addEventListener("change", handleUpload);
+}
+
+if (headerNewFolderBtn) {
+  headerNewFolderBtn.addEventListener("click", handleNewFolder);
+}
+
+// Auth state changes
 supabase.auth.onAuthStateChange((_event, session) => {
   void updateMemberAccess(session?.user || null);
 });
 
+// Initial load
 getCurrentUser().then((user) => updateMemberAccess(user));
