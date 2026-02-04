@@ -330,8 +330,17 @@ h1 {
   flex-wrap: wrap;
 }
 
-.upload-row input[type="file"] {
-  color: var(--ink);
+.file-input-hidden {
+  display: none;
+}
+
+.file-choose-btn {
+  min-width: 120px;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 
 .upload-note {
@@ -364,4 +373,8 @@ h1 {
   background: #c8c6c4;
   border-color: #c8c6c4;
   color: #ffffff;
+}
+
+.upload-panel.is-disabled .file-name {
+  color: var(--muted);
 }

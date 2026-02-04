@@ -23,6 +23,30 @@ const uploadInput = document.getElementById("uploadInput");
 const uploadBtn = document.getElementById("uploadBtn");
 const uploadStatus = document.getElementById("uploadStatus");
 const docTableBody = document.querySelector(".doc-table tbody");
+let chooseFileBtn = null;
+let fileNameEl = null;
+
+const uploadRow = uploadInput?.closest(".upload-row");
+if (uploadRow && uploadInput) {
+  uploadInput.classList.add("file-input-hidden");
+  chooseFileBtn = document.createElement("button");
+  chooseFileBtn.type = "button";
+  chooseFileBtn.className = "button secondary file-choose-btn";
+  chooseFileBtn.textContent = "Choose File";
+
+  fileNameEl = document.createElement("span");
+  fileNameEl.className = "file-name";
+  fileNameEl.textContent = "No file chosen";
+
+  uploadRow.insertBefore(chooseFileBtn, uploadInput);
+  if (uploadBtn) {
+    uploadRow.insertBefore(fileNameEl, uploadBtn);
+  } else {
+    uploadRow.appendChild(fileNameEl);
+  }
+
+  chooseFileBtn.addEventListener("click", () => uploadInput.click());
+}
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -78,6 +102,10 @@ const setAdminState = (user) => {
 
   if (uploadBtn) {
     uploadBtn.disabled = !isAdmin;
+  }
+
+  if (chooseFileBtn) {
+    chooseFileBtn.disabled = !isAdmin;
   }
 
   if (uploadStatus && !isAdmin) {
@@ -163,7 +191,11 @@ const handleUpload = async () => {
     .upload(path, file, { upsert: true });
 
   if (error) {
-    uploadStatus.textContent = `Upload failed: ${error.message}`;
+    if (error.message?.toLowerCase().includes("bucket not found")) {
+      uploadStatus.textContent = "Upload failed: bucket not found. Create the kybalion-docs bucket in Supabase.";
+    } else {
+      uploadStatus.textContent = `Upload failed: ${error.message}`;
+    }
     return;
   }
 
@@ -198,6 +230,9 @@ if (uploadInput) {
   uploadInput.addEventListener("change", () => {
     if (uploadInput.files && uploadInput.files.length > 0) {
       uploadStatus.textContent = "Ready to upload.";
+      if (fileNameEl) {
+        fileNameEl.textContent = uploadInput.files[0].name;
+      }
     }
   });
 }
