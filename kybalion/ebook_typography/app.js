@@ -1,7 +1,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.8.8";
+const APP_VERSION = "1.8.9";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -99,6 +99,15 @@ const state = {
 
 if (appVersionEl) {
   appVersionEl.textContent = APP_VERSION;
+}
+
+function updateStickyOffsets() {
+  const header = document.querySelector(".page-header");
+  if (!header) return;
+  const rect = header.getBoundingClientRect();
+  const base = Math.ceil(rect.height);
+  const offset = Math.max(120, base + 12);
+  document.documentElement.style.setProperty("--header-offset", `${offset}px`);
 }
 
 function getScopedKey(baseKey, userId) {
@@ -805,6 +814,7 @@ function updateAuthUI() {
   const { client, user, ready, mode } = state.auth;
 
   updateUserDisplay(user);
+  updateStickyOffsets();
 
   if (!ready || !client) {
     setAuthConfirmMessage("Sync not configured. Notes are local only.");
@@ -1529,6 +1539,11 @@ async function init() {
     });
 
     await initializeSupabase();
+
+    updateStickyOffsets();
+    window.addEventListener("resize", () => {
+      updateStickyOffsets();
+    });
 
     printBtn?.addEventListener("click", () => window.print());
   } catch (error) {

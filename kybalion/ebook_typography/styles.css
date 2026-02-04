@@ -26,7 +26,7 @@ body {
 }
 
 html {
-  scroll-padding-top: 200px;
+  scroll-padding-top: var(--header-offset, 200px);
 }
 
 body[data-view-mode="standard"] #typographyView {
@@ -294,7 +294,7 @@ body[data-view-mode="standard"] .controls {
 }
 
 .standard-toc {
-  max-height: calc(100vh - 140px);
+  max-height: calc(100vh - var(--header-offset, 200px) - 120px);
 }
 
 .standard-tools {
@@ -371,7 +371,7 @@ body[data-view-mode="standard"] .controls {
 
 .toc {
   position: sticky;
-  top: 24px;
+  top: var(--header-offset, 200px);
   align-self: start;
   background: var(--panel);
   border-radius: 20px;
@@ -379,19 +379,19 @@ body[data-view-mode="standard"] .controls {
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   color: var(--ink);
-  max-height: calc(100vh - 48px);
+  max-height: calc(100vh - var(--header-offset, 200px) - 24px);
   overflow-y: auto;
 }
 
 body[data-view-mode="standard"] .toc {
-  max-height: calc(100vh - 280px);
+  max-height: calc(100vh - var(--header-offset, 200px) - 120px);
 }
 
 #toc,
 #standardToc,
 .chapter,
 .standard-chapter {
-  scroll-margin-top: 200px;
+  scroll-margin-top: var(--header-offset, 200px);
 }
 
 .toc-header h2 {
