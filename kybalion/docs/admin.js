@@ -139,7 +139,10 @@ const handleSignOut = async () => {
 };
 
 const handleUpload = async () => {
-  if (!uploadInput?.files?.length) {
+  if (!uploadInput) return;
+
+  if (!uploadInput.files || uploadInput.files.length === 0) {
+    uploadInput.click();
     uploadStatus.textContent = "Choose a file to upload.";
     return;
   }
@@ -189,6 +192,14 @@ if (headerSignOutBtn) {
 
 if (uploadBtn) {
   uploadBtn.addEventListener("click", handleUpload);
+}
+
+if (uploadInput) {
+  uploadInput.addEventListener("change", () => {
+    if (uploadInput.files && uploadInput.files.length > 0) {
+      uploadStatus.textContent = "Ready to upload.";
+    }
+  });
 }
 
 supabase.auth.onAuthStateChange((_event, session) => {
