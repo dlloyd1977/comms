@@ -13,6 +13,7 @@
     data-admin-emails="davidelloydjr@gmail.com"
     data-docs-bucket="kybalion-docs"
     data-docs-prefix="session-04/"
+    data-members-table="active_members"
   >
     <header class="page-header">
       <div class="header-content">
@@ -32,6 +33,13 @@
     </header>
 
     <main class="page">
+      <section class="section is-hidden" id="accessGate">
+        <div class="panel">
+          <h2>Documents Library</h2>
+          <p>Sign in with an active member account to view these documents.</p>
+        </div>
+      </section>
+      <div data-docs-content>
       <section class="section">
         <div class="panel auth-panel">
           <div class="auth-header">
@@ -74,6 +82,7 @@
           </ul>
         </div>
       </section>
+      </div>
     </main>
     <script type="module" src="../admin.js"></script>
   </body>
