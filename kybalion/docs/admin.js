@@ -165,6 +165,10 @@ const updateMemberAccess = async (user) => {
   if (!isActive && authStatus) {
     authStatus.textContent = "Access restricted to active members.";
   }
+  // Load docs from bucket if user has access
+  if (isActive) {
+    await loadDocsFromBucket();
+  }
 };
 
 const appendRow = ({ name, modified, size, url }) => {
@@ -178,6 +182,42 @@ const appendRow = ({ name, modified, size, url }) => {
     <td>${size}</td>
   `;
   docTableBody.prepend(row);
+};
+
+const loadDocsFromBucket = async () => {
+  if (!docTableBody) return;
+
+  const { data: files, error } = await supabase.storage
+    .from(docsBucket)
+    .list(docsPrefix || "", { sortBy: { column: "created_at", order: "desc" } });
+
+  if (error) {
+    console.error("Failed to load docs:", error.message);
+    return;
+  }
+
+  // Clear existing rows (except header)
+  docTableBody.innerHTML = "";
+
+  for (const file of files) {
+    // Skip folders (they have no metadata)
+    if (!file.metadata) continue;
+
+    const { data: publicUrlData } = supabase.storage
+      .from(docsBucket)
+      .getPublicUrl(`${docsPrefix}${file.name}`);
+
+    const modified = file.updated_at
+      ? formatTimestamp(new Date(file.updated_at))
+      : "—";
+
+    appendRow({
+      name: file.name,
+      modified,
+      size: formatFileSize(file.metadata?.size),
+      url: publicUrlData.publicUrl,
+    });
+  }
 };
 
 const getCurrentUser = async () => {
