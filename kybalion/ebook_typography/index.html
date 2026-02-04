@@ -24,11 +24,12 @@
       content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
     />
     <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
-    <link rel="stylesheet" href="styles.css?v=1.9.0" />
+    <link rel="stylesheet" href="styles.css?v=1.11.1" />
   </head>
   <body
     data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
     data-supabase-anon-key="sb_publishable_pGN0njb-9XysERIUFiYtPg_NbAQuZGT"
+    data-admin-emails="davidelloydjr@gmail.com"
   >
     <header class="page-header">
       <div class="header-content">
@@ -44,24 +45,26 @@
           <span class="user-display is-hidden" id="userDisplay" aria-live="polite"></span>
           <button class="secondary is-hidden" type="button" id="headerSignOutBtn">Log out</button>
           <button class="primary" type="button" id="printBtn">Print / Save as PDF</button>
+          <button class="secondary" type="button" id="layoutEditBtn">Edit layout</button>
+          <button class="secondary" type="button" id="layoutResetBtn">Reset layout</button>
           <a class="secondary" href="#toc" id="tocJump">Jump to TOC</a>
         </div>
       </div>
       <div class="controls">
-        <label class="control">
+        <label class="control search-control" data-layout-key="search">
           <span>Search</span>
           <div class="search-row">
             <input type="search" id="searchInput" placeholder="Search the text..." />
             <button class="secondary search-button" type="button" id="searchBtn">Search</button>
           </div>
         </label>
-        <label class="control">
+        <label class="control" data-layout-key="tag">
           <span>Tag filter</span>
           <select id="tagFilter">
             <option value="">All tags</option>
           </select>
         </label>
-        <div class="control view-toggle" aria-label="View mode">
+        <div class="control view-toggle" aria-label="View mode" data-layout-key="view">
           <span>View</span>
           <div class="view-toggle-pill" role="tablist" aria-label="View mode">
             <button
@@ -86,19 +89,15 @@
             </button>
           </div>
         </div>
-        <label class="toggle">
+        <label class="toggle" data-layout-key="pages">
           <input type="checkbox" id="togglePages" checked />
           <span>Show page numbers</span>
         </label>
-        <label class="toggle">
+        <label class="toggle" data-layout-key="refs">
           <input type="checkbox" id="toggleRefs" checked />
           <span>Show stanza references</span>
         </label>
-        <div class="notes-actions">
-          <button class="secondary" type="button" id="saveNoteBtn">Save highlight as Note</button>
-          <button class="secondary" type="button" id="toggleNotesBtn">View Notes</button>
-        </div>
-        <div class="standard-tools header-reader-tools" id="standardTools">
+        <div class="standard-tools header-reader-tools" id="standardTools" data-layout-key="reader-tools">
           <span class="standard-tools-label">Reader tools</span>
           <button class="secondary" type="button" id="standardSaveHighlightBtn">
             Save highlight as Note
@@ -285,6 +284,6 @@
       <p class="version">Version <span id="appVersion"></span></p>
     </footer>
 
-    <script src="app.js?v=1.9.0" type="module"></script>
+    <script src="app.js?v=1.11.1" type="module"></script>
   </body>
 </html>
