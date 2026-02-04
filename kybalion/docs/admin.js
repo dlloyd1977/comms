@@ -199,9 +199,14 @@ const loadDocsFromBucket = async () => {
   // Clear existing rows (except header)
   docTableBody.innerHTML = "";
 
+  const emptyState = document.getElementById("emptyState");
+  let fileCount = 0;
+
   for (const file of files) {
     // Skip folders (they have no metadata)
     if (!file.metadata) continue;
+
+    fileCount++;
 
     const { data: publicUrlData } = supabase.storage
       .from(docsBucket)
@@ -217,6 +222,11 @@ const loadDocsFromBucket = async () => {
       size: formatFileSize(file.metadata?.size),
       url: publicUrlData.publicUrl,
     });
+  }
+
+  // Show/hide empty state
+  if (emptyState) {
+    emptyState.classList.toggle("is-hidden", fileCount > 0);
   }
 };
 
