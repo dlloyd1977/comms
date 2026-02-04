@@ -68,7 +68,20 @@ const setAdminState = (user) => {
   }
 
   if (uploadPanel) {
-    uploadPanel.classList.toggle("is-hidden", !isAdmin);
+    uploadPanel.classList.remove("is-hidden");
+    uploadPanel.classList.toggle("is-disabled", !isAdmin);
+  }
+
+  if (uploadInput) {
+    uploadInput.disabled = !isAdmin;
+  }
+
+  if (uploadBtn) {
+    uploadBtn.disabled = !isAdmin;
+  }
+
+  if (uploadStatus && !isAdmin) {
+    uploadStatus.textContent = "Admin access required to upload.";
   }
 
   if (authStatus) {

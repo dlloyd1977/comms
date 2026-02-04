@@ -345,3 +345,23 @@ h1 {
   color: var(--muted);
   font-size: 0.9rem;
 }
+
+.upload-panel.is-disabled {
+  opacity: 0.6;
+}
+
+.upload-panel.is-disabled input,
+.upload-panel.is-disabled button {
+  cursor: not-allowed;
+}
+
+.upload-panel.is-disabled input {
+  background: #f3f2f1;
+  color: var(--muted);
+}
+
+.upload-panel.is-disabled button {
+  background: #c8c6c4;
+  border-color: #c8c6c4;
+  color: #ffffff;
+}
