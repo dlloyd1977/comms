@@ -81,6 +81,9 @@ const standardSaveHighlightBtn = document.getElementById("standardSaveHighlightB
 const menuBtn = document.getElementById("menuBtn");
 const menuPanel = document.getElementById("menuPanel");
 const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
+const docsMenuLinks = document.querySelectorAll(".menu-link");
+const menuWrapper = menuBtn?.closest(".menu-wrapper") || null;
+const membersTable = document.body?.dataset?.membersTable || "active_members";
 const standardAddTagBtn = document.getElementById("standardAddTagBtn");
 const standardAnnotateBtn = document.getElementById("standardAnnotateBtn");
 const standardViewNotesBtn = document.getElementById("standardViewNotesBtn");
@@ -114,6 +117,9 @@ const state = {
     mode: "local",
     url: "",
     broadcastChannel: null,
+  },
+  access: {
+    activeMember: false,
   },
   annotation: {
     ref: "",
@@ -168,6 +174,41 @@ function updateMenuAdminUI() {
     link.classList.toggle("is-hidden", !isAdmin);
     link.setAttribute("aria-hidden", String(!isAdmin));
   });
+}
+
+function updateDocsMenuAccess() {
+  const canView = state.access.activeMember || isAdminUser(state.auth.user);
+  docsMenuLinks.forEach((link) => {
+    link.classList.toggle("is-hidden", !canView);
+    link.setAttribute("aria-hidden", String(!canView));
+  });
+  if (menuWrapper) {
+    menuWrapper.classList.toggle("is-hidden", !canView);
+  }
+  if (!canView) {
+    setMenuOpen(false);
+  }
+}
+
+async function refreshMemberAccess() {
+  if (!state.auth.client || !state.auth.user) {
+    state.access.activeMember = false;
+    updateDocsMenuAccess();
+    return;
+  }
+  const email = getUserEmail(state.auth.user);
+  if (!email) {
+    state.access.activeMember = false;
+    updateDocsMenuAccess();
+    return;
+  }
+  const { data, error } = await state.auth.client
+    .from(membersTable)
+    .select("active")
+    .eq("email", email)
+    .maybeSingle();
+  state.access.activeMember = Boolean(data?.active) && !error;
+  updateDocsMenuAccess();
 }
 
 function setMenuOpen(open) {
@@ -1123,6 +1164,7 @@ function updateAuthUI() {
   updateStickyOffsets();
   updateLayoutAdminUI();
   updateMenuAdminUI();
+  void refreshMemberAccess();
 
   if (!ready || !client) {
     setAuthConfirmMessage("Sync not configured. Notes are local only.");
