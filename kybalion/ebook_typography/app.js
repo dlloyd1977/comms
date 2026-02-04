@@ -1,17 +1,19 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.11.1";
+const APP_VERSION = "1.11.2";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
 const PREFS_KEY = "kybalion.preferences";
 const LAYOUT_KEY = "kybalion.layout.controls";
 const LAYOUT_POS_KEY = "kybalion.layout.positions";
-const ADMIN_EMAILS = (document.body?.dataset.adminEmails || "")
-  .split(",")
-  .map((email) => email.trim().toLowerCase())
-  .filter(Boolean);
+function getAdminEmails() {
+  return (document.body?.dataset.adminEmails || "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+}
 
 const contentEl = document.getElementById("content");
 const tocListEl = document.getElementById("tocList");
@@ -130,9 +132,19 @@ function updateStickyOffsets() {
   document.documentElement.style.setProperty("--header-offset", `${offset}px`);
 }
 
+function getUserEmail(user) {
+  return (
+    user?.email ||
+    user?.user_metadata?.email ||
+    user?.identities?.[0]?.identity_data?.email ||
+    ""
+  ).toLowerCase();
+}
+
 function isAdminUser(user) {
-  if (!user?.email) return false;
-  return ADMIN_EMAILS.includes(user.email.toLowerCase());
+  const email = getUserEmail(user);
+  if (!email) return false;
+  return getAdminEmails().includes(email);
 }
 
 function updateLayoutAdminUI() {
