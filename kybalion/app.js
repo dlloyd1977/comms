@@ -1985,7 +1985,10 @@ async function init() {
 
     closeNotesBtn?.addEventListener("click", () => setNotesModalOpen(false));
     notesModal?.addEventListener("click", (event) => {
-      if (event.target === notesModal) {
+      // Only close on backdrop click if auth panel is NOT showing
+      // This prevents accidental closes when users are entering credentials
+      const authPanelVisible = authPanel && !authPanel.classList.contains("is-hidden");
+      if (event.target === notesModal && !authPanelVisible) {
         setNotesModalOpen(false);
       }
     });
