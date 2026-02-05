@@ -303,6 +303,24 @@ async function loadAdminLayout() {
   return data;
 }
 
+async function applyAdminLayoutFromDatabase() {
+  const adminLayout = await loadAdminLayout();
+  if (adminLayout) {
+    console.log("Loading admin layout from database");
+    if (adminLayout.order?.length) {
+      applyLayoutOrder(adminLayout.order);
+      localStorage.setItem(LAYOUT_KEY, JSON.stringify(adminLayout.order));
+    }
+    if (adminLayout.positions && Object.keys(adminLayout.positions).length) {
+      layoutPositions = adminLayout.positions;
+      applyLayoutPositions(adminLayout.positions);
+      localStorage.setItem(LAYOUT_POS_KEY, JSON.stringify(adminLayout.positions));
+    }
+  } else {
+    console.log("No admin layout in database, using localStorage");
+  }
+}
+
 function saveLayoutPositions() {
   const positions = getLayoutPositionsFromDom();
   layoutPositions = positions;
@@ -1366,6 +1384,9 @@ async function initializeSupabase() {
     await loadNotesFromCloud();
     await loadPreferencesFromCloud();
   }
+
+  // Load admin layout from database (for all users)
+  await applyAdminLayoutFromDatabase();
 }
 
 async function loadPreferencesFromCloud() {
@@ -1830,30 +1851,15 @@ async function init() {
         .filter(Boolean);
       defaultLayoutPositions = getLayoutPositionsFromDom();
 
-      // Try to load admin layout from Supabase first
-      const adminLayout = await loadAdminLayout();
-      if (adminLayout) {
-        console.log("Loading admin layout from database");
-        if (adminLayout.order?.length) {
-          applyLayoutOrder(adminLayout.order);
-          localStorage.setItem(LAYOUT_KEY, JSON.stringify(adminLayout.order));
-        }
-        if (adminLayout.positions && Object.keys(adminLayout.positions).length) {
-          layoutPositions = adminLayout.positions;
-          applyLayoutPositions(adminLayout.positions);
-          localStorage.setItem(LAYOUT_POS_KEY, JSON.stringify(adminLayout.positions));
-        }
-      } else {
-        // Fall back to localStorage
-        const savedOrder = loadLayoutOrder();
-        if (savedOrder.length) {
-          applyLayoutOrder(savedOrder);
-        }
+      // Load from localStorage initially (admin layout loaded later via initializeSupabase)
+      const savedOrder = loadLayoutOrder();
+      if (savedOrder.length) {
+        applyLayoutOrder(savedOrder);
+      }
 
-        layoutPositions = loadLayoutPositions();
-        if (Object.keys(layoutPositions).length) {
-          applyLayoutPositions(layoutPositions);
-        }
+      layoutPositions = loadLayoutPositions();
+      if (Object.keys(layoutPositions).length) {
+        applyLayoutPositions(layoutPositions);
       }
 
       getLayoutItems().forEach((item) => {
