@@ -258,11 +258,61 @@ function loadLayoutPositions() {
   }
 }
 
+// Admin layout persistence to Supabase
+const ADMIN_LAYOUT_TABLE = "kybalion_layout";
+
+async function saveAdminLayout() {
+  if (!state.auth.client || !isAdminUser(state.auth.user)) return;
+  
+  const positions = getLayoutPositionsFromDom();
+  const order = getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean);
+  
+  const layoutData = {
+    id: 1,
+    positions: positions,
+    order: order,
+    updated_at: new Date().toISOString(),
+    updated_by: getUserEmail(state.auth.user),
+  };
+
+  const { error } = await state.auth.client
+    .from(ADMIN_LAYOUT_TABLE)
+    .upsert(layoutData, { onConflict: "id" });
+
+  if (error) {
+    console.error("Failed to save admin layout:", error.message);
+  } else {
+    console.log("Admin layout saved to database");
+  }
+}
+
+async function loadAdminLayout() {
+  if (!state.auth.client) return null;
+  
+  const { data, error } = await state.auth.client
+    .from(ADMIN_LAYOUT_TABLE)
+    .select("positions, order")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (error) {
+    console.log("No admin layout found or error:", error.message);
+    return null;
+  }
+  
+  return data;
+}
+
 function saveLayoutPositions() {
   const positions = getLayoutPositionsFromDom();
   layoutPositions = positions;
   localStorage.setItem(LAYOUT_POS_KEY, JSON.stringify(positions));
   updateLayoutContainerHeight();
+  
+  // If admin, also save to Supabase
+  if (isAdminUser(state.auth.user)) {
+    saveAdminLayout();
+  }
 }
 
 function applyLayoutPositions(positions) {
@@ -347,6 +397,11 @@ function loadLayoutOrder() {
 function saveLayoutOrder() {
   const order = getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean);
   localStorage.setItem(LAYOUT_KEY, JSON.stringify(order));
+  
+  // If admin, also save to Supabase
+  if (isAdminUser(state.auth.user)) {
+    saveAdminLayout();
+  }
 }
 
 function setLayoutEditing(enabled) {
@@ -1775,14 +1830,30 @@ async function init() {
         .filter(Boolean);
       defaultLayoutPositions = getLayoutPositionsFromDom();
 
-      const savedOrder = loadLayoutOrder();
-      if (savedOrder.length) {
-        applyLayoutOrder(savedOrder);
-      }
+      // Try to load admin layout from Supabase first
+      const adminLayout = await loadAdminLayout();
+      if (adminLayout) {
+        console.log("Loading admin layout from database");
+        if (adminLayout.order?.length) {
+          applyLayoutOrder(adminLayout.order);
+          localStorage.setItem(LAYOUT_KEY, JSON.stringify(adminLayout.order));
+        }
+        if (adminLayout.positions && Object.keys(adminLayout.positions).length) {
+          layoutPositions = adminLayout.positions;
+          applyLayoutPositions(adminLayout.positions);
+          localStorage.setItem(LAYOUT_POS_KEY, JSON.stringify(adminLayout.positions));
+        }
+      } else {
+        // Fall back to localStorage
+        const savedOrder = loadLayoutOrder();
+        if (savedOrder.length) {
+          applyLayoutOrder(savedOrder);
+        }
 
-      layoutPositions = loadLayoutPositions();
-      if (Object.keys(layoutPositions).length) {
-        applyLayoutPositions(layoutPositions);
+        layoutPositions = loadLayoutPositions();
+        if (Object.keys(layoutPositions).length) {
+          applyLayoutPositions(layoutPositions);
+        }
       }
 
       getLayoutItems().forEach((item) => {
