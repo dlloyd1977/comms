@@ -278,6 +278,55 @@ async function resetDocsAdminLayout() {
   }
 }
 
+/**
+ * Calculate a wrapping grid arrangement that fits the container width.
+ * Used on first edit so items don't overflow off-screen.
+ */
+function calculateInitialGridPositions() {
+  const container = getLayoutContainer();
+  if (!container) return {};
+  // Temporarily force full width so we measure the available space
+  const prevWidth = container.style.width;
+  container.style.width = "100%";
+  const containerWidth = container.getBoundingClientRect().width;
+  container.style.width = prevWidth;
+
+  const items = getLayoutItems();
+  const positions = {};
+  const padding = 8;
+  const gap = 12;
+  let currentLeft = padding;
+  let currentTop = padding;
+  let rowHeight = 0;
+
+  items.forEach((item) => {
+    const key = item.dataset.layoutKey;
+    if (!key) return;
+    const rect = item.getBoundingClientRect();
+    const itemWidth = Math.max(80, Math.round(rect.width));
+    const itemHeight = Math.max(36, Math.round(rect.height));
+
+    // Wrap to next row if exceeding container width
+    if (currentLeft + itemWidth > containerWidth - padding && currentLeft > padding) {
+      currentLeft = padding;
+      currentTop += rowHeight + gap;
+      rowHeight = 0;
+    }
+
+    positions[key] = {
+      left: Math.round(currentLeft),
+      top: Math.round(currentTop),
+      width: itemWidth,
+      height: itemHeight,
+    };
+
+    currentLeft += itemWidth + gap;
+    rowHeight = Math.max(rowHeight, itemHeight);
+  });
+
+  return positions;
+}
+
 function setLayoutEditing(enabled) {
   if (!document.body) return;
   document.body.classList.toggle("layout-editing", enabled);
@@ -287,7 +336,7 @@ function setLayoutEditing(enabled) {
   }
   if (enabled) {
     if (!Object.keys(layoutPositions).length) {
-      layoutPositions = getLayoutPositionsFromDom();
+      layoutPositions = calculateInitialGridPositions();
       applyLayoutPositions(layoutPositions);
       saveLayoutPositions();
     }
