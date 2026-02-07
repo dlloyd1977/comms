@@ -293,8 +293,11 @@ function calculateInitialGridPositions() {
 
   const items = getLayoutItems();
   const positions = {};
-  const padding = 8;
-  const gap = 12;
+  const padding = 10;
+  const gap = 16;
+  // Account for editing-mode CSS: padding 6px 10px + 1px border on each side
+  const editExtraW = 22; // 10 + 10 + 1 + 1
+  const editExtraH = 14; // 6 + 6 + 1 + 1
   let currentLeft = padding;
   let currentTop = padding;
   let rowHeight = 0;
@@ -303,8 +306,8 @@ function calculateInitialGridPositions() {
     const key = item.dataset.layoutKey;
     if (!key) return;
     const rect = item.getBoundingClientRect();
-    const itemWidth = Math.max(80, Math.round(rect.width));
-    const itemHeight = Math.max(36, Math.round(rect.height));
+    const itemWidth = Math.max(80, Math.round(rect.width) + editExtraW);
+    const itemHeight = Math.max(36, Math.round(rect.height) + editExtraH);
 
     // Wrap to next row if exceeding container width
     if (currentLeft + itemWidth > containerWidth - padding && currentLeft > padding) {
