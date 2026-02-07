@@ -45,6 +45,7 @@ let layoutPositions = {};
 let layoutResizeObserver = null;
 let dragItem = null;
 let dragState = null;
+let didDrag = false;
 let currentIsAdmin = false;
 
 // Utility functions
@@ -370,6 +371,7 @@ function handleLayoutPointerDown(event) {
   const startLeft = parseFloat(item.style.left || "0");
   const startTop = parseFloat(item.style.top || "0");
   dragItem = item;
+  didDrag = false;
   dragState = {
     startX: event.clientX,
     startY: event.clientY,
@@ -387,6 +389,8 @@ function handleLayoutPointerMove(event) {
   if (!dragItem || !dragState) return;
   const deltaX = event.clientX - dragState.startX;
   const deltaY = event.clientY - dragState.startY;
+  // Mark as a real drag once the pointer moves more than a few pixels
+  if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) didDrag = true;
   const nextLeft = Math.min(Math.max(0, dragState.startLeft + deltaX), dragState.maxLeft);
   const nextTop = Math.max(dragState.minTop, dragState.startTop + deltaY);
   dragItem.style.left = `${Math.round(nextLeft)}px`;
@@ -464,8 +468,9 @@ function initDocsLayoutUI() {
       if (!document.body.classList.contains("layout-editing")) return;
       const target = e.target.closest("[data-layout-key]");
       if (!target) return;
-      // Allow the admin layout buttons to function during editing
-      if (target.id === "layoutEditBtn" || target.id === "layoutResetBtn") return;
+      // Allow the admin layout buttons to function during editing,
+      // but only if the user clicked without dragging
+      if ((target.id === "layoutEditBtn" || target.id === "layoutResetBtn") && !didDrag) return;
       e.preventDefault();
       e.stopImmediatePropagation();
     },
