@@ -400,7 +400,7 @@ body.layout-freeform .controls [data-layout-key] {
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) 1fr 220px;
+  grid-template-columns: minmax(260px, 320px) 1fr auto;
   gap: 24px;
   padding: 32px 40px 40px;
 }
@@ -412,9 +412,6 @@ body.layout-freeform .controls [data-layout-key] {
   align-self: start;
   justify-self: center;
   z-index: 1;
-  width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 .invite-card {
@@ -423,9 +420,6 @@ body.layout-freeform .controls [data-layout-key] {
   align-items: center;
   gap: 14px;
   padding: 20px 16px 18px;
-  position: relative;
-  right: 200px;
-  margin: 0 auto;
   background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -467,7 +461,7 @@ body.layout-freeform .controls [data-layout-key] {
 
 .standard-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr 220px;
+  grid-template-columns: minmax(220px, 280px) 1fr auto;
   gap: 24px;
   align-items: start;
   padding-top: 20px;
