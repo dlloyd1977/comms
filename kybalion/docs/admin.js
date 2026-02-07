@@ -1576,6 +1576,13 @@ if (authOpenBtn) {
   authOpenBtn.addEventListener("click", showAuthModal);
 }
 
+// Fallback: delegated handler in case the button is re-rendered or missed
+document.addEventListener("click", (event) => {
+  const target = event.target.closest("#authOpenBtn");
+  if (!target) return;
+  showAuthModal();
+});
+
 if (headerSignOutBtn) {
   headerSignOutBtn.addEventListener("click", async () => {
     await supabase.auth.signOut();
