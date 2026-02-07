@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&display=swap");
 
 :root {
   color-scheme: light;
@@ -22,10 +22,11 @@
 
 body {
   margin: 0;
-  font-family: "Work Sans", "Segoe UI", "Segoe UI Variable", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-family: "Atkinson Hyperlegible", "Segoe UI", "Segoe UI Variable", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   background: radial-gradient(circle at top left, #f9f6f1 0%, #f2ece5 40%, #efe7dd 100%);
   color: var(--ink);
   min-height: 100vh;
+  line-height: 1.7;
 }
 
 body::before {
@@ -106,6 +107,7 @@ h1 {
   color: var(--ink-soft);
   max-width: 520px;
   margin: 0;
+  letter-spacing: 0.01em;
 }
 
 .header-actions {
@@ -350,6 +352,10 @@ textarea {
 .toc {
   padding: 20px;
   height: fit-content;
+  position: sticky;
+  top: calc(var(--header-offset, 200px) + 12px);
+  max-height: calc(100vh - var(--header-offset, 200px) - 24px);
+  overflow: auto;
 }
 
 .toc-header h2,
@@ -374,6 +380,7 @@ textarea {
   flex-direction: column;
   gap: 8px;
   margin-top: 16px;
+  font-size: 0.95rem;
 }
 
 .toc-list a {
@@ -437,9 +444,9 @@ textarea {
 }
 
 .stanza-text {
-  font-family: "Cormorant Garamond", "Times New Roman", serif;
-  font-size: 1.15rem;
-  line-height: 1.7;
+  font-family: "Atkinson Hyperlegible", "Times New Roman", serif;
+  font-size: 1.18rem;
+  line-height: 1.8;
   color: var(--ink);
 }
 
@@ -480,6 +487,9 @@ textarea {
   padding: 28px;
   box-shadow: var(--shadow);
   min-height: 60vh;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  word-spacing: 0.05em;
 }
 
 .loading {
