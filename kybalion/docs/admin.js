@@ -228,6 +228,7 @@ function updateLayoutContainerHeight() {
   if (!container) return;
   let maxBottom = 0;
   getLayoutItems().forEach((item) => {
+    if (item.classList.contains("is-hidden") || item.offsetParent === null) return;
     const top = parseFloat(item.style.top || "0");
     const height = parseFloat(item.style.height || `${item.getBoundingClientRect().height}`);
     maxBottom = Math.max(maxBottom, top + height);
@@ -274,15 +275,42 @@ function saveLayoutOrder() {
 
 // ── Supabase layout persistence (shared with all members) ──
 
+// Only persist header items that exist for all visitors.
+const DOCS_SHARED_LAYOUT_KEYS = new Set([
+  "back",
+  "home",
+  "auth",
+  "user",
+  "signout",
+  "profile",
+  "menu",
+]);
+
+function filterDocsLayoutPositions(allPositions) {
+  const src = allPositions && typeof allPositions === "object" ? allPositions : {};
+  const out = {};
+  Object.keys(src).forEach((key) => {
+    if (DOCS_SHARED_LAYOUT_KEYS.has(key)) out[key] = src[key];
+  });
+  return out;
+}
+
+function filterDocsLayoutOrder(allOrder) {
+  const arr = Array.isArray(allOrder) ? allOrder : [];
+  return arr.filter((key) => DOCS_SHARED_LAYOUT_KEYS.has(key));
+}
+
 async function saveDocsAdminLayout() {
   if (!currentIsAdmin) return;
   const user = await getCurrentUser();
   if (!user) return;
 
-  // Use the merged layoutPositions (already includes hidden items' prior positions)
-  // instead of re-reading from DOM which would lose hidden items
-  const positions = { ...layoutPositions };
-  const order = getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean);
+  // Use the merged layoutPositions (already includes hidden items' prior positions),
+  // but persist only the shared keys so hidden/admin-only items can't corrupt member layouts.
+  const positions = filterDocsLayoutPositions(layoutPositions);
+  const order = filterDocsLayoutOrder(
+    getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean)
+  );
 
   const layoutData = {
     id: DOCS_LAYOUT_ROW_ID,
@@ -298,8 +326,10 @@ async function saveDocsAdminLayout() {
 
   if (error) {
     console.error("Failed to save docs admin layout:", error.message);
+    showStatus(`Layout save failed: ${error.message}`);
   } else {
     console.log("Docs admin layout saved to database");
+    showStatus("Layout saved (applies to all visitors).");
   }
 }
 
@@ -322,14 +352,36 @@ async function applyDocsAdminLayoutFromDatabase() {
   const adminLayout = await loadDocsAdminLayout();
   if (adminLayout) {
     console.log("Loading docs admin layout from database");
-    if (adminLayout.order?.length) {
-      applyLayoutOrder(adminLayout.order);
-      localStorage.setItem(DOCS_LAYOUT_KEY, JSON.stringify(adminLayout.order));
+    const sharedOrder = filterDocsLayoutOrder(adminLayout.order);
+    const sharedPositions = filterDocsLayoutPositions(adminLayout.positions);
+
+    if (sharedOrder?.length) {
+      applyLayoutOrder(sharedOrder);
+      localStorage.setItem(DOCS_LAYOUT_KEY, JSON.stringify(sharedOrder));
     }
-    if (adminLayout.positions && Object.keys(adminLayout.positions).length) {
-      layoutPositions = adminLayout.positions;
-      applyLayoutPositions(adminLayout.positions);
-      localStorage.setItem(DOCS_LAYOUT_POS_KEY, JSON.stringify(adminLayout.positions));
+    if (sharedPositions && Object.keys(sharedPositions).length) {
+      // Admins keep local-only positions; members get shared-only layout.
+      layoutPositions = currentIsAdmin
+        ? { ...layoutPositions, ...sharedPositions }
+        : { ...sharedPositions };
+
+      applyLayoutPositions(layoutPositions);
+      localStorage.setItem(DOCS_LAYOUT_POS_KEY, JSON.stringify(layoutPositions));
+
+      // Extra safety for non-admins: clear any stale inline positioning on non-shared items.
+      if (!currentIsAdmin) {
+        getLayoutItems().forEach((item) => {
+          const key = item.dataset.layoutKey;
+          if (!key || DOCS_SHARED_LAYOUT_KEYS.has(key)) return;
+          item.style.removeProperty("left");
+          item.style.removeProperty("top");
+          item.style.removeProperty("width");
+          item.style.removeProperty("height");
+        });
+      }
+    }
+    if (currentIsAdmin) {
+      showStatus("Layout loaded from shared settings.");
     }
   } else {
     console.log("No docs admin layout in database, using localStorage");
@@ -503,8 +555,19 @@ function initDocsLayoutUI() {
   ];
   keyMap.forEach(({ selector, key }) => {
     const el = container.querySelector(selector);
-    if (el) el.dataset.layoutKey = key;
+    if (el && !el.dataset.layoutKey) el.dataset.layoutKey = key;
   });
+
+  const requiredKeys = Array.from(DOCS_SHARED_LAYOUT_KEYS);
+  const presentKeys = getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean);
+  const missingKeys = requiredKeys.filter((key) => !presentKeys.includes(key));
+  const duplicateKeys = presentKeys.filter((key, idx) => presentKeys.indexOf(key) !== idx);
+  if (missingKeys.length || duplicateKeys.length) {
+    console.warn("Layout key audit:", {
+      missingKeys,
+      duplicateKeys: Array.from(new Set(duplicateKeys)),
+    });
+  }
 
   // Create Edit layout button — place inside the layout container so it's draggable
   layoutEditBtn = document.createElement("button");
@@ -725,19 +788,48 @@ const appendRow = ({ name, modified, size, url, isFolder, filePath, folderPrefix
   row.dataset.fileName = name;
   row.dataset.isFolder = isFolder ? "true" : "false";
   const icon = isFolder ? "📁" : "";
-  const actionsHtml = currentAdminState
-    ? `<td class="actions-cell">
-        <button class="action-btn action-move" title="Move" data-action="move"${isFolder ? " disabled" : ""}>Move</button>
-        <button class="action-btn action-delete" title="Delete" data-action="delete">Delete</button>
-      </td>`
-    : "";
-  row.innerHTML = `
-    <td><a class="doc-link${isFolder ? " folder-link" : ""}" href="${url}">${icon} ${name}</a></td>
-    <td>${modified}</td>
-    <td>David Lloyd</td>
-    <td>${size}</td>
-    ${actionsHtml}
-  `;
+  const nameCell = document.createElement("td");
+  const nameLink = document.createElement("a");
+  nameLink.className = `doc-link${isFolder ? " folder-link" : ""}`;
+  nameLink.href = url;
+  nameLink.textContent = `${icon} ${name}`.trim();
+  nameCell.appendChild(nameLink);
+
+  const modifiedCell = document.createElement("td");
+  modifiedCell.textContent = modified;
+
+  const byCell = document.createElement("td");
+  byCell.textContent = "—";
+
+  const sizeCell = document.createElement("td");
+  sizeCell.textContent = size;
+
+  row.appendChild(nameCell);
+  row.appendChild(modifiedCell);
+  row.appendChild(byCell);
+  row.appendChild(sizeCell);
+
+  if (currentAdminState) {
+    const actionsCell = document.createElement("td");
+    actionsCell.className = "actions-cell";
+
+    const moveBtn = document.createElement("button");
+    moveBtn.className = "action-btn action-move";
+    moveBtn.title = "Move";
+    moveBtn.dataset.action = "move";
+    moveBtn.textContent = "Move";
+    if (isFolder) moveBtn.disabled = true;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "action-btn action-delete";
+    deleteBtn.title = "Delete";
+    deleteBtn.dataset.action = "delete";
+    deleteBtn.textContent = "Delete";
+
+    actionsCell.appendChild(moveBtn);
+    actionsCell.appendChild(deleteBtn);
+    row.appendChild(actionsCell);
+  }
 
   // Make folder links navigate into the folder
   if (isFolder && folderPrefix) {
@@ -764,15 +856,40 @@ const appendTrashRow = ({ name, originalPath, trashedAt, size }, trashTbody) => 
   const row = document.createElement("tr");
   row.dataset.trashPath = `.trash/${originalPath}`;
   row.dataset.originalPath = originalPath;
-  row.innerHTML = `
-    <td><span class="doc-link trash-item-name">${name}</span></td>
-    <td>${trashedAt}</td>
-    <td>${size}</td>
-    <td class="actions-cell">
-      <button class="action-btn action-restore" title="Restore" data-action="restore">Restore</button>
-      <button class="action-btn action-permadelete" title="Permanently delete" data-action="permadelete">Perm. Delete</button>
-    </td>
-  `;
+  const nameCell = document.createElement("td");
+  const nameSpan = document.createElement("span");
+  nameSpan.className = "doc-link trash-item-name";
+  nameSpan.textContent = name;
+  nameCell.appendChild(nameSpan);
+
+  const trashedCell = document.createElement("td");
+  trashedCell.textContent = trashedAt;
+
+  const sizeCell = document.createElement("td");
+  sizeCell.textContent = size;
+
+  const actionsCell = document.createElement("td");
+  actionsCell.className = "actions-cell";
+
+  const restoreBtn = document.createElement("button");
+  restoreBtn.className = "action-btn action-restore";
+  restoreBtn.title = "Restore";
+  restoreBtn.dataset.action = "restore";
+  restoreBtn.textContent = "Restore";
+
+  const permaDeleteBtn = document.createElement("button");
+  permaDeleteBtn.className = "action-btn action-permadelete";
+  permaDeleteBtn.title = "Permanently delete";
+  permaDeleteBtn.dataset.action = "permadelete";
+  permaDeleteBtn.textContent = "Perm. Delete";
+
+  actionsCell.appendChild(restoreBtn);
+  actionsCell.appendChild(permaDeleteBtn);
+
+  row.appendChild(nameCell);
+  row.appendChild(trashedCell);
+  row.appendChild(sizeCell);
+  row.appendChild(actionsCell);
   const restoreBtn = row.querySelector('[data-action="restore"]');
   const permaDeleteBtn = row.querySelector('[data-action="permadelete"]');
   if (restoreBtn) restoreBtn.addEventListener("click", () => handleRestoreFile(originalPath, name));

@@ -39,6 +39,13 @@ button {
   background: var(--header-bg);
   border-bottom: 1px solid var(--header-border);
   padding: 20px 32px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+body.layout-editing .page-header {
+  position: static;
 }
 
 .header-content {
