@@ -72,6 +72,8 @@ let dragState = null;
 let didDrag = false;
 let currentIsAdmin = false;
 let memberAccessPromise = null; // deduplication guard for updateMemberAccess
+let memberAccessUserKey = "";
+let pendingMemberAccessUser = null;
 
 // Utility functions
 const formatTimestamp = (date) =>
@@ -679,8 +681,15 @@ const setUIState = (user, member) => {
 };
 
 const updateMemberAccess = async (user) => {
-  // Deduplicate: if already running, return the existing promise
-  if (memberAccessPromise) return memberAccessPromise;
+  const nextKey = getUserEmail(user) || "";
+  // Deduplicate: if already running with same user, return the existing promise
+  if (memberAccessPromise) {
+    if (memberAccessUserKey === nextKey) return memberAccessPromise;
+    // Queue a follow-up run for the new user
+    pendingMemberAccessUser = user;
+    return memberAccessPromise;
+  }
+  memberAccessUserKey = nextKey;
   memberAccessPromise = (async () => {
     try {
       const member = await getActiveMember(user);
@@ -698,7 +707,13 @@ const updateMemberAccess = async (user) => {
       memberAccessPromise = null;
     }
   })();
-  return memberAccessPromise;
+  const result = await memberAccessPromise;
+  if (pendingMemberAccessUser) {
+    const queuedUser = pendingMemberAccessUser;
+    pendingMemberAccessUser = null;
+    return updateMemberAccess(queuedUser);
+  }
+  return result;
 };
 
 // Document loading
