@@ -1,5 +1,5 @@
 import Link from "next/link";
-import AuthAwareButtons from "@/components/AuthAwareButtons";
+import DocsHeaderActions from "@/components/docs/DocsHeaderActions";
 import { DOC_SECTIONS } from "@/lib/docs/sections";
 
 type DocsShellProps = {
@@ -23,21 +23,7 @@ export default function DocsShell({
             <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Kybalion Docs</p>
             <p className="text-lg font-semibold text-slate-900">{title}</p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href="/kybalion"
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
-              Kybalion hub
-            </Link>
-            <Link
-              href="/old/kybalion/docs"
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
-              Legacy docs
-            </Link>
-            <AuthAwareButtons variant="nav" />
-          </div>
+          <DocsHeaderActions />
         </div>
       </nav>
 
