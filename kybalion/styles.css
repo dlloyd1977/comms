@@ -410,6 +410,7 @@ body.layout-freeform .controls [data-layout-key] {
   position: sticky;
   top: 32px;
   align-self: start;
+  justify-self: center;
 }
 
 .invite-card {
