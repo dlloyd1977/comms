@@ -408,9 +408,10 @@ body.layout-freeform .controls [data-layout-key] {
 /* ── Invite sidebar ────────────────── */
 .invite-sidebar {
   position: sticky;
-  top: 32px;
+  top: var(--header-offset, 200px);
   align-self: start;
   justify-self: center;
+  z-index: 1;
 }
 
 .invite-card {
