@@ -520,12 +520,25 @@ textarea {
 .profile-modal {
   position: fixed;
   inset: 0;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 24px;
   background: rgba(19, 16, 14, 0.45);
   z-index: 60;
+}
+
+.notes-modal.active,
+.annotation-modal.active {
+  display: flex;
+}
+
+.profile-modal.is-hidden {
+  display: none;
+}
+
+.profile-modal:not(.is-hidden) {
+  display: flex;
 }
 
 .profile-modal {
