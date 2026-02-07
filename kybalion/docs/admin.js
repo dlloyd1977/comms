@@ -23,10 +23,21 @@ const headerUploadBtn = document.getElementById("headerUploadBtn");
 const headerNewFolderBtn = document.getElementById("headerNewFolderBtn");
 const uploadInput = document.getElementById("uploadInput");
 const uploadStatus = document.getElementById("uploadStatus");
+const menuBtn = document.getElementById("menuBtn");
+const menuPanel = document.getElementById("menuPanel");
+const menuWrapper = menuBtn?.closest(".menu-wrapper") || null;
+const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
 
 // Move uploadInput out of header-actions so layout-freeform positioning doesn't interfere
 if (uploadInput && uploadInput.parentElement) {
   document.body.appendChild(uploadInput);
+}
+
+// ── Menu toggle helper ────────────────────────────────────────
+function setDocsMenuOpen(open) {
+  if (!menuBtn || !menuPanel) return;
+  menuPanel.classList.toggle("is-hidden", !open);
+  menuBtn.setAttribute("aria-expanded", String(open));
 }
 
 // Content elements
@@ -586,6 +597,18 @@ const setUIState = (user, member) => {
     headerNewFolderBtn.classList.toggle("is-hidden", !isAdmin);
   }
 
+  // Menu dropdown: admin-only links and visibility
+  adminMenuLinks.forEach((link) => {
+    link.classList.toggle("is-hidden", !isAdmin);
+    link.setAttribute("aria-hidden", String(!isAdmin));
+  });
+  if (menuWrapper) {
+    menuWrapper.classList.toggle("is-hidden", !isActive && !isAdmin);
+  }
+  if (!isActive && !isAdmin) {
+    setDocsMenuOpen(false);
+  }
+
   // Layout editing buttons (show only for admins)
   updateDocsLayoutAdminUI(isAdmin);
 
@@ -887,21 +910,32 @@ const handleDeleteFile = async (filePath, name, isFolder) => {
   showStatus(`Moving ${name} to trash…`);
 
   if (isFolder) {
-    // List all files in the folder, move each to .trash/
-    const { data: folderFiles, error: listErr } = await supabase.storage
-      .from(docsBucket)
-      .list(filePath, { limit: 1000 });
-    if (listErr) {
-      showStatus(`Failed to list folder: ${listErr.message}`);
-      return;
-    }
+    // Recursively list all files in the folder and move each to .trash/
+    const moveAllInFolder = async (prefix) => {
+      const { data: items, error: listErr } = await supabase.storage
+        .from(docsBucket)
+        .list(prefix, { limit: 1000 });
+      if (listErr) throw listErr;
+      let count = 0;
+      for (const item of items || []) {
+        const src = `${prefix}/${item.name}`;
+        if (!item.metadata) {
+          // It's a sub-folder — recurse into it
+          count += await moveAllInFolder(src);
+        } else {
+          const dest = `.trash/${src}`;
+          const { error } = await supabase.storage.from(docsBucket).move(src, dest);
+          if (!error) count++;
+        }
+      }
+      return count;
+    };
     let moved = 0;
-    for (const f of folderFiles || []) {
-      if (!f.metadata) continue; // skip sub-folders for now
-      const src = `${filePath}/${f.name}`;
-      const dest = `.trash/${filePath}/${f.name}`;
-      const { error } = await supabase.storage.from(docsBucket).move(src, dest);
-      if (!error) moved++;
+    try {
+      moved = await moveAllInFolder(filePath);
+    } catch (err) {
+      showStatus(`Failed to list folder: ${err.message}`);
+      return;
     }
     // Also move the .folder placeholder if present
     await supabase.storage.from(docsBucket).move(`${filePath}/.folder`, `.trash/${filePath}/.folder`);
@@ -1369,6 +1403,22 @@ if (uploadInput) {
 
 if (headerNewFolderBtn) {
   headerNewFolderBtn.addEventListener("click", handleNewFolder);
+}
+
+// ── Menu dropdown toggle ─────────────────────────────────────
+if (menuBtn && menuPanel) {
+  menuBtn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const isOpen = !menuPanel.classList.contains("is-hidden");
+    setDocsMenuOpen(!isOpen);
+  });
+  menuPanel.addEventListener("click", (event) => {
+    event.stopPropagation();
+  });
+  document.addEventListener("click", () => setDocsMenuOpen(false));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setDocsMenuOpen(false);
+  });
 }
 
 // Auth state changes
