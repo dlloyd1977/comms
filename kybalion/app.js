@@ -41,6 +41,7 @@ const authFlow = document.getElementById("authFlow");
 const authChoiceSignInBtn = document.getElementById("authChoiceSignInBtn");
 const authChoiceSignUpBtn = document.getElementById("authChoiceSignUpBtn");
 const authChoiceGuestBtn = document.getElementById("authChoiceGuestBtn");
+const authChoiceCloseBtn = document.getElementById("authChoiceCloseBtn");
 const authEmail = document.getElementById("authEmail");
 const authPassword = document.getElementById("authPassword");
 const authSignUpEmail = document.getElementById("authSignUpEmail");
@@ -177,10 +178,38 @@ function updateMenuAdminUI() {
 }
 
 function updateDocsMenuAccess() {
+  const isGuest = state.auth.mode === "guest";
   const canView = state.access.activeMember || isAdminUser(state.auth.user);
+
+  // For guests: show menu but gray out (disable) all links
+  if (isGuest) {
+    docsMenuLinks.forEach((link) => {
+      if (link.classList.contains("admin-only")) {
+        link.classList.add("is-hidden");
+        link.setAttribute("aria-hidden", "true");
+      } else {
+        link.classList.remove("is-hidden");
+        link.setAttribute("aria-hidden", "false");
+        link.classList.add("is-disabled");
+        link.setAttribute("aria-disabled", "true");
+        link.setAttribute("tabindex", "-1");
+      }
+    });
+    if (menuWrapper) {
+      menuWrapper.classList.remove("is-hidden");
+    }
+    return;
+  }
+
+  // Non-guest: restore normal link state
   docsMenuLinks.forEach((link) => {
-    link.classList.toggle("is-hidden", !canView);
-    link.setAttribute("aria-hidden", String(!canView));
+    if (!link.classList.contains("admin-only")) {
+      link.classList.toggle("is-hidden", !canView);
+      link.setAttribute("aria-hidden", String(!canView));
+      link.classList.remove("is-disabled");
+      link.removeAttribute("aria-disabled");
+      link.removeAttribute("tabindex");
+    }
   });
   if (menuWrapper) {
     menuWrapper.classList.toggle("is-hidden", !canView);
@@ -2005,6 +2034,10 @@ async function init() {
     authChoiceSignInBtn?.addEventListener("click", () => setAuthStep("signin"));
     authChoiceSignUpBtn?.addEventListener("click", () => setAuthStep("signup"));
     authChoiceGuestBtn?.addEventListener("click", () => setAuthStep("guest"));
+    authChoiceCloseBtn?.addEventListener("click", () => {
+      setNotesModalOpen(false);
+      setAuthPanelVisible(false);
+    });
     authResetPasswordBtn?.addEventListener("click", () => {
       // Pre-populate reset email from sign-in form if available
       if (authEmail?.value?.trim() && authResetEmail) {

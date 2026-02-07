@@ -150,6 +150,18 @@ h1 {
   color: var(--accent-dark);
 }
 
+.menu-link.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+  color: var(--muted);
+}
+
+.menu-link.is-disabled:hover {
+  background: transparent;
+  color: var(--muted);
+}
+
 .user-display {
   display: inline-flex;
   align-items: center;

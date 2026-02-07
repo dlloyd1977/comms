@@ -449,3 +449,39 @@ h1 {
   gap: 12px;
   justify-content: flex-end;
 }
+
+/* ── Layout editing (Docs header) ── */
+
+body.layout-freeform .header-actions {
+  position: relative;
+}
+
+body.layout-freeform .header-actions [data-layout-key] {
+  position: absolute;
+}
+
+.layout-editing .header-actions [data-layout-key] {
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--ink);
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+  resize: both;
+  overflow: auto;
+  min-width: 80px;
+  min-height: 36px;
+}
+
+.layout-editing .header-actions [data-layout-key].is-dragging {
+  opacity: 0.65;
+  cursor: grabbing;
+}
+
+.layout-editing .button.is-active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
