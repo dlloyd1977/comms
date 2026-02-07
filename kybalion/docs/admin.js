@@ -447,6 +447,20 @@ function initDocsLayoutUI() {
   layoutPositions = loadLayoutPositions();
   if (Object.keys(layoutPositions).length) applyLayoutPositions(layoutPositions);
 
+  // Block clicks/navigation on layout items while editing (capturing phase)
+  container.addEventListener(
+    "click",
+    (e) => {
+      if (!document.body.classList.contains("layout-editing")) return;
+      const target = e.target.closest("[data-layout-key]");
+      if (target) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    },
+    true
+  );
+
   // Attach drag handlers
   getLayoutItems().forEach((item) => {
     item.addEventListener("pointerdown", handleLayoutPointerDown);
