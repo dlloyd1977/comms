@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.12.0";
+const APP_VERSION = "1.6.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -25,8 +25,7 @@ const toggleRefs = document.getElementById("toggleRefs");
 const searchBtn = document.getElementById("searchBtn");
 const viewModeStandardBtn = document.getElementById("viewModeStandardBtn");
 const viewModeStanzaBtn = document.getElementById("viewModeStanzaBtn");
-const printBtn = document.getElementById("printBtn");
-const tocJump = document.getElementById("tocJump");
+
 const layoutEditBtn = document.getElementById("layoutEditBtn");
 const layoutResetBtn = document.getElementById("layoutResetBtn");
 const saveNoteBtn = document.getElementById("saveNoteBtn");
@@ -652,9 +651,7 @@ function updateViewModeUI(mode) {
   setDisabledState(notesActions, isStandard);
   setDisabledState(standardTools, false);
 
-  if (tocJump) {
-    tocJump.href = isStandard ? "#standardToc" : "#toc";
-  }
+
 }
 
 function setViewMode(mode) {
@@ -2101,7 +2098,7 @@ async function init() {
       updateStickyOffsets();
     });
 
-    printBtn?.addEventListener("click", () => window.print());
+
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     if (contentEl) {
