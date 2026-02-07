@@ -236,6 +236,7 @@ h1 {
 
 body.layout-freeform .controls {
   position: relative;
+  overflow: visible;
 }
 
 body.layout-freeform .controls [data-layout-key] {
