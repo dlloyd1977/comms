@@ -424,7 +424,7 @@ body.layout-freeform .controls [data-layout-key] {
   gap: 14px;
   padding: 20px 16px 18px;
   position: relative;
-  right: 30px;
+  right: 50px;
   margin: 0 auto;
   background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
   border: 1px solid var(--border);
