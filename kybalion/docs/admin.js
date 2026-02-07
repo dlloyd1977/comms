@@ -423,21 +423,33 @@ function initDocsLayoutUI() {
     if (el) el.dataset.layoutKey = key;
   });
 
-  // Create Edit layout button
+  // Create Edit layout button — place next to the page title
+  const brand = document.querySelector(".brand") || document.querySelector(".header-content > div:first-child");
+  const titleEl = brand?.querySelector("h1");
+
   layoutEditBtn = document.createElement("button");
-  layoutEditBtn.className = "button secondary is-hidden";
+  layoutEditBtn.className = "button secondary layout-admin-btn is-hidden";
   layoutEditBtn.type = "button";
   layoutEditBtn.id = "layoutEditBtn";
   layoutEditBtn.textContent = "Edit layout";
-  container.appendChild(layoutEditBtn);
 
   // Create Reset layout button
   layoutResetBtn = document.createElement("button");
-  layoutResetBtn.className = "button secondary is-hidden";
+  layoutResetBtn.className = "button secondary layout-admin-btn is-hidden";
   layoutResetBtn.type = "button";
   layoutResetBtn.id = "layoutResetBtn";
   layoutResetBtn.textContent = "Reset layout";
-  container.appendChild(layoutResetBtn);
+
+  // Insert buttons after the h1 title (or append to brand as fallback)
+  if (titleEl && titleEl.nextSibling) {
+    titleEl.after(layoutEditBtn, layoutResetBtn);
+  } else if (brand) {
+    brand.appendChild(layoutEditBtn);
+    brand.appendChild(layoutResetBtn);
+  } else {
+    container.appendChild(layoutEditBtn);
+    container.appendChild(layoutResetBtn);
+  }
 
   // Capture default order before any saved layout is applied
   defaultLayoutOrder = getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean);
