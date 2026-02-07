@@ -94,6 +94,13 @@ h1 {
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.header-actions [data-layout-key] {
+  pointer-events: auto;
 }
 
 .button {
