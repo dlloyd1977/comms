@@ -511,9 +511,4 @@ body.layout-freeform .header-actions [data-layout-key] {
   line-height: 1.3;
   vertical-align: middle;
   display: inline-flex;
-  margin-left: 6px;
-}
-
-.brand h1 {
-  display: inline;
 }

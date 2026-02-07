@@ -426,14 +426,12 @@ function initDocsLayoutUI() {
     if (el) el.dataset.layoutKey = key;
   });
 
-  // Create Edit layout button — place next to the page title
-  const brand = document.querySelector(".brand") || document.querySelector(".header-content > div:first-child");
-  const titleEl = brand?.querySelector("h1");
-
+  // Create Edit layout button — place inside the layout container so it's draggable
   layoutEditBtn = document.createElement("button");
   layoutEditBtn.className = "button secondary layout-admin-btn is-hidden";
   layoutEditBtn.type = "button";
   layoutEditBtn.id = "layoutEditBtn";
+  layoutEditBtn.dataset.layoutKey = "editbtn";
   layoutEditBtn.textContent = "Edit layout";
 
   // Create Reset layout button
@@ -441,18 +439,12 @@ function initDocsLayoutUI() {
   layoutResetBtn.className = "button secondary layout-admin-btn is-hidden";
   layoutResetBtn.type = "button";
   layoutResetBtn.id = "layoutResetBtn";
+  layoutResetBtn.dataset.layoutKey = "resetbtn";
   layoutResetBtn.textContent = "Reset layout";
 
-  // Insert buttons after the h1 title (or append to brand as fallback)
-  if (titleEl && titleEl.nextSibling) {
-    titleEl.after(layoutEditBtn, layoutResetBtn);
-  } else if (brand) {
-    brand.appendChild(layoutEditBtn);
-    brand.appendChild(layoutResetBtn);
-  } else {
-    container.appendChild(layoutEditBtn);
-    container.appendChild(layoutResetBtn);
-  }
+  // Append buttons to the layout container so they participate in drag/resize
+  container.appendChild(layoutEditBtn);
+  container.appendChild(layoutResetBtn);
 
   // Capture default order before any saved layout is applied
   defaultLayoutOrder = getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean);
@@ -465,15 +457,17 @@ function initDocsLayoutUI() {
   if (Object.keys(layoutPositions).length) applyLayoutPositions(layoutPositions);
 
   // Block clicks/navigation on layout items while editing (capturing phase)
+  // but allow the Edit/Reset layout buttons to still function
   container.addEventListener(
     "click",
     (e) => {
       if (!document.body.classList.contains("layout-editing")) return;
       const target = e.target.closest("[data-layout-key]");
-      if (target) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      }
+      if (!target) return;
+      // Allow the admin layout buttons to function during editing
+      if (target.id === "layoutEditBtn" || target.id === "layoutResetBtn") return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
     },
     true
   );
