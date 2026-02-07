@@ -2,7 +2,7 @@
 A hub for invites, quick updates, and links shared through emails, texts, and group messages.
 
 ## Version
-v1.4.0 — File management: delete, move, trash bin, upload fix
+v1.5.0 — Enhanced signup (first/last name), Profile Settings, confirmation email
 
 ## URL scheme
 
@@ -13,16 +13,26 @@ v1.4.0 — File management: delete, move, trash bin, upload fix
 
 - `kybalion/` — Kybalion invite (current)
   - `kybalion/docs/` — Document library with Supabase storage backend
-  - `kybalion/docs/admin.js` — Admin functionality: auth, uploads, layout editing, file management
+  - `kybalion/docs/admin.js` — Admin functionality: auth, uploads, layout editing, file management, profile settings
   - `kybalion/docs/styles.css` — Docs page styles
+  - `kybalion/migrations/` — SQL migration scripts for Supabase
 - `_templates/invite/` — starter template for new invites
 
 ## Kybalion Docs Features
 
 ### Auth & Access
 - Supabase-based authentication with admin/member roles
+- Signup captures first name, last name, email, and password (names required)
+- Auto-enrollment trigger populates `active_members` on signup
+- Confirmation email sent on signup with redirect to main page
 - Guest access with limited functionality (grayed-out menu items)
 - Close button on sign-in popup
+
+### Profile Settings
+- Accessible via Profile button (visible when signed in, both pages)
+- Editable fields: first name, last name, nickname, middle initial, phone, address
+- Email displayed as read-only
+- RLS policies allow members to view/update their own profile
 
 ### Layout Editing (Admin)
 - Draggable/resizable header elements including Edit/Reset buttons

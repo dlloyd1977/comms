@@ -41,6 +41,10 @@ let moveModal = null;
 let trashSection = null;
 let currentAdminState = false; // tracks if current user is admin for table actions
 
+// Dynamic UI elements
+let docsProfileBtn = null;
+let docsProfileModal = null;
+
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // ── Layout editing state ──
@@ -566,6 +570,11 @@ const setUIState = (user, member) => {
     headerSignOutBtn.classList.toggle("is-hidden", !isSignedIn);
   }
 
+  // Profile button (show when signed in)
+  if (docsProfileBtn) {
+    docsProfileBtn.classList.toggle("is-hidden", !isSignedIn);
+  }
+
   // Upload button (show only for admins)
   if (headerUploadBtn) {
     headerUploadBtn.classList.toggle("is-hidden", !isAdmin);
@@ -1043,6 +1052,145 @@ const executeMoveFile = async (filePath, name, destPrefix) => {
   await loadDocsFromBucket();
 };
 
+// ── Profile Settings (Docs) ──
+
+const createDocsProfileBtn = () => {
+  if (docsProfileBtn) return docsProfileBtn;
+  docsProfileBtn = document.createElement("button");
+  docsProfileBtn.className = "button secondary is-hidden";
+  docsProfileBtn.type = "button";
+  docsProfileBtn.textContent = "Profile";
+  docsProfileBtn.id = "docsProfileBtn";
+  // Insert before sign-out button
+  if (headerSignOutBtn?.parentElement) {
+    headerSignOutBtn.parentElement.insertBefore(docsProfileBtn, headerSignOutBtn);
+  }
+  docsProfileBtn.addEventListener("click", openDocsProfileModal);
+  return docsProfileBtn;
+};
+
+const createDocsProfileModal = () => {
+  if (docsProfileModal) return docsProfileModal;
+  docsProfileModal = document.createElement("div");
+  docsProfileModal.className = "auth-modal is-hidden";
+  docsProfileModal.innerHTML = `
+    <div class="auth-modal-backdrop"></div>
+    <div class="auth-modal-content panel" style="max-width:520px">
+      <div class="profile-header">
+        <h2>Profile Settings</h2>
+        <button class="button secondary" type="button" id="docsProfileCloseBtn">Close</button>
+      </div>
+      <form class="profile-form" id="docsProfileForm">
+        <div class="profile-row">
+          <label class="profile-control">
+            <span>First Name <span class="required">*</span></span>
+            <input type="text" id="docsProfileFirstName" required />
+          </label>
+          <label class="profile-control">
+            <span>Last Name <span class="required">*</span></span>
+            <input type="text" id="docsProfileLastName" required />
+          </label>
+        </div>
+        <div class="profile-row">
+          <label class="profile-control">
+            <span>Email</span>
+            <input type="email" id="docsProfileEmail" disabled />
+          </label>
+          <label class="profile-control">
+            <span>Nickname</span>
+            <input type="text" id="docsProfileNickname" placeholder="Optional" />
+          </label>
+        </div>
+        <div class="profile-row">
+          <label class="profile-control">
+            <span>Middle Initial</span>
+            <input type="text" id="docsProfileMiddleInitial" maxlength="1" placeholder="Optional" />
+          </label>
+          <label class="profile-control">
+            <span>Phone</span>
+            <input type="tel" id="docsProfilePhone" placeholder="Optional" />
+          </label>
+        </div>
+        <div class="profile-row profile-row-full">
+          <label class="profile-control">
+            <span>Address</span>
+            <input type="text" id="docsProfileAddress" placeholder="Optional" />
+          </label>
+        </div>
+        <p class="auth-status" id="docsProfileStatus"></p>
+        <div class="auth-actions" style="justify-content:flex-end">
+          <button class="button primary" type="submit">Save</button>
+          <button class="button secondary" type="button" id="docsProfileCancelBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(docsProfileModal);
+
+  const closeModal = () => docsProfileModal.classList.add("is-hidden");
+  docsProfileModal.querySelector(".auth-modal-backdrop").addEventListener("click", closeModal);
+  docsProfileModal.querySelector("#docsProfileCloseBtn").addEventListener("click", closeModal);
+  docsProfileModal.querySelector("#docsProfileCancelBtn").addEventListener("click", closeModal);
+
+  docsProfileModal.querySelector("#docsProfileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const status = docsProfileModal.querySelector("#docsProfileStatus");
+    const firstName = docsProfileModal.querySelector("#docsProfileFirstName").value.trim();
+    const lastName = docsProfileModal.querySelector("#docsProfileLastName").value.trim();
+    if (!firstName || !lastName) {
+      if (status) { status.textContent = "First name and last name are required."; status.className = "auth-status is-error"; }
+      return;
+    }
+    if (status) { status.textContent = "Saving…"; status.className = "auth-status is-info"; }
+    const user = await getCurrentUser();
+    const email = getUserEmail(user);
+    const updates = {
+      first_name: firstName,
+      last_name: lastName,
+      nickname: docsProfileModal.querySelector("#docsProfileNickname").value.trim() || null,
+      middle_initial: docsProfileModal.querySelector("#docsProfileMiddleInitial").value.trim() || null,
+      phone: docsProfileModal.querySelector("#docsProfilePhone").value.trim() || null,
+      address: docsProfileModal.querySelector("#docsProfileAddress").value.trim() || null,
+    };
+    const { error } = await supabase.from(membersTable).update(updates).eq("email", email);
+    if (error) {
+      if (status) { status.textContent = `Save failed: ${error.message}`; status.className = "auth-status is-error"; }
+      return;
+    }
+    if (status) { status.textContent = "Profile saved."; status.className = "auth-status is-success"; }
+    setTimeout(closeModal, 1200);
+  });
+
+  return docsProfileModal;
+};
+
+const openDocsProfileModal = async () => {
+  const modal = createDocsProfileModal();
+  modal.classList.remove("is-hidden");
+  const user = await getCurrentUser();
+  const email = getUserEmail(user);
+  const emailInput = modal.querySelector("#docsProfileEmail");
+  if (emailInput) emailInput.value = email;
+
+  const { data } = await supabase
+    .from(membersTable)
+    .select("first_name, last_name, nickname, middle_initial, phone, address")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (data) {
+    const set = (id, val) => { const el = modal.querySelector(id); if (el) el.value = val || ""; };
+    set("#docsProfileFirstName", data.first_name);
+    set("#docsProfileLastName", data.last_name);
+    set("#docsProfileNickname", data.nickname);
+    set("#docsProfileMiddleInitial", data.middle_initial);
+    set("#docsProfilePhone", data.phone);
+    set("#docsProfileAddress", data.address);
+  }
+  const status = modal.querySelector("#docsProfileStatus");
+  if (status) { status.textContent = ""; status.className = "auth-status"; }
+};
+
 // Auth modal
 const createAuthModal = () => {
   if (authModal) return authModal;
@@ -1194,6 +1342,9 @@ const handleNewFolder = async () => {
 
 // Initialize layout editing UI
 initDocsLayoutUI();
+
+// Create dynamic profile button
+createDocsProfileBtn();
 
 // Event listeners
 if (authOpenBtn) {
