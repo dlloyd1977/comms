@@ -448,6 +448,8 @@ function initDocsLayoutUI() {
     { selector: "#headerSignOutBtn", key: "signout" },
     { selector: "#headerUploadBtn", key: "upload" },
     { selector: "#headerNewFolderBtn", key: "newfolder" },
+    { selector: "#docsProfileBtn", key: "profile" },
+    { selector: ".menu-wrapper", key: "menu" },
   ];
   keyMap.forEach(({ selector, key }) => {
     const el = container.querySelector(selector);
@@ -1374,11 +1376,11 @@ const handleNewFolder = async () => {
   setTimeout(() => window.location.reload(), 1000);
 };
 
+// Create dynamic profile button (must run before layout init so it gets a layout key)
+createDocsProfileBtn();
+
 // Initialize layout editing UI
 initDocsLayoutUI();
-
-// Create dynamic profile button
-createDocsProfileBtn();
 
 // Event listeners
 if (authOpenBtn) {
