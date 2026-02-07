@@ -1425,7 +1425,7 @@ const createAuthModal = () => {
   authModal.innerHTML = `
     <div class="auth-modal-backdrop"></div>
     <div class="auth-modal-content panel">
-      <h2>Admin Sign In</h2>
+      <h2>Sign In / Create Account</h2>
       <form class="auth-form" id="authModalForm">
         <label>
           Email
