@@ -23,6 +23,11 @@ const headerNewFolderBtn = document.getElementById("headerNewFolderBtn");
 const uploadInput = document.getElementById("uploadInput");
 const uploadStatus = document.getElementById("uploadStatus");
 
+// Move uploadInput out of header-actions so layout-freeform positioning doesn't interfere
+if (uploadInput && uploadInput.parentElement) {
+  document.body.appendChild(uploadInput);
+}
+
 // Content elements
 const docTableBody = document.querySelector(".doc-table tbody");
 const docsContent = document.querySelector("[data-docs-content]");
@@ -31,6 +36,9 @@ const emptyState = document.getElementById("emptyState");
 
 // Auth modal elements
 let authModal = null;
+let moveModal = null;
+let trashSection = null;
+let currentAdminState = false; // tracks if current user is admin for table actions
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -581,6 +589,9 @@ const setUIState = (user, member) => {
     accessGate.classList.toggle("is-hidden", isActive);
   }
 
+  // Track admin state for table action buttons
+  currentAdminState = isAdmin;
+
   return { isSignedIn, isActive, isAdmin };
 };
 
@@ -597,22 +608,64 @@ const updateMemberAccess = async (user) => {
 };
 
 // Document loading
-const appendRow = ({ name, modified, size, url, isFolder }) => {
+const appendRow = ({ name, modified, size, url, isFolder, filePath }) => {
   if (!docTableBody) return;
 
   const row = document.createElement("tr");
+  row.dataset.filePath = filePath || "";
+  row.dataset.fileName = name;
+  row.dataset.isFolder = isFolder ? "true" : "false";
   const icon = isFolder ? "📁" : "";
+  const actionsHtml = currentAdminState
+    ? `<td class="actions-cell">
+        <button class="action-btn action-move" title="Move" data-action="move"${isFolder ? " disabled" : ""}>Move</button>
+        <button class="action-btn action-delete" title="Delete" data-action="delete">Delete</button>
+      </td>`
+    : "";
   row.innerHTML = `
     <td><a class="doc-link" href="${url}">${icon} ${name}</a></td>
     <td>${modified}</td>
     <td>David Lloyd</td>
     <td>${size}</td>
+    ${actionsHtml}
   `;
+
+  // Wire up action buttons
+  const moveBtn = row.querySelector('[data-action="move"]');
+  const deleteBtn = row.querySelector('[data-action="delete"]');
+  if (moveBtn) moveBtn.addEventListener("click", () => handleMoveFile(filePath, name, isFolder));
+  if (deleteBtn) deleteBtn.addEventListener("click", () => handleDeleteFile(filePath, name, isFolder));
+
   docTableBody.appendChild(row);
+};
+
+const appendTrashRow = ({ name, originalPath, trashedAt, size }, trashTbody) => {
+  if (!trashTbody) return;
+  const row = document.createElement("tr");
+  row.dataset.trashPath = `.trash/${originalPath}`;
+  row.dataset.originalPath = originalPath;
+  row.innerHTML = `
+    <td><span class="doc-link trash-item-name">${name}</span></td>
+    <td>${trashedAt}</td>
+    <td>${size}</td>
+    <td class="actions-cell">
+      <button class="action-btn action-restore" title="Restore" data-action="restore">Restore</button>
+      <button class="action-btn action-permadelete" title="Permanently delete" data-action="permadelete">Perm. Delete</button>
+    </td>
+  `;
+  const restoreBtn = row.querySelector('[data-action="restore"]');
+  const permaDeleteBtn = row.querySelector('[data-action="permadelete"]');
+  if (restoreBtn) restoreBtn.addEventListener("click", () => handleRestoreFile(originalPath, name));
+  if (permaDeleteBtn) permaDeleteBtn.addEventListener("click", () => handlePermanentDelete(originalPath, name));
+  trashTbody.appendChild(row);
 };
 
 const loadDocsFromBucket = async () => {
   if (!docTableBody) return;
+
+  // Show/hide Actions column header
+  const actionsHeader = document.getElementById("actionsHeader");
+  if (actionsHeader) actionsHeader.classList.toggle("is-hidden", !currentAdminState);
 
   const { data: files, error } = await supabase.storage
     .from(docsBucket)
@@ -627,23 +680,25 @@ const loadDocsFromBucket = async () => {
   let fileCount = 0;
 
   for (const file of files) {
+    // Skip .trash folder and .folder placeholders
+    if (file.name === ".trash" || file.name === ".folder") continue;
     const isFolder = !file.metadata;
-    
+    const filePath = `${docsPrefix}${file.name}`;
+
     if (isFolder) {
-      // It's a folder - show it
       appendRow({
         name: file.name,
         modified: "—",
         size: "—",
         url: `#folder-${file.name}`,
         isFolder: true,
+        filePath,
       });
       fileCount++;
     } else {
-      // It's a file
       const { data: publicUrlData } = supabase.storage
         .from(docsBucket)
-        .getPublicUrl(`${docsPrefix}${file.name}`);
+        .getPublicUrl(filePath);
 
       const modified = file.updated_at
         ? formatTimestamp(new Date(file.updated_at))
@@ -655,6 +710,7 @@ const loadDocsFromBucket = async () => {
         size: formatFileSize(file.metadata?.size),
         url: publicUrlData.publicUrl,
         isFolder: false,
+        filePath,
       });
       fileCount++;
     }
@@ -663,6 +719,264 @@ const loadDocsFromBucket = async () => {
   if (emptyState) {
     emptyState.classList.toggle("is-hidden", fileCount > 0);
   }
+
+  // Load trash if admin
+  if (currentAdminState) {
+    await loadTrashBin();
+  }
+};
+
+// ── Trash Bin ──
+
+const ensureTrashSection = () => {
+  if (trashSection) return trashSection;
+  const docsContentEl = document.querySelector("[data-docs-content]");
+  if (!docsContentEl) return null;
+
+  trashSection = document.createElement("section");
+  trashSection.className = "section trash-section";
+  trashSection.id = "trashSection";
+  trashSection.innerHTML = `
+    <h2>🗑️ Trash</h2>
+    <p class="trash-hint">Recently deleted files. Restore or permanently remove them.</p>
+    <div class="panel">
+      <table class="doc-table trash-table">
+        <thead>
+          <tr>
+            <th>File</th>
+            <th>Deleted</th>
+            <th>Size</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p class="empty-state" id="trashEmptyState">Trash is empty.</p>
+    </div>
+  `;
+  docsContentEl.appendChild(trashSection);
+  return trashSection;
+};
+
+const loadTrashBin = async () => {
+  const trashPrefix = `.trash/${docsPrefix}`;
+  const { data: files, error } = await supabase.storage
+    .from(docsBucket)
+    .list(trashPrefix, { sortBy: { column: "created_at", order: "desc" } });
+
+  if (error) {
+    console.log("No trash folder or error:", error.message);
+    if (trashSection) trashSection.classList.add("is-hidden");
+    return;
+  }
+
+  const trashFiles = (files || []).filter((f) => f.metadata && f.name !== ".folder");
+
+  if (!trashFiles.length) {
+    if (trashSection) trashSection.classList.add("is-hidden");
+    return;
+  }
+
+  const section = ensureTrashSection();
+  if (!section) return;
+  section.classList.remove("is-hidden");
+
+  const trashTbody = section.querySelector(".trash-table tbody");
+  if (!trashTbody) return;
+  trashTbody.innerHTML = "";
+
+  const trashEmpty = section.querySelector("#trashEmptyState");
+
+  for (const file of trashFiles) {
+    const trashedAt = file.updated_at
+      ? formatTimestamp(new Date(file.updated_at))
+      : "—";
+    appendTrashRow(
+      {
+        name: file.name,
+        originalPath: `${docsPrefix}${file.name}`,
+        trashedAt,
+        size: formatFileSize(file.metadata?.size),
+      },
+      trashTbody
+    );
+  }
+
+  if (trashEmpty) trashEmpty.classList.toggle("is-hidden", trashFiles.length > 0);
+};
+
+// ── File actions: Delete, Move, Restore, Permanent Delete ──
+
+const handleDeleteFile = async (filePath, name, isFolder) => {
+  const label = isFolder ? `folder "${name}" and all its contents` : `file "${name}"`;
+  if (!confirm(`Move ${label} to Trash?`)) return;
+
+  showStatus(`Moving ${name} to trash…`);
+
+  if (isFolder) {
+    // List all files in the folder, move each to .trash/
+    const { data: folderFiles, error: listErr } = await supabase.storage
+      .from(docsBucket)
+      .list(filePath, { limit: 1000 });
+    if (listErr) {
+      showStatus(`Failed to list folder: ${listErr.message}`);
+      return;
+    }
+    let moved = 0;
+    for (const f of folderFiles || []) {
+      if (!f.metadata) continue; // skip sub-folders for now
+      const src = `${filePath}/${f.name}`;
+      const dest = `.trash/${filePath}/${f.name}`;
+      const { error } = await supabase.storage.from(docsBucket).move(src, dest);
+      if (!error) moved++;
+    }
+    // Also move the .folder placeholder if present
+    await supabase.storage.from(docsBucket).move(`${filePath}/.folder`, `.trash/${filePath}/.folder`);
+    showStatus(`Moved ${moved} file(s) from "${name}" to Trash. Refreshing…`);
+  } else {
+    const dest = `.trash/${filePath}`;
+    const { error } = await supabase.storage.from(docsBucket).move(filePath, dest);
+    if (error) {
+      showStatus(`Failed to trash "${name}": ${error.message}`);
+      return;
+    }
+    showStatus(`"${name}" moved to Trash. Refreshing…`);
+  }
+
+  await loadDocsFromBucket();
+};
+
+const handleRestoreFile = async (originalPath, name) => {
+  if (!confirm(`Restore "${name}" from Trash?`)) return;
+  showStatus(`Restoring ${name}…`);
+
+  const trashPath = `.trash/${originalPath}`;
+  const { error } = await supabase.storage.from(docsBucket).move(trashPath, originalPath);
+  if (error) {
+    showStatus(`Failed to restore "${name}": ${error.message}`);
+    return;
+  }
+  showStatus(`"${name}" restored. Refreshing…`);
+  await loadDocsFromBucket();
+};
+
+const handlePermanentDelete = async (originalPath, name) => {
+  if (!confirm(`PERMANENTLY delete "${name}"? This cannot be undone.`)) return;
+  showStatus(`Permanently deleting ${name}…`);
+
+  const trashPath = `.trash/${originalPath}`;
+  const { error } = await supabase.storage.from(docsBucket).remove([trashPath]);
+  if (error) {
+    showStatus(`Failed to delete "${name}": ${error.message}`);
+    return;
+  }
+  showStatus(`"${name}" permanently deleted. Refreshing…`);
+  await loadDocsFromBucket();
+};
+
+// ── Move File ──
+
+const createMoveModal = () => {
+  if (moveModal) return moveModal;
+  moveModal = document.createElement("div");
+  moveModal.className = "auth-modal is-hidden";
+  moveModal.id = "moveModal";
+  moveModal.innerHTML = `
+    <div class="auth-modal-backdrop"></div>
+    <div class="auth-modal-content panel">
+      <h2>Move File</h2>
+      <p class="move-file-label" id="moveFileLabel"></p>
+      <div class="move-folder-list" id="moveFolderList"></div>
+      <p class="auth-status" id="moveStatus"></p>
+      <div class="auth-actions">
+        <button class="button secondary" type="button" id="moveCancelBtn">Cancel</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(moveModal);
+
+  moveModal.querySelector(".auth-modal-backdrop").addEventListener("click", closeMoveModal);
+  moveModal.querySelector("#moveCancelBtn").addEventListener("click", closeMoveModal);
+  return moveModal;
+};
+
+const closeMoveModal = () => {
+  if (moveModal) moveModal.classList.add("is-hidden");
+};
+
+const handleMoveFile = async (filePath, name, isFolder) => {
+  if (isFolder) return; // folders can't be moved (Supabase limitation)
+
+  const modal = createMoveModal();
+  const label = modal.querySelector("#moveFileLabel");
+  const folderList = modal.querySelector("#moveFolderList");
+  const status = modal.querySelector("#moveStatus");
+  label.textContent = `Moving: ${name}`;
+  status.textContent = "Loading folders…";
+  folderList.innerHTML = "";
+  modal.classList.remove("is-hidden");
+
+  // List top-level folders in the bucket
+  const { data: topLevel, error } = await supabase.storage
+    .from(docsBucket)
+    .list("", { limit: 200 });
+
+  if (error) {
+    status.textContent = `Failed to list folders: ${error.message}`;
+    return;
+  }
+
+  const folders = (topLevel || []).filter((f) => !f.metadata && f.name !== ".trash");
+  status.textContent = folders.length ? "Select destination folder:" : "No other folders found.";
+
+  // Also add sub-folders within each main folder
+  for (const folder of folders) {
+    // List sub-folders
+    const { data: subFiles } = await supabase.storage.from(docsBucket).list(folder.name, { limit: 200 });
+    const subFolders = (subFiles || []).filter((sf) => !sf.metadata && sf.name !== ".trash" && sf.name !== ".folder");
+
+    // Main folder button
+    const btn = document.createElement("button");
+    btn.className = "button secondary move-dest-btn";
+    btn.textContent = `📁 ${folder.name}/`;
+    const destPrefix = `${folder.name}/`;
+    if (destPrefix === docsPrefix) {
+      btn.disabled = true;
+      btn.textContent += " (current)";
+    }
+    btn.addEventListener("click", () => executeMoveFile(filePath, name, destPrefix));
+    folderList.appendChild(btn);
+
+    // Sub-folder buttons
+    for (const sf of subFolders) {
+      const subBtn = document.createElement("button");
+      subBtn.className = "button secondary move-dest-btn move-subfolder";
+      const subDest = `${folder.name}/${sf.name}/`;
+      subBtn.textContent = `  📁 ${folder.name}/${sf.name}/`;
+      if (subDest === docsPrefix) {
+        subBtn.disabled = true;
+        subBtn.textContent += " (current)";
+      }
+      subBtn.addEventListener("click", () => executeMoveFile(filePath, name, subDest));
+      folderList.appendChild(subBtn);
+    }
+  }
+};
+
+const executeMoveFile = async (filePath, name, destPrefix) => {
+  const status = moveModal?.querySelector("#moveStatus");
+  if (status) status.textContent = `Moving "${name}" to ${destPrefix}…`;
+
+  const destPath = `${destPrefix}${name}`;
+  const { error } = await supabase.storage.from(docsBucket).move(filePath, destPath);
+  if (error) {
+    if (status) status.textContent = `Failed: ${error.message}`;
+    return;
+  }
+
+  closeMoveModal();
+  showStatus(`"${name}" moved to ${destPrefix}. Refreshing…`);
+  await loadDocsFromBucket();
 };
 
 // Auth modal
