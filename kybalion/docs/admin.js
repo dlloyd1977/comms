@@ -153,6 +153,8 @@ function applyLayoutPositions(positions) {
   const container = getLayoutContainer();
   if (!container) return;
   document.body.classList.add("layout-freeform");
+  const containerWidth = container.getBoundingClientRect().width;
+  const padding = 10;
 
   // First pass: apply saved positions and track rightmost edge for fallback placement
   let maxRight = 0;
@@ -162,19 +164,24 @@ function applyLayoutPositions(positions) {
     if (!key) return;
     const pos = positions[key];
     if (pos && pos.width > 0) {
-      item.style.left = `${pos.left}px`;
-      item.style.top = `${pos.top}px`;
-      item.style.width = `${pos.width}px`;
-      item.style.height = `${pos.height}px`;
-      maxRight = Math.max(maxRight, pos.left + pos.width);
-      if (pos.top >= 0) fallbackTop = Math.max(0, Math.min(fallbackTop, pos.top));
+      const width = Math.max(80, Math.round(pos.width));
+      const height = Math.max(36, Math.round(pos.height));
+      const maxLeft = Math.max(0, containerWidth - width - padding);
+      const clampedLeft = Math.min(Math.max(0, Math.round(pos.left)), maxLeft);
+      const clampedTop = Math.max(0, Math.round(pos.top));
+      item.style.left = `${clampedLeft}px`;
+      item.style.top = `${clampedTop}px`;
+      item.style.width = `${width}px`;
+      item.style.height = `${height}px`;
+      maxRight = Math.max(maxRight, clampedLeft + width);
+      if (clampedTop >= 0) fallbackTop = Math.max(0, Math.min(fallbackTop, clampedTop));
     }
   });
 
   // Second pass: position visible items missing from saved data
   // (e.g., Profile button added after layout was last saved, or hidden when captured)
   const gap = 12;
-  let nextLeft = maxRight > 0 ? maxRight + gap : 10;
+  let nextLeft = maxRight > 0 ? maxRight + gap : padding;
   getLayoutItems().forEach((item) => {
     const key = item.dataset.layoutKey;
     if (!key) return;
@@ -184,7 +191,13 @@ function applyLayoutPositions(positions) {
     const rect = item.getBoundingClientRect();
     const w = Math.max(80, Math.round(rect.width) || 100);
     const h = Math.max(36, Math.round(rect.height) || 40);
-    item.style.left = `${nextLeft}px`;
+    if (containerWidth > 0 && nextLeft + w > containerWidth - padding && nextLeft > padding) {
+      nextLeft = padding;
+      fallbackTop += h + gap;
+    }
+    const maxLeft = Math.max(0, containerWidth - w - padding);
+    const clampedLeft = Math.min(Math.max(0, nextLeft), maxLeft);
+    item.style.left = `${clampedLeft}px`;
     item.style.top = `${Math.max(0, fallbackTop)}px`;
     item.style.width = `${w}px`;
     item.style.height = `${h}px`;
