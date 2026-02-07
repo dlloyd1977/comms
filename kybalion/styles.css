@@ -242,6 +242,15 @@ body.layout-freeform .controls [data-layout-key] {
   position: absolute;
 }
 
+.layout-editing .page-header {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.layout-editing .controls {
+  margin-top: 4px;
+}
+
 .layout-editing .controls [data-layout-key] {
   border: 1px dashed var(--border);
   border-radius: 12px;

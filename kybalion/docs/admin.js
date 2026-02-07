@@ -371,7 +371,6 @@ function handleLayoutPointerDown(event) {
     startLeft,
     startTop,
     maxLeft: Math.max(0, containerRect.width - rect.width),
-    maxTop: Math.max(0, containerRect.height - rect.height),
   };
   item.classList.add("is-dragging");
   item.setPointerCapture(event.pointerId);
@@ -383,7 +382,7 @@ function handleLayoutPointerMove(event) {
   const deltaX = event.clientX - dragState.startX;
   const deltaY = event.clientY - dragState.startY;
   const nextLeft = Math.min(Math.max(0, dragState.startLeft + deltaX), dragState.maxLeft);
-  const nextTop = Math.min(Math.max(0, dragState.startTop + deltaY), dragState.maxTop);
+  const nextTop = Math.max(0, dragState.startTop + deltaY);
   dragItem.style.left = `${Math.round(nextLeft)}px`;
   dragItem.style.top = `${Math.round(nextTop)}px`;
   updateLayoutContainerHeight();
