@@ -9,6 +9,7 @@ const adminEmails = (body.dataset.adminEmails || "")
   .filter(Boolean);
 const docsBucket = body.dataset.docsBucket || "kybalion-docs";
 const docsPrefix = body.dataset.docsPrefix || "";
+let currentPrefix = docsPrefix; // mutable — changes when navigating into sub-folders
 const membersTable = body.dataset.membersTable || "active_members";
 
 const DOCS_LAYOUT_KEY = "kybalion.docs.layout.order";
@@ -608,7 +609,7 @@ const updateMemberAccess = async (user) => {
 };
 
 // Document loading
-const appendRow = ({ name, modified, size, url, isFolder, filePath }) => {
+const appendRow = ({ name, modified, size, url, isFolder, filePath, folderPrefix }) => {
   if (!docTableBody) return;
 
   const row = document.createElement("tr");
@@ -623,12 +624,23 @@ const appendRow = ({ name, modified, size, url, isFolder, filePath }) => {
       </td>`
     : "";
   row.innerHTML = `
-    <td><a class="doc-link" href="${url}">${icon} ${name}</a></td>
+    <td><a class="doc-link${isFolder ? " folder-link" : ""}" href="${url}">${icon} ${name}</a></td>
     <td>${modified}</td>
     <td>David Lloyd</td>
     <td>${size}</td>
     ${actionsHtml}
   `;
+
+  // Make folder links navigate into the folder
+  if (isFolder && folderPrefix) {
+    const link = row.querySelector(".folder-link");
+    if (link) {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigateToFolder(folderPrefix);
+      });
+    }
+  }
 
   // Wire up action buttons
   const moveBtn = row.querySelector('[data-action="move"]');
@@ -660,6 +672,55 @@ const appendTrashRow = ({ name, originalPath, trashedAt, size }, trashTbody) => 
   trashTbody.appendChild(row);
 };
 
+// ── Folder navigation ──
+
+const navigateToFolder = (prefix) => {
+  currentPrefix = prefix;
+  updateBreadcrumb();
+  loadDocsFromBucket();
+};
+
+const updateBreadcrumb = () => {
+  let breadcrumbEl = document.getElementById("folderBreadcrumb");
+  if (!breadcrumbEl) {
+    // Create breadcrumb bar above the table
+    const tablePanel = docTableBody?.closest(".panel");
+    if (!tablePanel) return;
+    breadcrumbEl = document.createElement("nav");
+    breadcrumbEl.id = "folderBreadcrumb";
+    breadcrumbEl.className = "folder-breadcrumb";
+    tablePanel.parentElement.insertBefore(breadcrumbEl, tablePanel);
+  }
+
+  // If we're at the page's root prefix, hide breadcrumb
+  if (currentPrefix === docsPrefix) {
+    breadcrumbEl.classList.add("is-hidden");
+    return;
+  }
+
+  breadcrumbEl.classList.remove("is-hidden");
+
+  // Build path segments relative to docsPrefix
+  const relativePath = currentPrefix.slice(docsPrefix.length);
+  const segments = relativePath.split("/").filter(Boolean);
+
+  let html = `<a class="breadcrumb-link" href="#" data-prefix="${docsPrefix}">Root</a>`;
+  let accumulated = docsPrefix;
+  for (const seg of segments) {
+    accumulated += `${seg}/`;
+    html += ` <span class="breadcrumb-sep">/</span> <a class="breadcrumb-link" href="#" data-prefix="${accumulated}">${seg}</a>`;
+  }
+  breadcrumbEl.innerHTML = html;
+
+  // Attach click handlers
+  breadcrumbEl.querySelectorAll(".breadcrumb-link").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      navigateToFolder(link.dataset.prefix);
+    });
+  });
+};
+
 const loadDocsFromBucket = async () => {
   if (!docTableBody) return;
 
@@ -669,7 +730,7 @@ const loadDocsFromBucket = async () => {
 
   const { data: files, error } = await supabase.storage
     .from(docsBucket)
-    .list(docsPrefix || "", { sortBy: { column: "created_at", order: "desc" } });
+    .list(currentPrefix || "", { sortBy: { column: "created_at", order: "desc" } });
 
   if (error) {
     console.error("Failed to load docs:", error.message);
@@ -683,7 +744,7 @@ const loadDocsFromBucket = async () => {
     // Skip .trash folder and .folder placeholders
     if (file.name === ".trash" || file.name === ".folder") continue;
     const isFolder = !file.metadata;
-    const filePath = `${docsPrefix}${file.name}`;
+    const filePath = `${currentPrefix}${file.name}`;
 
     if (isFolder) {
       appendRow({
@@ -693,6 +754,7 @@ const loadDocsFromBucket = async () => {
         url: `#folder-${file.name}`,
         isFolder: true,
         filePath,
+        folderPrefix: `${currentPrefix}${file.name}/`,
       });
       fileCount++;
     } else {
@@ -759,7 +821,7 @@ const ensureTrashSection = () => {
 };
 
 const loadTrashBin = async () => {
-  const trashPrefix = `.trash/${docsPrefix}`;
+  const trashPrefix = `.trash/${currentPrefix}`;
   const { data: files, error } = await supabase.storage
     .from(docsBucket)
     .list(trashPrefix, { sortBy: { column: "created_at", order: "desc" } });
@@ -794,7 +856,7 @@ const loadTrashBin = async () => {
     appendTrashRow(
       {
         name: file.name,
-        originalPath: `${docsPrefix}${file.name}`,
+        originalPath: `${currentPrefix}${file.name}`,
         trashedAt,
         size: formatFileSize(file.metadata?.size),
       },
@@ -1064,7 +1126,7 @@ const handleUpload = async () => {
 
   for (const file of files) {
     const fileName = file.webkitRelativePath || file.name;
-    const path = `${docsPrefix}${fileName}`;
+    const path = `${currentPrefix}${fileName}`;
     showStatus(`Uploading ${uploaded + 1}/${total}: ${file.name}…`);
 
     const { error } = await supabase.storage
@@ -1112,7 +1174,7 @@ const handleNewFolder = async () => {
   }
 
   // Create a placeholder file to make the folder exist
-  const placeholderPath = `${docsPrefix}${folderName.trim()}/.folder`;
+  const placeholderPath = `${currentPrefix}${folderName.trim()}/.folder`;
   showStatus(`Creating folder: ${folderName}…`);
 
   const { error } = await supabase.storage
