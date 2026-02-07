@@ -525,14 +525,14 @@ textarea {
 }
 
 .standard-view {
-  max-width: 1300px;
-  margin: 24px auto 80px;
+  max-width: 1240px;
+  margin: 28px auto 60px;
   padding: 0 24px;
 }
 
 .standard-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) minmax(0, 3fr) minmax(200px, 1fr);
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 1.618fr) minmax(220px, 1fr);
   gap: 24px;
 }
 
