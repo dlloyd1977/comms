@@ -1,0 +1,5 @@
+.git/
+.lite_zip_out/
+node_modules/
+.DS_Store
+*.log
