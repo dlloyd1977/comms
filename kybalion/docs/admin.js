@@ -602,10 +602,12 @@ const updateMemberAccess = async (user) => {
   
   if (isActive) {
     await loadDocsFromBucket();
+    // Only apply saved layout for authenticated active members
+    await applyDocsAdminLayoutFromDatabase();
+  } else {
+    // Non-authenticated visitors get the default flex layout (no freeform positioning)
+    clearLayoutPositions();
   }
-
-  // Load admin layout from database for all users (so admin changes apply to everyone)
-  await applyDocsAdminLayoutFromDatabase();
 };
 
 // Document loading
