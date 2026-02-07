@@ -400,9 +400,9 @@ body.layout-freeform .controls [data-layout-key] {
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) 1fr minmax(260px, 320px);
-  gap: 24px;
-  padding: 32px 40px 40px;
+  grid-template-columns: 320px 1fr 320px;
+  gap: 32px;
+  padding: 32px;
 }
 
 /* ── Invite sidebar ────────────────── */
@@ -412,7 +412,6 @@ body.layout-freeform .controls [data-layout-key] {
   align-self: start;
   justify-self: center;
   z-index: 1;
-  padding: 0 16px;
 }
 
 .invite-card {
@@ -462,10 +461,10 @@ body.layout-freeform .controls [data-layout-key] {
 
 .standard-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr minmax(260px, 320px);
-  gap: 24px;
+  grid-template-columns: 320px 1fr 320px;
+  gap: 32px;
   align-items: start;
-  padding-top: 20px;
+  padding: 32px;
 }
 
 .standard-toc {
