@@ -71,6 +71,7 @@ let dragItem = null;
 let dragState = null;
 let didDrag = false;
 let currentIsAdmin = false;
+let memberAccessPromise = null; // deduplication guard for updateMemberAccess
 
 // Utility functions
 const formatTimestamp = (date) =>
@@ -111,7 +112,10 @@ function getLayoutPositionsFromDom() {
   getLayoutItems().forEach((item) => {
     const key = item.dataset.layoutKey;
     if (!key) return;
+    // Skip hidden items — they report zero-size rects that corrupt saved positions
+    if (item.classList.contains("is-hidden") || item.offsetParent === null) return;
     const rect = item.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) return;
     positions[key] = {
       left: Math.max(0, Math.round(rect.left - containerRect.left)),
       top: Math.round(rect.top - containerRect.top),
@@ -133,9 +137,10 @@ function loadLayoutPositions() {
 }
 
 function saveLayoutPositions() {
-  const positions = getLayoutPositionsFromDom();
-  layoutPositions = positions;
-  localStorage.setItem(DOCS_LAYOUT_POS_KEY, JSON.stringify(positions));
+  const visiblePositions = getLayoutPositionsFromDom();
+  // Merge: keep previously saved positions for currently-hidden items
+  layoutPositions = { ...layoutPositions, ...visiblePositions };
+  localStorage.setItem(DOCS_LAYOUT_POS_KEY, JSON.stringify(layoutPositions));
   updateLayoutContainerHeight();
   // If admin, also persist to Supabase for all members
   if (currentIsAdmin) {
@@ -148,16 +153,44 @@ function applyLayoutPositions(positions) {
   const container = getLayoutContainer();
   if (!container) return;
   document.body.classList.add("layout-freeform");
+
+  // First pass: apply saved positions and track rightmost edge for fallback placement
+  let maxRight = 0;
+  let fallbackTop = 10;
   getLayoutItems().forEach((item) => {
     const key = item.dataset.layoutKey;
     if (!key) return;
-    const pos = positions[key] || defaultLayoutPositions?.[key];
-    if (!pos) return;
-    item.style.left = `${pos.left}px`;
-    item.style.top = `${pos.top}px`;
-    item.style.width = `${pos.width}px`;
-    item.style.height = `${pos.height}px`;
+    const pos = positions[key];
+    if (pos && pos.width > 0) {
+      item.style.left = `${pos.left}px`;
+      item.style.top = `${pos.top}px`;
+      item.style.width = `${pos.width}px`;
+      item.style.height = `${pos.height}px`;
+      maxRight = Math.max(maxRight, pos.left + pos.width);
+      if (pos.top >= 0) fallbackTop = Math.max(0, Math.min(fallbackTop, pos.top));
+    }
   });
+
+  // Second pass: position visible items missing from saved data
+  // (e.g., Profile button added after layout was last saved, or hidden when captured)
+  const gap = 12;
+  let nextLeft = maxRight > 0 ? maxRight + gap : 10;
+  getLayoutItems().forEach((item) => {
+    const key = item.dataset.layoutKey;
+    if (!key) return;
+    if (positions[key] && positions[key].width > 0) return; // already positioned
+    if (item.classList.contains("is-hidden")) return; // skip hidden items
+    // Place after the last positioned item in the same row
+    const rect = item.getBoundingClientRect();
+    const w = Math.max(80, Math.round(rect.width) || 100);
+    const h = Math.max(36, Math.round(rect.height) || 40);
+    item.style.left = `${nextLeft}px`;
+    item.style.top = `${Math.max(0, fallbackTop)}px`;
+    item.style.width = `${w}px`;
+    item.style.height = `${h}px`;
+    nextLeft += w + gap;
+  });
+
   updateLayoutContainerHeight();
 }
 
@@ -231,7 +264,9 @@ async function saveDocsAdminLayout() {
   const user = await getCurrentUser();
   if (!user) return;
 
-  const positions = getLayoutPositionsFromDom();
+  // Use the merged layoutPositions (already includes hidden items' prior positions)
+  // instead of re-reading from DOM which would lose hidden items
+  const positions = { ...layoutPositions };
   const order = getLayoutItems().map((el) => el.dataset.layoutKey).filter(Boolean);
 
   const layoutData = {
@@ -631,17 +666,26 @@ const setUIState = (user, member) => {
 };
 
 const updateMemberAccess = async (user) => {
-  const member = await getActiveMember(user);
-  const { isActive } = setUIState(user, member);
-  
-  if (isActive) {
-    await loadDocsFromBucket();
-    // Only apply saved layout for authenticated active members
-    await applyDocsAdminLayoutFromDatabase();
-  } else {
-    // Non-authenticated visitors get the default flex layout (no freeform positioning)
-    clearLayoutPositions();
-  }
+  // Deduplicate: if already running, return the existing promise
+  if (memberAccessPromise) return memberAccessPromise;
+  memberAccessPromise = (async () => {
+    try {
+      const member = await getActiveMember(user);
+      const { isActive } = setUIState(user, member);
+      
+      if (isActive) {
+        await loadDocsFromBucket();
+        // Only apply saved layout for authenticated active members
+        await applyDocsAdminLayoutFromDatabase();
+      } else {
+        // Non-authenticated visitors get the default flex layout (no freeform positioning)
+        clearLayoutPositions();
+      }
+    } finally {
+      memberAccessPromise = null;
+    }
+  })();
+  return memberAccessPromise;
 };
 
 // Document loading
