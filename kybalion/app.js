@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.6.1";
+const APP_VERSION = "1.7.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -2081,6 +2081,15 @@ async function init() {
     authConfirmBtn?.addEventListener("click", () => {
       setNotesVisibility(true);
       setAuthPanelVisible(false);
+    });
+
+    // ── Invite card: force new-tab behaviour (Safari fallback) ──
+    document.querySelectorAll(".invite-card").forEach((card) => {
+      card.addEventListener("click", (e) => {
+        e.preventDefault();
+        const url = card.href || card.closest("a")?.href;
+        if (url) window.open(url, "_blank", "noopener,noreferrer");
+      });
     });
 
     await initializeSupabase();
