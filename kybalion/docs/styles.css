@@ -668,3 +668,72 @@ body.layout-freeform .header-actions [data-layout-key] {
   padding-left: 24px;
   font-size: 0.85rem;
 }
+
+/* ── Required field indicator ── */
+.required {
+  color: #a12424;
+  font-weight: 600;
+}
+
+/* ── Profile Settings (Docs) ── */
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.profile-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+.profile-form {
+  display: grid;
+  gap: 14px;
+}
+
+.profile-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.profile-row-full {
+  grid-template-columns: 1fr;
+}
+
+.profile-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.profile-control span {
+  color: var(--muted);
+}
+
+.profile-control input {
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.profile-control input:disabled {
+  background: #f3f2f1;
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .profile-row {
+    grid-template-columns: 1fr;
+  }
+}

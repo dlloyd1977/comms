@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "1.11.4";
+const APP_VERSION = "1.12.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -46,6 +46,8 @@ const authEmail = document.getElementById("authEmail");
 const authPassword = document.getElementById("authPassword");
 const authSignUpEmail = document.getElementById("authSignUpEmail");
 const authSignUpPassword = document.getElementById("authSignUpPassword");
+const authSignUpFirstName = document.getElementById("authSignUpFirstName");
+const authSignUpLastName = document.getElementById("authSignUpLastName");
 const authSignInBtn = document.getElementById("authSignInBtn");
 const authSignUpBtn = document.getElementById("authSignUpBtn");
 const authSignOutBtn = document.getElementById("authSignOutBtn");
@@ -69,6 +71,7 @@ const authPanel = document.getElementById("authPanel");
 const notesTitle = document.getElementById("notesTitle");
 const userDisplay = document.getElementById("userDisplay");
 const headerSignOutBtn = document.getElementById("headerSignOutBtn");
+const headerProfileBtn = document.getElementById("headerProfileBtn");
 const annotationModal = document.getElementById("annotationModal");
 const annotationInput = document.getElementById("annotationInput");
 const annotationCloseBtn = document.getElementById("annotationCloseBtn");
@@ -1314,6 +1317,9 @@ function updateUserDisplay(user) {
     if (headerSignOutBtn) {
       headerSignOutBtn.classList.remove("is-hidden");
     }
+    if (headerProfileBtn) {
+      headerProfileBtn.classList.remove("is-hidden");
+    }
     return;
   }
   userDisplay.textContent = "";
@@ -1322,6 +1328,9 @@ function updateUserDisplay(user) {
   authOpenBtn.setAttribute("aria-hidden", "false");
   if (headerSignOutBtn) {
     headerSignOutBtn.classList.add("is-hidden");
+  }
+  if (headerProfileBtn) {
+    headerProfileBtn.classList.add("is-hidden");
   }
 }
 
@@ -1578,13 +1587,26 @@ async function handleResetPassword() {
 
 async function handleSignUp() {
   if (!state.auth.client) return;
+  const firstName = authSignUpFirstName?.value?.trim();
+  const lastName = authSignUpLastName?.value?.trim();
   const email = authSignUpEmail?.value?.trim();
   const password = authSignUpPassword?.value || "";
+  if (!firstName || !lastName) {
+    setAuthStatus("First name and last name are required.", "error");
+    return;
+  }
   if (!email || !password) {
     setAuthStatus("Enter both email and password.", "error");
     return;
   }
-  const { data, error } = await state.auth.client.auth.signUp({ email, password });
+  const { data, error } = await state.auth.client.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { first_name: firstName, last_name: lastName },
+      emailRedirectTo: "https://comms.davidelloyd.com/kybalion/"
+    }
+  });
   if (error) {
     setAuthStatus(error.message, "error");
     return;
@@ -1991,6 +2013,11 @@ async function init() {
       }
     });
     headerSignOutBtn?.addEventListener("click", handleHeaderSignOut);
+
+    // Profile settings
+    headerProfileBtn?.addEventListener("click", openProfileModal);
+    initProfileModal();
+
     authOpenBtn?.addEventListener("click", () => {
       setAuthPanelVisible(true);
       setNotesVisibility(false);
@@ -2081,6 +2108,114 @@ async function init() {
       contentEl.innerHTML = `<div class="loading">Error loading book data: ${message}</div>`;
     }
   }
+}
+
+// ── Profile Settings Modal ──
+
+const profileModal = document.getElementById("profileModal");
+const profileForm = document.getElementById("profileForm");
+const profileCloseBtn = document.getElementById("profileCloseBtn");
+const profileCancelBtn = document.getElementById("profileCancelBtn");
+const profileStatus = document.getElementById("profileStatus");
+const profileFirstName = document.getElementById("profileFirstName");
+const profileLastName = document.getElementById("profileLastName");
+const profileEmail = document.getElementById("profileEmail");
+const profileNickname = document.getElementById("profileNickname");
+const profileMiddleInitial = document.getElementById("profileMiddleInitial");
+const profilePhone = document.getElementById("profilePhone");
+const profileAddress = document.getElementById("profileAddress");
+
+function setProfileStatus(msg, type = "info") {
+  if (!profileStatus) return;
+  profileStatus.textContent = msg;
+  profileStatus.className = `profile-status is-${type}`;
+}
+
+async function loadProfileData() {
+  if (!state.auth.client || !state.auth.user) return;
+  const email = getUserEmail(state.auth.user);
+  if (!email) return;
+
+  if (profileEmail) profileEmail.value = email;
+
+  const { data, error } = await state.auth.client
+    .from(membersTable)
+    .select("first_name, last_name, nickname, middle_initial, phone, address")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (error || !data) {
+    setProfileStatus("Could not load profile.", "error");
+    return;
+  }
+
+  if (profileFirstName) profileFirstName.value = data.first_name || "";
+  if (profileLastName) profileLastName.value = data.last_name || "";
+  if (profileNickname) profileNickname.value = data.nickname || "";
+  if (profileMiddleInitial) profileMiddleInitial.value = data.middle_initial || "";
+  if (profilePhone) profilePhone.value = data.phone || "";
+  if (profileAddress) profileAddress.value = data.address || "";
+  setProfileStatus("");
+}
+
+async function saveProfileData(e) {
+  e.preventDefault();
+  if (!state.auth.client || !state.auth.user) return;
+  const email = getUserEmail(state.auth.user);
+  if (!email) return;
+
+  const firstName = profileFirstName?.value?.trim();
+  const lastName = profileLastName?.value?.trim();
+  if (!firstName || !lastName) {
+    setProfileStatus("First name and last name are required.", "error");
+    return;
+  }
+
+  setProfileStatus("Saving…", "info");
+
+  const updates = {
+    first_name: firstName,
+    last_name: lastName,
+    nickname: profileNickname?.value?.trim() || null,
+    middle_initial: profileMiddleInitial?.value?.trim() || null,
+    phone: profilePhone?.value?.trim() || null,
+    address: profileAddress?.value?.trim() || null,
+  };
+
+  const { error } = await state.auth.client
+    .from(membersTable)
+    .update(updates)
+    .eq("email", email);
+
+  if (error) {
+    setProfileStatus(`Save failed: ${error.message}`, "error");
+    return;
+  }
+
+  setProfileStatus("Profile saved.", "success");
+  setTimeout(() => closeProfileModal(), 1200);
+}
+
+function openProfileModal() {
+  if (!profileModal) return;
+  profileModal.classList.remove("is-hidden");
+  profileModal.setAttribute("aria-hidden", "false");
+  loadProfileData();
+}
+
+function closeProfileModal() {
+  if (!profileModal) return;
+  profileModal.classList.add("is-hidden");
+  profileModal.setAttribute("aria-hidden", "true");
+  setProfileStatus("");
+}
+
+function initProfileModal() {
+  if (!profileModal) return;
+  profileForm?.addEventListener("submit", saveProfileData);
+  profileCloseBtn?.addEventListener("click", closeProfileModal);
+  profileCancelBtn?.addEventListener("click", closeProfileModal);
+  profileModal.querySelector(".profile-modal-backdrop")?.addEventListener("click", closeProfileModal);
 }
 
 init();

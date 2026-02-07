@@ -24,7 +24,7 @@
       content="Stanza-based, hyperlinked edition with tags, TOC, and print-to-PDF support."
     />
     <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
-    <link rel="stylesheet" href="styles.css?v=1.11.4" />
+    <link rel="stylesheet" href="styles.css?v=1.12.0" />
   </head>
   <body
     data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
@@ -44,6 +44,7 @@
         <div class="header-actions">
           <button class="secondary" type="button" id="authOpenBtn">Sign In / Create Account</button>
           <span class="user-display is-hidden" id="userDisplay" aria-live="polite"></span>
+          <button class="secondary is-hidden" type="button" id="headerProfileBtn">Profile</button>
           <button class="secondary is-hidden" type="button" id="headerSignOutBtn">Log out</button>
           <div class="menu-wrapper">
             <button
@@ -238,12 +239,22 @@
               <p class="auth-step-title">Create account</p>
               <div class="auth-row">
                 <label class="control auth-control">
-                  <span>Email</span>
-                  <input type="email" id="authSignUpEmail" placeholder="you@example.com" />
+                  <span>First Name <span class="required">*</span></span>
+                  <input type="text" id="authSignUpFirstName" placeholder="First name" required />
                 </label>
                 <label class="control auth-control">
-                  <span>Password</span>
-                  <input type="password" id="authSignUpPassword" placeholder="Password" />
+                  <span>Last Name <span class="required">*</span></span>
+                  <input type="text" id="authSignUpLastName" placeholder="Last name" required />
+                </label>
+              </div>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>Email <span class="required">*</span></span>
+                  <input type="email" id="authSignUpEmail" placeholder="you@example.com" required />
+                </label>
+                <label class="control auth-control">
+                  <span>Password <span class="required">*</span></span>
+                  <input type="password" id="authSignUpPassword" placeholder="Password" required />
                 </label>
               </div>
               <div class="auth-actions">
@@ -312,6 +323,59 @@
       <p class="version">Version <span id="appVersion"></span></p>
     </footer>
 
-    <script src="app.js?v=1.11.3" type="module"></script>
+    <div class="profile-modal is-hidden" id="profileModal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="profile-modal-backdrop"></div>
+      <div class="profile-modal-content panel">
+        <div class="profile-header">
+          <h2>Profile Settings</h2>
+          <button class="secondary" type="button" id="profileCloseBtn">Close</button>
+        </div>
+        <form class="profile-form" id="profileForm">
+          <div class="profile-row">
+            <label class="control profile-control">
+              <span>First Name <span class="required">*</span></span>
+              <input type="text" id="profileFirstName" required />
+            </label>
+            <label class="control profile-control">
+              <span>Last Name <span class="required">*</span></span>
+              <input type="text" id="profileLastName" required />
+            </label>
+          </div>
+          <div class="profile-row">
+            <label class="control profile-control">
+              <span>Email</span>
+              <input type="email" id="profileEmail" disabled />
+            </label>
+            <label class="control profile-control">
+              <span>Nickname</span>
+              <input type="text" id="profileNickname" placeholder="Optional" />
+            </label>
+          </div>
+          <div class="profile-row">
+            <label class="control profile-control">
+              <span>Middle Initial</span>
+              <input type="text" id="profileMiddleInitial" maxlength="1" placeholder="Optional" />
+            </label>
+            <label class="control profile-control">
+              <span>Phone</span>
+              <input type="tel" id="profilePhone" placeholder="Optional" />
+            </label>
+          </div>
+          <div class="profile-row profile-row-full">
+            <label class="control profile-control">
+              <span>Address</span>
+              <input type="text" id="profileAddress" placeholder="Optional" />
+            </label>
+          </div>
+          <p class="profile-status" id="profileStatus"></p>
+          <div class="profile-actions">
+            <button class="primary" type="submit">Save</button>
+            <button class="secondary" type="button" id="profileCancelBtn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="app.js?v=1.12.0" type="module"></script>
   </body>
 </html>
