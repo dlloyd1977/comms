@@ -497,3 +497,11 @@ body.layout-freeform .header-actions [data-layout-key] {
   color: #ffffff;
   border-color: var(--accent);
 }
+
+#layoutEditBtn,
+#layoutResetBtn {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  width: auto;
+}
