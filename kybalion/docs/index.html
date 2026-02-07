@@ -10,7 +10,14 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body
+    data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
+    data-supabase-anon-key="sb_publishable_pGN0njb-9XysERIUFiYtPg_NbAQuZGT"
+    data-admin-emails="davidelloydjr@gmail.com"
+    data-docs-bucket="kybalion-docs"
+    data-docs-prefix=""
+    data-members-table="active_members"
+  >
     <header class="page-header">
       <div class="header-content">
         <div class="brand">
@@ -21,8 +28,38 @@
           </p>
         </div>
         <div class="header-actions">
-          <a class="button secondary" href="/kybalion/">Back to Kybalion</a>
-          <a class="button primary" href="/kybalion/">Reader</a>
+          <a class="button secondary" href="/kybalion/" data-layout-key="back">Back to Kybalion</a>
+          <a class="button primary" href="/kybalion/" data-layout-key="home">Reader</a>
+          <button class="button secondary" type="button" id="authOpenBtn" data-layout-key="auth">Admin Sign In</button>
+          <span class="user-display is-hidden" id="userDisplay" data-layout-key="user" aria-live="polite"></span>
+          <button class="button secondary is-hidden" type="button" id="headerSignOutBtn" data-layout-key="signout">Log out</button>
+          <button class="button primary is-hidden" type="button" id="headerUploadBtn">Upload</button>
+          <button class="button secondary is-hidden" type="button" id="headerNewFolderBtn">+ New</button>
+          <input type="file" id="uploadInput" class="file-input-hidden" multiple />
+          <div class="menu-wrapper" data-layout-key="menu">
+            <button class="button secondary" type="button" id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="menuPanel">Menu</button>
+            <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
+              <div class="menu-section">
+                <p class="menu-title">Documents</p>
+                <a class="menu-link" href="/kybalion/docs/general/">General</a>
+                <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
+                <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
+                <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
+                <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
+                <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
+                <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
+                <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
+                <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
+                <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
+                <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
+                <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
+                <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
+                <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
+                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/">Assets</a>
+                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/">Master Documents</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -87,5 +124,6 @@
     <footer class="page-footer">
       <p>Questions or updates? Reach out to the facilitator team.</p>
     </footer>
+    <script type="module" src="admin.js"></script>
   </body>
 </html>
