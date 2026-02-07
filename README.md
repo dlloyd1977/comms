@@ -8,6 +8,7 @@ v1.5.0 — Enhanced signup (first/last name), Profile Settings, confirmation ema
 
 - Root: `https://comms.davidelloyd.com/`
 - Invite pages live in folders, e.g. `https://comms.davidelloyd.com/kybalion/`
+- Converted invites live at `/kybalion`, `/bookclub`, and `/templates/invite`
 - Legacy pages are preserved under `https://comms.davidelloyd.com/old/`
 
 ## Structure
@@ -16,6 +17,8 @@ v1.5.0 — Enhanced signup (first/last name), Profile Settings, confirmation ema
   - `kybalion-next/nextjs/` — Next.js + Supabase SaaS template (migration target)
     - `nextjs/public/kybalion/docs/` — Static Kybalion docs preserved at `/kybalion/docs/`
     - `nextjs/public/old-static/` — Legacy comms pages copied into `/old/` routes
+    - `nextjs/public/kybalion/images/` — Assets used by converted Kybalion invites
+    - `nextjs/public/bookclub/images/` — Assets used by converted Book Club invite
   - `kybalion/docs/` — Document library with Supabase storage backend
   - `kybalion/docs/admin.js` — Admin functionality: auth, uploads, layout editing, file management, profile settings
   - `kybalion/docs/styles.css` — Docs page styles
