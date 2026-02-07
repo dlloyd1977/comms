@@ -454,6 +454,8 @@ h1 {
 
 body.layout-freeform .header-actions {
   position: relative;
+  width: 100%;
+  flex-basis: 100%;
 }
 
 body.layout-freeform .header-actions [data-layout-key] {
