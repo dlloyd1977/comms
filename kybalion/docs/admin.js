@@ -1481,6 +1481,9 @@ const showAuthModal = () => {
   modal.querySelector("#authModalEmail")?.focus();
 };
 
+// Expose a safe global hook for inline fallback handlers
+window.__docsShowAuthModal = showAuthModal;
+
 // Upload handling
 const handleUpload = async () => {
   if (!uploadInput?.files?.length) return;
