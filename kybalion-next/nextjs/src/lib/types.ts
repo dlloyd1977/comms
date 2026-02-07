@@ -39,6 +39,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_members: {
+        Row: {
+          address: string | null
+          email: string
+          first_name: string | null
+          group: string | null
+          last_name: string | null
+          middle_initial: string | null
+          nickname: string | null
+          phone: string | null
+          status: string | null
+        }
+        Insert: {
+          address?: string | null
+          email: string
+          first_name?: string | null
+          group?: string | null
+          last_name?: string | null
+          middle_initial?: string | null
+          nickname?: string | null
+          phone?: string | null
+          status?: string | null
+        }
+        Update: {
+          address?: string | null
+          email?: string
+          first_name?: string | null
+          group?: string | null
+          last_name?: string | null
+          middle_initial?: string | null
+          nickname?: string | null
+          phone?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      kybalion_layout: {
+        Row: {
+          id: number
+          order: Json | null
+          positions: Json | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: number
+          order?: Json | null
+          positions?: Json | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: number
+          order?: Json | null
+          positions?: Json | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       todo_list: {
         Row: {
           created_at: string
