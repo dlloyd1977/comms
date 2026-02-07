@@ -528,12 +528,23 @@ textarea {
   z-index: 60;
 }
 
+.profile-modal {
+  position: fixed;
+}
+
+.profile-modal-backdrop {
+  position: absolute;
+  inset: 0;
+}
+
 .notes-modal-card,
 .annotation-modal-card,
 .profile-modal-content {
   width: min(920px, 100%);
   padding: 24px;
   color: var(--ink);
+  position: relative;
+  z-index: 1;
 }
 
 .auth-panel {

@@ -2222,6 +2222,16 @@ function initProfileModal() {
   profileCloseBtn?.addEventListener("click", closeProfileModal);
   profileCancelBtn?.addEventListener("click", closeProfileModal);
   profileModal.querySelector(".profile-modal-backdrop")?.addEventListener("click", closeProfileModal);
+  profileModal.addEventListener("click", (event) => {
+    if (event.target === profileModal) {
+      closeProfileModal();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !profileModal.classList.contains("is-hidden")) {
+      closeProfileModal();
+    }
+  });
 }
 
 init();
