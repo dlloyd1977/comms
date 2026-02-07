@@ -512,3 +512,129 @@ body.layout-freeform .header-actions [data-layout-key] {
   vertical-align: middle;
   display: inline-flex;
 }
+
+/* ── File action buttons (Delete, Move) ── */
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin-right: 4px;
+  color: var(--ink);
+  background: #f3f2f1;
+  border-color: #c8c6c4;
+}
+
+.action-btn:hover {
+  background: #e1dfdd;
+  color: var(--ink);
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.action-btn.action-delete {
+  color: #a4262c;
+  border-color: #d1383e;
+  background: #fdf3f4;
+}
+
+.action-btn.action-delete:hover {
+  background: #f4d6d8;
+  color: #a4262c;
+}
+
+.action-btn.action-restore {
+  color: #107c10;
+  border-color: #107c10;
+  background: #f0faf0;
+}
+
+.action-btn.action-restore:hover {
+  background: #d6f0d6;
+  color: #107c10;
+}
+
+.action-btn.action-permadelete {
+  color: #a4262c;
+  border-color: #d1383e;
+  background: #fdf3f4;
+}
+
+.action-btn.action-permadelete:hover {
+  background: #f4d6d8;
+  color: #a4262c;
+}
+
+/* ── Trash section ── */
+
+.trash-section {
+  margin-top: 32px;
+}
+
+.trash-section h2 {
+  color: var(--ink);
+}
+
+.trash-hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 12px;
+}
+
+.trash-table {
+  opacity: 0.85;
+}
+
+.trash-item-name {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ── Move modal ── */
+
+.move-file-label {
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.move-folder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+.move-dest-btn {
+  text-align: left;
+  justify-content: flex-start;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.move-dest-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--muted);
+}
+
+.move-subfolder {
+  padding-left: 24px;
+  font-size: 0.85rem;
+}
