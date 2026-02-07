@@ -1,5 +1,4 @@
 import Link from "next/link";
-import AuthAwareButtons from "@/components/AuthAwareButtons";
 
 export default function KybalionHubPage() {
   return (
@@ -42,7 +41,13 @@ export default function KybalionHubPage() {
             >
               Document Library
             </Link>
-            <AuthAwareButtons variant="nav" />
+            <Link
+              href="/kybalion/reader.html"
+              className="rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ background: "#2f5f8f", color: "#ffffff", border: "1px solid #2f5f8f" }}
+            >
+              Sign In
+            </Link>
           </div>
         </div>
       </nav>
