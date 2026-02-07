@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002Fkybalion\u002Fdocs\u002F[section]","\u002Flegal\u002F[document]","\u002Fold\u002F[...slug]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()

@@ -15,6 +15,7 @@ v1.5.0 — Enhanced signup (first/last name), Profile Settings, confirmation ema
 
 - `kybalion/` — Kybalion invite (current)
   - `kybalion-next/nextjs/` — Next.js + Supabase SaaS template (migration target)
+    - `nextjs/src/app/kybalion/docs/` — Next.js docs rebuild (Phase 2 in progress)
     - `nextjs/public/kybalion/docs/` — Static Kybalion docs preserved at `/kybalion/docs/`
     - `nextjs/public/old-static/` — Legacy comms pages copied into `/old/` routes
     - `nextjs/public/kybalion/images/` — Assets used by converted Kybalion invites
