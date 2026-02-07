@@ -12,6 +12,8 @@ v1.5.0 — Enhanced signup (first/last name), Profile Settings, confirmation ema
 ## Structure
 
 - `kybalion/` — Kybalion invite (current)
+  - `kybalion-next/nextjs/` — Next.js + Supabase SaaS template (migration target)
+    - `nextjs/public/kybalion/docs/` — Static Kybalion docs preserved at `/kybalion/docs/`
   - `kybalion/docs/` — Document library with Supabase storage backend
   - `kybalion/docs/admin.js` — Admin functionality: auth, uploads, layout editing, file management, profile settings
   - `kybalion/docs/styles.css` — Docs page styles
