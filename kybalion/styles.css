@@ -400,9 +400,11 @@ body.layout-freeform .controls [data-layout-key] {
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) 1fr auto;
+  grid-template-columns: minmax(260px, 320px) 1fr 220px;
   gap: 24px;
   padding: 32px 40px 40px;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 /* ── Invite sidebar ────────────────── */
@@ -461,10 +463,12 @@ body.layout-freeform .controls [data-layout-key] {
 
 .standard-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr auto;
+  grid-template-columns: minmax(220px, 280px) 1fr 220px;
   gap: 24px;
   align-items: start;
   padding-top: 20px;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .standard-toc {
