@@ -89,7 +89,7 @@ function getLayoutPositionsFromDom() {
     const rect = item.getBoundingClientRect();
     positions[key] = {
       left: Math.max(0, Math.round(rect.left - containerRect.left)),
-      top: Math.max(0, Math.round(rect.top - containerRect.top)),
+      top: Math.round(rect.top - containerRect.top),
       width: Math.max(80, Math.round(rect.width)),
       height: Math.max(36, Math.round(rect.height)),
     };
@@ -362,6 +362,8 @@ function handleLayoutPointerDown(event) {
   const container = getLayoutContainer();
   if (!container) return;
   const containerRect = container.getBoundingClientRect();
+  const pageHeader = container.closest(".page-header") || container;
+  const headerRect = pageHeader.getBoundingClientRect();
   const startLeft = parseFloat(item.style.left || "0");
   const startTop = parseFloat(item.style.top || "0");
   dragItem = item;
@@ -371,6 +373,7 @@ function handleLayoutPointerDown(event) {
     startLeft,
     startTop,
     maxLeft: Math.max(0, containerRect.width - rect.width),
+    minTop: Math.round(headerRect.top - containerRect.top),
   };
   item.classList.add("is-dragging");
   item.setPointerCapture(event.pointerId);
@@ -382,7 +385,7 @@ function handleLayoutPointerMove(event) {
   const deltaX = event.clientX - dragState.startX;
   const deltaY = event.clientY - dragState.startY;
   const nextLeft = Math.min(Math.max(0, dragState.startLeft + deltaX), dragState.maxLeft);
-  const nextTop = Math.max(0, dragState.startTop + deltaY);
+  const nextTop = Math.max(dragState.minTop, dragState.startTop + deltaY);
   dragItem.style.left = `${Math.round(nextLeft)}px`;
   dragItem.style.top = `${Math.round(nextTop)}px`;
   updateLayoutContainerHeight();

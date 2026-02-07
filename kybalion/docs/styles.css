@@ -456,6 +456,7 @@ body.layout-freeform .header-actions {
   position: relative;
   width: 100%;
   flex-basis: 100%;
+  overflow: visible;
 }
 
 body.layout-freeform .header-actions [data-layout-key] {
