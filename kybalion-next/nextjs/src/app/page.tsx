@@ -37,6 +37,12 @@ export default function Home() {
             >
               Open Document Library
             </Link>
+            <Link
+              href="/old"
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+            >
+              Legacy Pages
+            </Link>
             <AuthAwareButtons variant="nav" />
           </div>
         </div>
