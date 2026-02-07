@@ -459,7 +459,7 @@ body.layout-freeform .controls [data-layout-key] {
 
 .standard-layout {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-columns: minmax(220px, 280px) 1fr 220px;
   gap: 24px;
   align-items: start;
   padding-top: 20px;
