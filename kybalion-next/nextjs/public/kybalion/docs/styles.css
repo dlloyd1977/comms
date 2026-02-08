@@ -192,6 +192,12 @@ h1 {
   color: var(--accent-dark);
 }
 
+.menu-link.is-active {
+  background: #e8f0fe;
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .menu-link.is-disabled {
   opacity: 0.45;
   pointer-events: none;
