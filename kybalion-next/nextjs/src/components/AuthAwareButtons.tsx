@@ -32,10 +32,10 @@ export default function AuthAwareButtons({ variant = 'primary' }) {
     if (variant === 'nav') {
         return isAuthenticated ? (
             <Link
-                href="/app"
+                href="/kybalion/"
                 className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
             >
-                Go to Dashboard
+                Go to Kybalion
             </Link>
         ) : (
             <>
@@ -55,10 +55,10 @@ export default function AuthAwareButtons({ variant = 'primary' }) {
     // Primary buttons for the hero section
     return isAuthenticated ? (
         <Link
-            href="/app"
+            href="/kybalion/"
             className="inline-flex items-center px-6 py-3 rounded-lg bg-primary-600 text-white font-medium hover:bg-primary-700 transition-colors"
         >
-            Go to Dashboard
+            Go to Kybalion
             <ArrowRight className="ml-2 h-5 w-5" />
         </Link>
     ) : (
