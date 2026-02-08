@@ -152,8 +152,7 @@ h1 {
   top: calc(100% + 8px);
   right: 0;
   min-width: 220px;
-  max-height: 70vh;
-  overflow: auto;
+  overflow: visible;
   background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 12px;
