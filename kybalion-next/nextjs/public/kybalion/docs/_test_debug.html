@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Debug Test</title></head>
+<body>
+<h2>Button Debug Test</h2>
+<pre id="log"></pre>
+<button id="testBtn" onclick="document.getElementById('log').textContent += 'inline onclick fired\n'">Test Inline Click</button>
+<hr>
+<button id="testBtn2">Test JS Click</button>
+
+<script>
+  document.getElementById('log').textContent += '1. Inline script loaded\n';
+  document.getElementById('testBtn2').addEventListener('click', () => {
+    document.getElementById('log').textContent += 'addEventListener click fired\n';
+  });
+</script>
+
+<script type="module">
+  const log = document.getElementById('log');
+  log.textContent += '2. Module script started\n';
+  try {
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    log.textContent += '3. Supabase import SUCCESS: ' + typeof createClient + '\n';
+  } catch (e) {
+    log.textContent += '3. Supabase import FAILED: ' + e.message + '\n';
+  }
+  log.textContent += '4. Module script completed\n';
+</script>
+</body>
+</html>
