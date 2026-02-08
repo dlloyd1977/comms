@@ -725,6 +725,7 @@ const setUIState = (user, member) => {
       menuAuthLink.style.cursor = "pointer";
       menuAuthLink.onclick = async (e) => {
         e.preventDefault();
+        if (typeof window.__authSync !== "undefined") window.__authSync.clearAll();
         await supabase.auth.signOut();
       };
     } else {
@@ -1635,6 +1636,7 @@ document.addEventListener("click", (event) => {
 
 if (headerSignOutBtn) {
   headerSignOutBtn.addEventListener("click", async () => {
+    if (typeof window.__authSync !== "undefined") window.__authSync.clearAll();
     await supabase.auth.signOut();
   });
 }
@@ -1839,8 +1841,15 @@ window.addEventListener("popstate", () => {
 // Save initial page state for popstate
 history.replaceState({ docsUrl: location.pathname }, "", location.pathname);
 
-// Auth state changes
+// Auth state changes — also sync session to cookies for Next.js SSO
 supabase.auth.onAuthStateChange((_event, session) => {
+  if (typeof window.__authSync !== "undefined") {
+    if (session) {
+      window.__authSync.syncToCookies(session);
+    } else {
+      window.__authSync.clearCookies();
+    }
+  }
   void updateMemberAccess(session?.user || null);
 });
 

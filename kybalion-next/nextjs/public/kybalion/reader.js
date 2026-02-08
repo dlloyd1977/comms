@@ -1426,6 +1426,14 @@ async function initializeSupabase() {
   updateAuthUI();
 
   state.auth.client.auth.onAuthStateChange((event, session) => {
+    // Bidirectional auth sync — keep cookies in sync for Next.js SSO
+    if (typeof window.__authSync !== "undefined") {
+      if (session) {
+        window.__authSync.syncToCookies(session);
+      } else {
+        window.__authSync.clearCookies();
+      }
+    }
     const previousUserId = state.auth.user?.id || null;
     state.auth.user = session?.user || null;
     const nextUserId = state.auth.user?.id || null;
@@ -1653,6 +1661,7 @@ async function handleSignUp() {
 
 async function handleSignOut() {
   if (!state.auth.client) return;
+  if (typeof window.__authSync !== "undefined") window.__authSync.clearAll();
   await state.auth.client.auth.signOut({ scope: "global" });
   state.auth.user = null;
   state.auth.mode = "local";

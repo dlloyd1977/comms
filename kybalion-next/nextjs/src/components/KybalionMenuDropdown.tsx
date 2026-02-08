@@ -99,6 +99,15 @@ export default function KybalionMenuDropdown() {
   /* Sign-out handler */
   const handleSignOut = async () => {
     try {
+      // Clear localStorage so static docs/reader pages also lose the session
+      try {
+        const ref = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).host.split('.')[0];
+        const prefix = `sb-${ref}-`;
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key?.startsWith(prefix)) localStorage.removeItem(key);
+        }
+      } catch { /* non-critical */ }
       const { createSPASassClient } = await import("@/lib/supabase/client");
       const supabase = await createSPASassClient();
       await supabase.getSupabaseClient().auth.signOut();

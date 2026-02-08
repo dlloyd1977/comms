@@ -169,6 +169,18 @@
             console.warn("[fallback.js] Could not store session:", err);
           }
 
+          // Also sync session to cookies for Next.js SSO
+          if (typeof window.__authSync !== "undefined") {
+            window.__authSync.syncToCookies({
+              access_token: result.data.access_token,
+              refresh_token: result.data.refresh_token,
+              expires_at: Math.floor(Date.now() / 1000) + result.data.expires_in,
+              expires_in: result.data.expires_in,
+              token_type: result.data.token_type || "bearer",
+              user: result.data.user,
+            });
+          }
+
           status.textContent = "Signed in! Reloading\u2026";
           status.style.color = "#080";
           form.reset();
