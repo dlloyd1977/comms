@@ -725,9 +725,14 @@ const setUIState = (user, member) => {
       };
     } else {
       menuAuthLink.textContent = "Sign In";
-      menuAuthLink.href = "/auth/login?redirect=" + encodeURIComponent(window.location.pathname);
-      menuAuthLink.style.cursor = "";
-      menuAuthLink.onclick = null;
+      menuAuthLink.removeAttribute("href");
+      menuAuthLink.style.cursor = "pointer";
+      menuAuthLink.onclick = (e) => {
+        e.preventDefault();
+        // Close menu panel first
+        menuPanel?.classList.add("is-hidden");
+        showAuthModal();
+      };
     }
   }
 

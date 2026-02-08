@@ -1345,9 +1345,18 @@ function updateUserDisplay(user) {
   // Menu auth link: show Sign In
   if (menuAuthLink) {
     menuAuthLink.textContent = "Sign In";
-    menuAuthLink.href = "/auth/login?redirect=" + encodeURIComponent(window.location.pathname);
-    menuAuthLink.style.cursor = "";
-    menuAuthLink.onclick = null;
+    menuAuthLink.removeAttribute("href");
+    menuAuthLink.style.cursor = "pointer";
+    menuAuthLink.onclick = (e) => {
+      e.preventDefault();
+      // Close menu panel first
+      menuPanel?.classList.add("is-hidden");
+      // Open notes modal with auth panel visible
+      setNotesModalOpen(true);
+      setNotesVisibility(false);
+      setAuthPanelVisible(true);
+      authEmail?.focus();
+    };
   }
 }
 
@@ -2035,7 +2044,14 @@ async function init() {
     headerProfileBtn?.addEventListener("click", openProfileModal);
     initProfileModal();
 
-    // authOpenBtn is now an <a> link to /auth/login — no click handler needed
+    // authOpenBtn: intercept click to open inline auth panel (works in iframe/Simple Browser)
+    authOpenBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      setNotesModalOpen(true);
+      setNotesVisibility(false);
+      setAuthPanelVisible(true);
+      authEmail?.focus();
+    });
     if (menuBtn && menuPanel) {
       menuBtn.addEventListener("click", (event) => {
         event.stopPropagation();
