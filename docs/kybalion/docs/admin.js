@@ -325,9 +325,11 @@ async function saveDocsAdminLayout() {
     updated_by: getUserEmail(user),
   };
 
-  const { error } = await supabase
+  // Use UPDATE (not upsert) to avoid INSERT which may be blocked by RLS.
+  const { error, count } = await supabase
     .from(DOCS_LAYOUT_TABLE)
-    .upsert(layoutData, { onConflict: "id" });
+    .update(layoutData)
+    .eq("id", DOCS_LAYOUT_ROW_ID);
 
   if (error) {
     console.error("Failed to save docs admin layout:", error.message);
@@ -355,7 +357,11 @@ async function loadDocsAdminLayout() {
 
 async function applyDocsAdminLayoutFromDatabase() {
   const adminLayout = await loadDocsAdminLayout();
-  if (adminLayout) {
+  // Treat empty order/positions (from a reset) the same as no layout data.
+  const hasLayout = adminLayout &&
+    ((Array.isArray(adminLayout.order) && adminLayout.order.length > 0) ||
+     (adminLayout.positions && Object.keys(adminLayout.positions).length > 0));
+  if (hasLayout) {
     console.log("Loading docs admin layout from database");
     const sharedOrder = filterDocsLayoutOrder(adminLayout.order);
     const sharedPositions = filterDocsLayoutPositions(adminLayout.positions);
@@ -398,9 +404,16 @@ async function resetDocsAdminLayout() {
   const user = await getCurrentUser();
   if (!user) return;
 
+  // UPDATE with empty values instead of DELETE.
+  // This avoids needing INSERT (which RLS may block) when saving again later.
   const { error } = await supabase
     .from(DOCS_LAYOUT_TABLE)
-    .delete()
+    .update({
+      positions: {},
+      order: [],
+      updated_at: new Date().toISOString(),
+      updated_by: getUserEmail(user),
+    })
     .eq("id", DOCS_LAYOUT_ROW_ID);
 
   if (error) {
