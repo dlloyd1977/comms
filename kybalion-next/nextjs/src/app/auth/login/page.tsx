@@ -15,9 +15,9 @@ function LoginForm() {
     const [showMFAPrompt, setShowMFAPrompt] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
-    const rawRedirect = searchParams.get('redirect') || '/app';
+    const rawRedirect = searchParams.get('redirect') || '/kybalion/';
     // Safety: only allow relative paths to prevent open redirects
-    const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/app';
+    const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/kybalion/';
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

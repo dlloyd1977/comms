@@ -46,28 +46,28 @@ export default function DashboardContent() {
                 <CardContent>
                     <div className="grid gap-4 md:grid-cols-2">
                         <Link
-                            href="/app/user-settings"
+                            href="/kybalion/docs/"
                             className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                         >
                             <div className="p-2 bg-primary-50 rounded-full">
                                 <Settings className="h-4 w-4 text-primary-600" />
                             </div>
                             <div>
-                                <h3 className="font-medium">User Settings</h3>
-                                <p className="text-sm text-gray-500">Manage your account preferences</p>
+                                <h3 className="font-medium">Document Library</h3>
+                                <p className="text-sm text-gray-500">Access course documents</p>
                             </div>
                         </Link>
 
                         <Link
-                            href="/app/table"
+                            href="/kybalion/reader.html"
                             className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                         >
                             <div className="p-2 bg-primary-50 rounded-full">
                                 <ExternalLink className="h-4 w-4 text-primary-600" />
                             </div>
                             <div>
-                                <h3 className="font-medium">Example Page</h3>
-                                <p className="text-sm text-gray-500">Check out example features</p>
+                                <h3 className="font-medium">Reader</h3>
+                                <p className="text-sm text-gray-500">Open The Kybalion reader</p>
                             </div>
                         </Link>
                     </div>

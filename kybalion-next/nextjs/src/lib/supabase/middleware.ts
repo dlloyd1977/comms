@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
 
     const {data: user} = await supabase.auth.getUser()
     if (
-        (!user || !user.user) && request.nextUrl.pathname.startsWith('/app')
+        (!user || !user.user) && request.nextUrl.pathname.startsWith('/kybalion/')
     ) {
         const url = request.nextUrl.clone()
         url.pathname = '/auth/login'

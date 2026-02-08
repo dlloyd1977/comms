@@ -57,7 +57,7 @@ export default function ResetPasswordPage() {
 
             setSuccess(true);
             setTimeout(() => {
-                router.push('/app');
+                router.push('/kybalion/');
             }, 3000);
         } catch (err) {
             if (err instanceof Error) {
