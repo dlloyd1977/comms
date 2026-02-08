@@ -43,6 +43,21 @@ export class SassClient {
     }
 
     async logout() {
+        // Clear localStorage + cookies so static HTML pages (docs/reader) also lose the session
+        try {
+            const ref = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).host.split('.')[0];
+            const prefix = `sb-${ref}-`;
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key?.startsWith(prefix)) localStorage.removeItem(key);
+            }
+            for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                const key = sessionStorage.key(i);
+                if (key?.startsWith(prefix)) sessionStorage.removeItem(key);
+            }
+        } catch {
+            // Non-critical — static pages will clear on their next load
+        }
         const { error } = await this.client.auth.signOut({
             scope: 'local',
         });
