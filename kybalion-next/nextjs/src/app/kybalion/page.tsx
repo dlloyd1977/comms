@@ -1,5 +1,4 @@
 import Link from "next/link";
-import KybalionAuthButton from "@/components/KybalionAuthButton";
 import KybalionMenuDropdown from "@/components/KybalionMenuDropdown";
 
 export default function KybalionHubPage() {
@@ -30,7 +29,6 @@ export default function KybalionHubPage() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <KybalionMenuDropdown />
-            <KybalionAuthButton />
           </div>
         </div>
       </nav>

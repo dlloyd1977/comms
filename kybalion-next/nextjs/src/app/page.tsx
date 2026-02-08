@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import AuthAwareButtons from "@/components/AuthAwareButtons";
 import KybalionMenuDropdown from "@/components/KybalionMenuDropdown";
 
 export default function Home() {
@@ -33,7 +32,6 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <KybalionMenuDropdown />
-            <AuthAwareButtons variant="nav" />
           </div>
         </div>
       </nav>
