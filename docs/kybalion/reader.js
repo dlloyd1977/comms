@@ -1,5 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Signal to fallback-reader.js that the module loaded successfully
+window.__readerModuleLoaded = true;
+console.log("[reader.js] Module loaded");
+
 const DATA_URL = "data/kybalion.json";
 const APP_VERSION = "3.2.0";
 const STORAGE_KEY = "kybalion.tags";

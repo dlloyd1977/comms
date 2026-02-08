@@ -1,5 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Signal to fallback.js that the module loaded successfully
+window.__adminModuleLoaded = true;
+console.log("[admin.js] Module loaded");
+
 const body = document.body;
 const supabaseUrl = body.dataset.supabaseUrl;
 const supabaseAnonKey = body.dataset.supabaseAnonKey;
