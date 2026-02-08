@@ -39,7 +39,25 @@ function LoginForm() {
             if (mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
                 setShowMFAPrompt(true);
             } else {
-                router.push(redirectTo);
+                // Sync session to localStorage so the static reader page
+                // (which uses vanilla @supabase/supabase-js) can find it.
+                // @supabase/ssr stores sessions in cookies, but the reader
+                // reads from localStorage with key sb-<ref>-auth-token.
+                const { data: sessionData } = await supabase.auth.getSession();
+                if (sessionData.session) {
+                    try {
+                        const ref = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).host.split('.')[0];
+                        localStorage.setItem(
+                            `sb-${ref}-auth-token`,
+                            JSON.stringify(sessionData.session)
+                        );
+                    } catch {
+                        // Non-critical — reader will just not see the session
+                    }
+                }
+                // Use full page navigation (not router.push) so static HTML
+                // files like reader.html get a proper load cycle.
+                window.location.href = redirectTo;
                 return;
             }
         } catch (err) {
