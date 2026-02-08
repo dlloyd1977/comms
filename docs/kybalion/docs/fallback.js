@@ -64,40 +64,125 @@
         window.__docsShowAuthModal();
         return;
       }
-      // Otherwise show a "loading" notice
-      showFallbackAuthNotice();
+      // Show real auth form that signs in via Supabase REST API
+      showFallbackAuthForm();
     });
   }
 
-  function showFallbackAuthNotice() {
+  function showFallbackAuthForm() {
     var existing = document.getElementById("fallbackAuthModal");
     if (existing) {
       existing.classList.remove("is-hidden");
+      var emailInput = existing.querySelector("#fallbackAuthEmail");
+      if (emailInput) emailInput.focus();
       return;
     }
+
     var modal = document.createElement("div");
     modal.id = "fallbackAuthModal";
     modal.className = "auth-modal";
     modal.innerHTML =
       '<div class="auth-modal-backdrop"></div>' +
       '<div class="auth-modal-content panel">' +
-      "<h2>Sign In</h2>" +
-      '<p style="color:#555;margin:12px 0">The authentication service is still loading. ' +
-      "Please wait a moment and try again.</p>" +
+      "<h2>Sign In / Create Account</h2>" +
+      '<form id="fallbackAuthForm">' +
+      "<label>Email" +
+      '<input type="email" id="fallbackAuthEmail" autocomplete="email" required />' +
+      "</label>" +
+      "<label>Password" +
+      '<input type="password" id="fallbackAuthPassword" autocomplete="current-password" required />' +
+      "</label>" +
+      '<p class="auth-status" id="fallbackAuthStatus" style="color:#555;margin:8px 0;min-height:1.2em"></p>' +
       '<div class="auth-actions">' +
-      '<button class="button secondary" type="button" id="fallbackAuthClose">Close</button>' +
-      "</div></div>";
+      '<button class="button secondary" type="button" id="fallbackAuthCancel">Cancel</button>' +
+      '<button class="button primary" type="submit">Sign in</button>' +
+      "</div>" +
+      "</form>" +
+      "</div>";
     document.body.appendChild(modal);
-    modal
-      .querySelector(".auth-modal-backdrop")
-      .addEventListener("click", function () {
-        modal.classList.add("is-hidden");
-      });
-    modal
-      .querySelector("#fallbackAuthClose")
-      .addEventListener("click", function () {
-        modal.classList.add("is-hidden");
-      });
+
+    var form = modal.querySelector("#fallbackAuthForm");
+    var cancelBtn = modal.querySelector("#fallbackAuthCancel");
+    var backdrop = modal.querySelector(".auth-modal-backdrop");
+
+    function closeModal() {
+      modal.classList.add("is-hidden");
+    }
+    cancelBtn.addEventListener("click", closeModal);
+    backdrop.addEventListener("click", closeModal);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = modal.querySelector("#fallbackAuthEmail").value.trim();
+      var password = modal.querySelector("#fallbackAuthPassword").value;
+      var status = modal.querySelector("#fallbackAuthStatus");
+
+      var supabaseUrl = document.body.dataset.supabaseUrl;
+      var supabaseKey = document.body.dataset.supabaseAnonKey;
+
+      if (!supabaseUrl || !supabaseKey) {
+        status.textContent = "Auth configuration missing.";
+        status.style.color = "#c00";
+        return;
+      }
+
+      status.textContent = "Signing in\u2026";
+      status.style.color = "#555";
+
+      fetch(supabaseUrl + "/auth/v1/token?grant_type=password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: supabaseKey,
+          Authorization: "Bearer " + supabaseKey,
+        },
+        body: JSON.stringify({ email: email, password: password }),
+      })
+        .then(function (resp) {
+          return resp.json().then(function (data) {
+            return { ok: resp.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            var msg = (result.data && result.data.error_description) || (result.data && result.data.msg) || "Sign-in failed.";
+            status.textContent = msg;
+            status.style.color = "#c00";
+            return;
+          }
+
+          // Store session in localStorage (same key Supabase JS client uses)
+          var storageKey = "sb-" + supabaseUrl.replace(/^https?:\/\//, "").split(".")[0] + "-auth-token";
+          try {
+            localStorage.setItem(
+              storageKey,
+              JSON.stringify({
+                access_token: result.data.access_token,
+                refresh_token: result.data.refresh_token,
+                expires_at: Math.floor(Date.now() / 1000) + result.data.expires_in,
+                expires_in: result.data.expires_in,
+                token_type: result.data.token_type || "bearer",
+                user: result.data.user,
+              })
+            );
+          } catch (err) {
+            console.warn("[fallback.js] Could not store session:", err);
+          }
+
+          status.textContent = "Signed in! Reloading\u2026";
+          status.style.color = "#080";
+          form.reset();
+          setTimeout(function () {
+            window.location.reload();
+          }, 600);
+        })
+        .catch(function (err) {
+          status.textContent = "Network error: " + err.message;
+          status.style.color = "#c00";
+        });
+    });
+
+    modal.querySelector("#fallbackAuthEmail").focus();
   }
 
   console.log("[fallback.js] Non-module UI handlers registered");

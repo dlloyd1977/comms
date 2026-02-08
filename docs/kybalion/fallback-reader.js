@@ -53,24 +53,137 @@
     });
   }
 
-  // ── Auth button (opens notes modal with auth panel) ──
+  // ── Auth button ──
   var authBtn = document.getElementById("authOpenBtn");
-  var notesModal = document.getElementById("notesModal");
-  var authPanel = document.getElementById("authPanel");
-  var notesContent = document.getElementById("notesContent");
 
   if (authBtn) {
     authBtn.addEventListener("click", function (e) {
       if (window.__readerModuleLoaded) return;
       e.preventDefault();
-      // Open notes modal and show auth panel
-      if (notesModal) {
-        notesModal.classList.remove("is-hidden");
-        notesModal.setAttribute("aria-hidden", "false");
+      // Prefer module's handler if available
+      if (typeof window.__readerShowAuthModal === "function") {
+        window.__readerShowAuthModal();
+        return;
       }
-      if (notesContent) notesContent.classList.add("is-hidden");
-      if (authPanel) authPanel.classList.remove("is-hidden");
+      // Show real auth form that signs in via Supabase REST API
+      showFallbackReaderAuth();
     });
+  }
+
+  function showFallbackReaderAuth() {
+    var existing = document.getElementById("fallbackReaderAuthModal");
+    if (existing) {
+      existing.classList.remove("is-hidden");
+      var emailInput = existing.querySelector("#fallbackReaderEmail");
+      if (emailInput) emailInput.focus();
+      return;
+    }
+
+    var modal = document.createElement("div");
+    modal.id = "fallbackReaderAuthModal";
+    modal.className = "auth-modal";
+    modal.innerHTML =
+      '<div class="auth-modal-backdrop"></div>' +
+      '<div class="auth-modal-content panel">' +
+      "<h2>Sign In / Create Account</h2>" +
+      '<form id="fallbackReaderAuthForm">' +
+      "<label>Email" +
+      '<input type="email" id="fallbackReaderEmail" autocomplete="email" required />' +
+      "</label>" +
+      "<label>Password" +
+      '<input type="password" id="fallbackReaderPassword" autocomplete="current-password" required />' +
+      "</label>" +
+      '<p class="auth-status" id="fallbackReaderStatus" style="color:#555;margin:8px 0;min-height:1.2em"></p>' +
+      '<div class="auth-actions">' +
+      '<button class="button secondary" type="button" id="fallbackReaderCancel">Cancel</button>' +
+      '<button class="button primary" type="submit">Sign in</button>' +
+      "</div>" +
+      "</form>" +
+      "</div>";
+    document.body.appendChild(modal);
+
+    var form = modal.querySelector("#fallbackReaderAuthForm");
+    var cancelBtn = modal.querySelector("#fallbackReaderCancel");
+    var backdrop = modal.querySelector(".auth-modal-backdrop");
+
+    function closeModal() {
+      modal.classList.add("is-hidden");
+    }
+    cancelBtn.addEventListener("click", closeModal);
+    backdrop.addEventListener("click", closeModal);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = modal.querySelector("#fallbackReaderEmail").value.trim();
+      var password = modal.querySelector("#fallbackReaderPassword").value;
+      var status = modal.querySelector("#fallbackReaderStatus");
+
+      var supabaseUrl = document.body.dataset.supabaseUrl;
+      var supabaseKey = document.body.dataset.supabaseAnonKey;
+
+      if (!supabaseUrl || !supabaseKey) {
+        status.textContent = "Auth configuration missing.";
+        status.style.color = "#c00";
+        return;
+      }
+
+      status.textContent = "Signing in\u2026";
+      status.style.color = "#555";
+
+      fetch(supabaseUrl + "/auth/v1/token?grant_type=password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: supabaseKey,
+          Authorization: "Bearer " + supabaseKey,
+        },
+        body: JSON.stringify({ email: email, password: password }),
+      })
+        .then(function (resp) {
+          return resp.json().then(function (data) {
+            return { ok: resp.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            var msg = (result.data && result.data.error_description) || (result.data && result.data.msg) || "Sign-in failed.";
+            status.textContent = msg;
+            status.style.color = "#c00";
+            return;
+          }
+
+          // Store session in localStorage (same key Supabase JS client uses)
+          var storageKey = "sb-" + supabaseUrl.replace(/^https?:\/\//, "").split(".")[0] + "-auth-token";
+          try {
+            localStorage.setItem(
+              storageKey,
+              JSON.stringify({
+                access_token: result.data.access_token,
+                refresh_token: result.data.refresh_token,
+                expires_at: Math.floor(Date.now() / 1000) + result.data.expires_in,
+                expires_in: result.data.expires_in,
+                token_type: result.data.token_type || "bearer",
+                user: result.data.user,
+              })
+            );
+          } catch (err) {
+            console.warn("[fallback-reader.js] Could not store session:", err);
+          }
+
+          status.textContent = "Signed in! Reloading\u2026";
+          status.style.color = "#080";
+          form.reset();
+          setTimeout(function () {
+            window.location.reload();
+          }, 600);
+        })
+        .catch(function (err) {
+          status.textContent = "Network error: " + err.message;
+          status.style.color = "#c00";
+        });
+    });
+
+    modal.querySelector("#fallbackReaderEmail").focus();
   }
 
   // ── Close notes modal ──
