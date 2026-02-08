@@ -2,18 +2,22 @@
 'use client';
 
 import { createSPASassClient } from '@/lib/supabase/client';
-import {useEffect, useState} from 'react';
-import { useRouter } from 'next/navigation';
+import {Suspense, useEffect, useState} from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import SSOButtons from '@/components/SSOButtons';
 
-export default function LoginPage() {
+function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showMFAPrompt, setShowMFAPrompt] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const rawRedirect = searchParams.get('redirect') || '/app';
+    // Safety: only allow relative paths to prevent open redirects
+    const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/app';
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,7 +39,7 @@ export default function LoginPage() {
             if (mfaData.nextLevel === 'aal2' && mfaData.nextLevel !== mfaData.currentLevel) {
                 setShowMFAPrompt(true);
             } else {
-                router.push('/app');
+                router.push(redirectTo);
                 return;
             }
         } catch (err) {
@@ -131,5 +135,13 @@ export default function LoginPage() {
                 </Link>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center text-gray-500">Loading…</div>}>
+            <LoginForm />
+        </Suspense>
     );
 }
