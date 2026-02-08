@@ -27,6 +27,9 @@ const menuBtn = document.getElementById("menuBtn");
 const menuPanel = document.getElementById("menuPanel");
 const menuWrapper = menuBtn?.closest(".menu-wrapper") || null;
 const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
+const menuAuthLink = document.getElementById("menuAuthLink");
+const menuSessionsBtn = document.getElementById("menuSessionsBtn");
+const menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
 
 // Move uploadInput out of header-actions so layout-freeform positioning doesn't interfere
 if (uploadInput && uploadInput.parentElement) {
@@ -708,6 +711,24 @@ const setUIState = (user, member) => {
   // Sign out button (show when signed in)
   if (headerSignOutBtn) {
     headerSignOutBtn.classList.toggle("is-hidden", !isSignedIn);
+  }
+
+  // Menu auth link: toggle Sign In ↔ Log Out
+  if (menuAuthLink) {
+    if (isSignedIn) {
+      menuAuthLink.textContent = "Log Out";
+      menuAuthLink.removeAttribute("href");
+      menuAuthLink.style.cursor = "pointer";
+      menuAuthLink.onclick = async (e) => {
+        e.preventDefault();
+        await supabase.auth.signOut();
+      };
+    } else {
+      menuAuthLink.textContent = "Sign In";
+      menuAuthLink.href = "/auth/login?redirect=" + encodeURIComponent(window.location.pathname);
+      menuAuthLink.style.cursor = "";
+      menuAuthLink.onclick = null;
+    }
   }
 
   // Profile button (show when signed in)
@@ -1633,11 +1654,43 @@ if (menuBtn && menuPanel) {
   menuPanel.addEventListener("click", (event) => {
     event.stopPropagation();
   });
-  document.addEventListener("click", () => setDocsMenuOpen(false));
+  document.addEventListener("click", () => {
+    setDocsMenuOpen(false);
+    if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
+  });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") setDocsMenuOpen(false);
+    if (event.key === "Escape") {
+      setDocsMenuOpen(false);
+      if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
+    }
   });
 }
+
+// ── Sessions flyout sub-menu ─────────────────────────────────
+if (menuSessionsBtn && menuSessionsFlyout) {
+  let sessionsTimer = null;
+  const sessionsWrapper = menuSessionsBtn.closest(".menu-sessions-wrapper");
+
+  menuSessionsBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    menuSessionsFlyout.classList.toggle("is-hidden");
+  });
+
+  // Hover: open on enter, close on leave (with delay)
+  if (sessionsWrapper) {
+    sessionsWrapper.addEventListener("mouseenter", () => {
+      clearTimeout(sessionsTimer);
+      menuSessionsFlyout.classList.remove("is-hidden");
+    });
+    sessionsWrapper.addEventListener("mouseleave", () => {
+      sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
+    });
+  }
+  // Keep flyout open when hovering over it
+  menuSessionsFlyout.addEventListener("mouseenter", () => clearTimeout(sessionsTimer));
+  menuSessionsFlyout.addEventListener("mouseleave", () => {
+    sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
+  });
 
 // ── SPA Navigation (persistent header across docs pages) ─────
 
