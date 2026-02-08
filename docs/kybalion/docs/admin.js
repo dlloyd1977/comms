@@ -8,7 +8,7 @@ const adminEmails = (body.dataset.adminEmails || "")
   .map((email) => email.trim().toLowerCase())
   .filter(Boolean);
 const docsBucket = body.dataset.docsBucket || "kybalion-docs";
-const docsPrefix = body.dataset.docsPrefix || "";
+let docsPrefix = body.dataset.docsPrefix || "";
 let currentPrefix = docsPrefix; // mutable — changes when navigating into sub-folders
 const membersTable = body.dataset.membersTable || "active_members";
 
@@ -40,17 +40,22 @@ function setDocsMenuOpen(open) {
   menuBtn.setAttribute("aria-expanded", String(open));
 }
 
-// Content elements
-const docTableBody = document.querySelector(".doc-table tbody");
-const docsContent = document.querySelector("[data-docs-content]");
-const accessGate = document.getElementById("accessGate");
-const emptyState = document.getElementById("emptyState");
+// Content elements (let — re-bound after SPA navigation)
+let docTableBody = document.querySelector(".doc-table tbody");
+let docsContent = document.querySelector("[data-docs-content]");
+let accessGate = document.getElementById("accessGate");
+let emptyState = document.getElementById("emptyState");
 
 // Auth modal elements
 let authModal = null;
 let moveModal = null;
 let trashSection = null;
 let currentAdminState = false; // tracks if current user is admin for table actions
+
+// Cached auth state for SPA navigation re-application
+let cachedUser = null;
+let cachedMember = null;
+let cachedIsActive = false;
 
 // Dynamic UI elements
 let docsProfileBtn = null;
@@ -757,6 +762,11 @@ const updateMemberAccess = async (user) => {
     try {
       const member = await getActiveMember(user);
       const { isActive } = setUIState(user, member);
+
+      // Cache auth state for SPA navigation
+      cachedUser = user;
+      cachedMember = member;
+      cachedIsActive = isActive;
       
       if (isActive) {
         await loadDocsFromBucket();
@@ -1525,7 +1535,7 @@ const handleUpload = async () => {
     showStatus(`Uploaded ${uploaded} file${uploaded !== 1 ? "s" : ""}. Refreshing…`);
   }
 
-  setTimeout(() => window.location.reload(), 1500);
+  setTimeout(() => loadDocsFromBucket(), 1500);
 };
 
 const showStatus = (message) => {
@@ -1563,7 +1573,7 @@ const handleNewFolder = async () => {
   }
 
   showStatus(`Folder "${folderName}" created. Refreshing…`);
-  setTimeout(() => window.location.reload(), 1000);
+  setTimeout(() => loadDocsFromBucket(), 1000);
 };
 
 // Create dynamic profile button (must run before layout init so it gets a layout key)
@@ -1619,6 +1629,141 @@ if (menuBtn && menuPanel) {
     if (event.key === "Escape") setDocsMenuOpen(false);
   });
 }
+
+// ── SPA Navigation (persistent header across docs pages) ─────
+
+/**
+ * Re-query <main> element references after SPA content swap.
+ */
+function rebindMainElements() {
+  docTableBody = document.querySelector(".doc-table tbody");
+  docsContent = document.querySelector("[data-docs-content]");
+  accessGate = document.getElementById("accessGate");
+  emptyState = document.getElementById("emptyState");
+  trashSection = null; // will be recreated by ensureTrashSection if needed
+}
+
+/**
+ * Returns true if the URL points to an internal docs HTML page.
+ */
+function isDocsPageUrl(url) {
+  try {
+    const u = new URL(url, location.origin);
+    if (u.origin !== location.origin) return false;
+    if (!u.pathname.startsWith("/kybalion/docs")) return false;
+    // Don't intercept file downloads (URLs with file extensions like .pdf, .docx, etc.)
+    const lastSegment = u.pathname.split("/").filter(Boolean).pop() || "";
+    if (lastSegment.includes(".") && !lastSegment.endsWith(".html")) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Perform SPA navigation: fetch target docs page, swap <main> and brand,
+ * keep the header (auth state, layout, buttons) intact.
+ */
+let spaNavInProgress = false;
+async function spaNavigate(url, pushState = true) {
+  if (spaNavInProgress) return;
+  spaNavInProgress = true;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) { location.href = url; return; }
+    const html = await res.text();
+    const parsed = new DOMParser().parseFromString(html, "text/html");
+
+    // 1. Update page title
+    document.title = parsed.title;
+
+    // 2. Update brand section (session name, subtitle)
+    const newBrand = parsed.querySelector(".brand");
+    const curBrand = document.querySelector(".brand");
+    if (newBrand && curBrand) curBrand.innerHTML = newBrand.innerHTML;
+
+    // 3. Update data-docs-prefix for file loading
+    const newPrefix = parsed.body.dataset.docsPrefix || "";
+    document.body.dataset.docsPrefix = newPrefix;
+    docsPrefix = newPrefix;
+    currentPrefix = newPrefix;
+
+    // 4. Swap <main> content
+    const newMain = parsed.querySelector("main.page");
+    const curMain = document.querySelector("main.page");
+    if (newMain && curMain) curMain.innerHTML = newMain.innerHTML;
+
+    // 5. Re-bind element references that live inside <main>
+    rebindMainElements();
+
+    // 6. Re-apply auth visibility on the new <main> elements
+    if (cachedIsActive) {
+      if (docsContent) docsContent.classList.remove("is-hidden");
+      if (accessGate) accessGate.classList.add("is-hidden");
+    } else {
+      if (docsContent) docsContent.classList.add("is-hidden");
+      if (accessGate) accessGate.classList.remove("is-hidden");
+    }
+
+    // 7. Update URL
+    if (pushState) {
+      history.pushState({ docsUrl: url }, "", url);
+    }
+
+    // 8. Scroll to top
+    window.scrollTo(0, 0);
+
+    // 9. Highlight current page in the menu dropdown
+    if (menuPanel) {
+      menuPanel.querySelectorAll(".menu-link").forEach((link) => {
+        const href = link.getAttribute("href");
+        link.classList.toggle("is-active", href === url || url.startsWith(href));
+      });
+    }
+
+    // 10. Re-load files from Supabase if user has access
+    if (cachedIsActive && docTableBody) {
+      await loadDocsFromBucket();
+    }
+  } catch (err) {
+    console.error("SPA navigation failed, falling back:", err);
+    location.href = url;
+  } finally {
+    spaNavInProgress = false;
+  }
+}
+
+// Intercept clicks on internal docs links for SPA navigation
+document.addEventListener("click", (e) => {
+  // Don't intercept if modifier keys are pressed (allow open-in-new-tab etc.)
+  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+  const link = e.target.closest("a[href]");
+  if (!link) return;
+
+  const href = link.getAttribute("href");
+  if (!href || href.startsWith("#") || href.startsWith("javascript:")) return;
+
+  // Resolve relative URLs against current location
+  const resolved = new URL(href, location.href).pathname;
+
+  if (isDocsPageUrl(resolved)) {
+    e.preventDefault();
+    // Close the menu dropdown if open
+    setDocsMenuOpen(false);
+    spaNavigate(resolved);
+  }
+});
+
+// Handle browser back/forward navigation
+window.addEventListener("popstate", () => {
+  if (location.pathname.startsWith("/kybalion/docs")) {
+    spaNavigate(location.pathname, false);
+  }
+});
+
+// Save initial page state for popstate
+history.replaceState({ docsUrl: location.pathname }, "", location.pathname);
 
 // Auth state changes
 supabase.auth.onAuthStateChange((_event, session) => {
