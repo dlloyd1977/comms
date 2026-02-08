@@ -635,15 +635,15 @@ function initDocsLayoutUI() {
     setLayoutEditing(!isEditing);
   });
 
-  layoutResetBtn.addEventListener("click", () => {
+  layoutResetBtn.addEventListener("click", async () => {
     if (!defaultLayoutOrder.length) return;
     clearLayoutPositions();
     applyLayoutOrder(defaultLayoutOrder);
     localStorage.setItem(DOCS_LAYOUT_KEY, JSON.stringify(defaultLayoutOrder));
     localStorage.removeItem(DOCS_LAYOUT_POS_KEY);
     setLayoutEditing(false);
-    // Also clear from Supabase so all members see the reset
-    resetDocsAdminLayout();
+    // Await Supabase delete so it completes before any navigation
+    await resetDocsAdminLayout();
   });
 }
 
@@ -1733,7 +1733,9 @@ async function spaNavigate(url, pushState = true) {
   }
 }
 
-// Intercept clicks on internal docs links for SPA navigation
+// Intercept clicks on internal docs links for SPA navigation.
+// Use CAPTURE PHASE so this fires before menuPanel's stopPropagation,
+// which otherwise prevents menu-link clicks from reaching a bubbling listener.
 document.addEventListener("click", (e) => {
   // Don't intercept if modifier keys are pressed (allow open-in-new-tab etc.)
   if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -1749,11 +1751,12 @@ document.addEventListener("click", (e) => {
 
   if (isDocsPageUrl(resolved)) {
     e.preventDefault();
+    e.stopPropagation(); // prevent any other handlers from also processing
     // Close the menu dropdown if open
     setDocsMenuOpen(false);
     spaNavigate(resolved);
   }
-});
+}, true); // ← capture phase
 
 // Handle browser back/forward navigation
 window.addEventListener("popstate", () => {
