@@ -86,6 +86,9 @@ const menuPanel = document.getElementById("menuPanel");
 const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
 const docsMenuLinks = document.querySelectorAll(".menu-link");
 const menuWrapper = menuBtn?.closest(".menu-wrapper") || null;
+const menuAuthLink = document.getElementById("menuAuthLink");
+const menuSessionsBtn = document.getElementById("menuSessionsBtn");
+const menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
 const membersTable = document.body?.dataset?.membersTable || "active_members";
 const standardAddTagBtn = document.getElementById("standardAddTagBtn");
 const standardAnnotateBtn = document.getElementById("standardAnnotateBtn");
@@ -1317,6 +1320,16 @@ function updateUserDisplay(user) {
     if (headerProfileBtn) {
       headerProfileBtn.classList.remove("is-hidden");
     }
+    // Menu auth link: show Log Out
+    if (menuAuthLink) {
+      menuAuthLink.textContent = "Log Out";
+      menuAuthLink.removeAttribute("href");
+      menuAuthLink.style.cursor = "pointer";
+      menuAuthLink.onclick = async (e) => {
+        e.preventDefault();
+        await supabase.auth.signOut();
+      };
+    }
     return;
   }
   userDisplay.textContent = "";
@@ -1328,6 +1341,13 @@ function updateUserDisplay(user) {
   }
   if (headerProfileBtn) {
     headerProfileBtn.classList.add("is-hidden");
+  }
+  // Menu auth link: show Sign In
+  if (menuAuthLink) {
+    menuAuthLink.textContent = "Sign In";
+    menuAuthLink.href = "/auth/login?redirect=" + encodeURIComponent(window.location.pathname);
+    menuAuthLink.style.cursor = "";
+    menuAuthLink.onclick = null;
   }
 }
 
@@ -2025,11 +2045,40 @@ async function init() {
       menuPanel.addEventListener("click", (event) => {
         event.stopPropagation();
       });
-      document.addEventListener("click", () => setMenuOpen(false));
+      document.addEventListener("click", () => {
+        setMenuOpen(false);
+        if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
+      });
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
           setMenuOpen(false);
+          if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
         }
+      });
+    }
+
+    // Sessions flyout sub-menu
+    if (menuSessionsBtn && menuSessionsFlyout) {
+      let sessionsTimer = null;
+      const sessionsWrapper = menuSessionsBtn.closest(".menu-sessions-wrapper");
+
+      menuSessionsBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        menuSessionsFlyout.classList.toggle("is-hidden");
+      });
+
+      if (sessionsWrapper) {
+        sessionsWrapper.addEventListener("mouseenter", () => {
+          clearTimeout(sessionsTimer);
+          menuSessionsFlyout.classList.remove("is-hidden");
+        });
+        sessionsWrapper.addEventListener("mouseleave", () => {
+          sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
+        });
+      }
+      menuSessionsFlyout.addEventListener("mouseenter", () => clearTimeout(sessionsTimer));
+      menuSessionsFlyout.addEventListener("mouseleave", () => {
+        sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
       });
     }
 
