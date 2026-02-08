@@ -1,5 +1,6 @@
 import Link from "next/link";
 import KybalionAuthButton from "@/components/KybalionAuthButton";
+import KybalionMenuDropdown from "@/components/KybalionMenuDropdown";
 
 export default function KybalionHubPage() {
   return (
@@ -28,20 +29,7 @@ export default function KybalionHubPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href="/"
-              className="rounded-full border px-4 py-2 text-sm font-medium"
-              style={{ background: "#fff", color: "#2f5f8f", borderColor: "#2f5f8f" }}
-            >
-              Home
-            </Link>
-            <Link
-              href="/kybalion/docs/"
-              className="rounded-full border px-4 py-2 text-sm font-medium"
-              style={{ background: "#fff", color: "#2f5f8f", borderColor: "#2f5f8f" }}
-            >
-              Document Library
-            </Link>
+            <KybalionMenuDropdown />
             <KybalionAuthButton />
           </div>
         </div>

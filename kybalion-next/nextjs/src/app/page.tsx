@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import AuthAwareButtons from "@/components/AuthAwareButtons";
+import KybalionMenuDropdown from "@/components/KybalionMenuDropdown";
 
 export default function Home() {
   const productName = process.env.NEXT_PUBLIC_PRODUCTNAME || "Kybalion";
@@ -31,18 +32,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href="/kybalion/docs/"
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50"
-            >
-              Open Document Library
-            </Link>
-            <Link
-              href="/old"
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50"
-            >
-              Legacy Pages
-            </Link>
+            <KybalionMenuDropdown />
             <AuthAwareButtons variant="nav" />
           </div>
         </div>
