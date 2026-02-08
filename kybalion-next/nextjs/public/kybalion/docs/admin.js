@@ -282,8 +282,6 @@ function saveLayoutOrder() {
 
 // Only persist header items that exist for all visitors.
 const DOCS_SHARED_LAYOUT_KEYS = new Set([
-  "back",
-  "home",
   "auth",
   "user",
   "signout",
@@ -561,8 +559,6 @@ function initDocsLayoutUI() {
 
   // Assign data-layout-key to each actionable child
   const keyMap = [
-    { selector: "a[href='../']", key: "back" },
-    { selector: "a[href='/kybalion/']", key: "home" },
     { selector: "#authOpenBtn", key: "auth" },
     { selector: "#userDisplay", key: "user" },
     { selector: "#headerSignOutBtn", key: "signout" },
