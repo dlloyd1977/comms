@@ -890,10 +890,8 @@ const appendTrashRow = ({ name, originalPath, trashedAt, size }, trashTbody) => 
   row.appendChild(trashedCell);
   row.appendChild(sizeCell);
   row.appendChild(actionsCell);
-  const restoreBtn = row.querySelector('[data-action="restore"]');
-  const permaDeleteBtn = row.querySelector('[data-action="permadelete"]');
-  if (restoreBtn) restoreBtn.addEventListener("click", () => handleRestoreFile(originalPath, name));
-  if (permaDeleteBtn) permaDeleteBtn.addEventListener("click", () => handlePermanentDelete(originalPath, name));
+  restoreBtn.addEventListener("click", () => handleRestoreFile(originalPath, name));
+  permaDeleteBtn.addEventListener("click", () => handlePermanentDelete(originalPath, name));
   trashTbody.appendChild(row);
 };
 
