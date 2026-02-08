@@ -2015,12 +2015,7 @@ async function init() {
     headerProfileBtn?.addEventListener("click", openProfileModal);
     initProfileModal();
 
-    authOpenBtn?.addEventListener("click", () => {
-      setAuthPanelVisible(true);
-      setNotesVisibility(false);
-      setAuthStep("choice");
-      setNotesModalOpen(true);
-    });
+    // authOpenBtn is now an <a> link to /auth/login — no click handler needed
     if (menuBtn && menuPanel) {
       menuBtn.addEventListener("click", (event) => {
         event.stopPropagation();
