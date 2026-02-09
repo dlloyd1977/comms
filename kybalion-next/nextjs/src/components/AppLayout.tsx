@@ -112,7 +112,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <div className="relative ml-auto">
                         {user?.display_name || user?.email ? (
                             <span className="mr-4 text-sm font-semibold text-gray-700">
-                                Hi {user?.display_name || user?.email}
+                                Current User: {user?.display_name || user?.email}
                             </span>
                         ) : null}
                         <button
@@ -131,7 +131,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         {isUserDropdownOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg border">
                                 <div className="p-2 border-b border-gray-100">
-                                    <p className="text-xs text-gray-500">Current user</p>
+                                    <p className="text-xs text-gray-500">Current User</p>
                                     <p className="text-sm font-medium text-gray-900 truncate">
                                         {user?.display_name || user?.email}
                                     </p>

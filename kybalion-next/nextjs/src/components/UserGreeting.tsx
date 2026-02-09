@@ -69,7 +69,7 @@ export default function UserGreeting({ className }: UserGreetingProps) {
 
   return (
     <span className={className || "text-sm font-semibold text-slate-700"}>
-      Hi {displayName}
+      Current User: {displayName}
     </span>
   );
 }

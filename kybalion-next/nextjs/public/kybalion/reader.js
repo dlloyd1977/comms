@@ -1336,7 +1336,7 @@ async function updateUserDisplay(user) {
     const email = getUserEmail(user);
     const meta = user.user_metadata || {};
     const initialName = pickDisplayName(meta.nickname, meta.first_name, email);
-    userDisplay.textContent = initialName ? `Hi ${initialName}` : "";
+    userDisplay.textContent = initialName ? `Current User: ${initialName}` : "";
     userDisplay.classList.remove("is-hidden");
     authOpenBtn.classList.add("is-hidden");
     authOpenBtn.setAttribute("aria-hidden", "true");
@@ -1361,7 +1361,7 @@ async function updateUserDisplay(user) {
         state.auth.profile?.first_name,
         email
       );
-      userDisplay.textContent = profileName ? `Hi ${profileName}` : "";
+      userDisplay.textContent = profileName ? `Current User: ${profileName}` : "";
     }
     // Menu auth link: show Log Out
     if (menuAuthLink) {
