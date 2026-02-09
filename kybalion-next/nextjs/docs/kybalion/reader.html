@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Kybalion Reader &mdash; Facilitator Edition</title>
+    <meta
+      name="description"
+      content="Elevated facilitator reader for The Kybalion with TOC, notes, highlights, and annotated stanzas."
+    />
+    <link rel="canonical" href="https://comms.davidelloyd.com/kybalion/reader.html" />
+    <meta property="og:title" content="The Kybalion Reader — Facilitator Edition" />
+    <meta
+      property="og:description"
+      content="Elevated reader with hyperlinked TOC, highlights, notes, and stanza-based navigation."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://comms.davidelloyd.com/kybalion/reader.html" />
+    <meta property="og:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The Kybalion Reader — Facilitator Edition" />
+    <meta
+      name="twitter:description"
+      content="Elevated reader with hyperlinked TOC, highlights, notes, and stanza-based navigation."
+    />
+    <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
+    <link rel="stylesheet" href="reader.css?v=3.3.0" />
+  </head>
+  <body
+    data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
+    data-supabase-anon-key="sb_publishable_pGN0njb-9XysERIUFiYtPg_NbAQuZGT"
+    data-admin-emails="davidelloydjr@gmail.com"
+    data-members-table="active_members"
+  >
+    <header class="page-header">
+      <div class="header-content">
+        <div>
+          <p class="eyebrow">Annotated Facilitator Edition</p>
+          <h1>The Kybalion</h1>
+          <p class="subtitle">Universal Laws &amp; Principles &mdash; Reader Edition.</p>
+        </div>
+        <div class="header-actions">
+          <span class="user-display is-hidden" id="userDisplay" aria-live="polite"></span>
+          <button class="secondary is-hidden" type="button" id="headerProfileBtn">Profile</button>
+          <div class="menu-wrapper" data-layout-key="menu">
+            <button
+              class="button secondary"
+              type="button"
+              id="menuBtn"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="menuPanel"
+            >Main Menu</button>
+            <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
+              <div class="menu-section">
+                <p class="menu-title">Navigation</p>
+                <a class="menu-link" href="/">Home</a>
+                <a class="menu-link" href="/kybalion/">Kybalion Home</a>
+                <a class="menu-link" href="/kybalion/reader.html">Reader</a>
+                <a class="menu-link" href="/kybalion/docs/">Document Library</a>
+                                <a class="menu-link" href="/auth/login?redirect=/kybalion/reader.html" id="menuAuthLink">Sign In / Create Account</a>
+                <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
+                <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
+              </div>
+              <div class="menu-section">
+                <p class="menu-title">Documents</p>
+                <a class="menu-link" href="/kybalion/docs/general/">General</a>
+                <div class="menu-sessions-wrapper">
+                  <button class="menu-link menu-sessions-trigger" type="button" id="menuSessionsBtn">Sessions <span class="menu-arrow">&#9656;</span></button>
+                  <div class="menu-sessions-flyout is-hidden" id="menuSessionsFlyout">
+                    <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
+                    <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
+                    <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
+                    <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
+                    <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
+                    <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
+                    <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
+                    <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
+                    <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
+                    <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
+                    <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
+                    <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
+                  </div>
+                </div>
+                <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
+                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/">Assets</a>
+                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/">Master Documents</a>
+              </div>
+            </div>
+          </div>
+          <button class="secondary" type="button" id="layoutEditBtn">Edit layout</button>
+          <button class="secondary" type="button" id="layoutResetBtn">Reset layout</button>
+        </div>
+      </div>
+      <div class="controls">
+        <label class="control search-control" data-layout-key="search">
+          <span>Search</span>
+          <div class="search-row">
+            <input type="search" id="searchInput" placeholder="Search the text..." />
+            <button class="secondary search-button" type="button" id="searchBtn">Search</button>
+          </div>
+        </label>
+        <label class="control" data-layout-key="tag">
+          <span>Tag filter</span>
+          <select id="tagFilter">
+            <option value="">All tags</option>
+          </select>
+        </label>
+        <div class="control view-toggle" aria-label="View mode" data-layout-key="view">
+          <span>View</span>
+          <div class="view-toggle-pill" role="tablist" aria-label="View mode">
+            <button
+              class="view-pill-button is-active"
+              type="button"
+              id="viewModeStandardBtn"
+              data-mode="standard"
+              role="tab"
+              aria-selected="true"
+            >
+              Standard
+            </button>
+            <button
+              class="view-pill-button"
+              type="button"
+              id="viewModeStanzaBtn"
+              data-mode="typography"
+              role="tab"
+              aria-selected="false"
+            >
+              Stanza
+            </button>
+          </div>
+        </div>
+        <div class="standard-tools header-reader-tools" id="standardTools" data-layout-key="reader-tools">
+          <span class="standard-tools-label">Reader tools</span>
+          <button class="secondary" type="button" id="standardSaveHighlightBtn">
+            Save highlight as Note
+          </button>
+          <button class="secondary" type="button" id="standardAddTagBtn">Add Tag</button>
+          <button class="secondary" type="button" id="standardAnnotateBtn">Annotate</button>
+          <button class="secondary" type="button" id="standardViewNotesBtn">View Notes</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout" id="typographyView">
+      <aside class="toc" id="toc">
+        <div class="toc-header">
+          <h2>Table of Contents</h2>
+          <p>Tap a chapter to jump to stanza references.</p>
+        </div>
+        <nav id="tocList" class="toc-list" aria-label="Table of Contents"></nav>
+      </aside>
+
+      <section class="content" id="content">
+        <div class="loading" id="loading">Loading annotated text&hellip;</div>
+      </section>
+
+      <aside class="invite-sidebar" id="inviteSidebar">
+        <a
+          class="invite-card"
+          href="invite2/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="RSVP to the Kybalion kick-off meeting"
+        >
+          <p class="invite-cta">Sign Up&hellip; Click Here</p>
+          <img
+            class="invite-image"
+            src="images/7-february.jpg"
+            alt="February 7, 2026 — Kybalion kick-off meeting"
+          />
+        </a>
+      </aside>
+    </main>
+
+    <section class="standard-view is-hidden" id="standardView" aria-hidden="true">
+      <div class="standard-layout">
+        <aside class="toc standard-toc" id="standardToc">
+          <div class="toc-header">
+            <h2>Table of Contents</h2>
+            <p>Tap a chapter to jump to the text.</p>
+          </div>
+          <nav id="standardTocList" class="toc-list" aria-label="Standard Table of Contents"></nav>
+        </aside>
+        <div class="standard-content" id="standardContent"></div>
+        <aside class="invite-sidebar">
+          <a
+            class="invite-card"
+            href="invite2/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="RSVP to the Kybalion kick-off meeting"
+          >
+            <p class="invite-cta">Sign Up&hellip; Click Here</p>
+            <img
+              class="invite-image"
+              src="images/7-february.jpg"
+              alt="February 7, 2026 — Kybalion kick-off meeting"
+            />
+          </a>
+        </aside>
+      </div>
+    </section>
+
+    <div class="notes-modal" id="notesModal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="notes-modal-card" role="document">
+        <div class="notes-header">
+          <div>
+            <h2 id="notesTitle">Notes</h2>
+            <p>Highlights saved from the text appear here.</p>
+          </div>
+          <div class="notes-modal-actions">
+            <button class="secondary" type="button" id="copyNotesBtn">Copy All Notes</button>
+            <button class="secondary" type="button" id="closeNotesBtn">Close</button>
+          </div>
+        </div>
+        <div class="auth-panel" id="authPanel">
+          <div class="auth-flow" id="authFlow">
+            <div class="auth-step is-active" data-step="choice">
+              <p class="auth-step-title">Choose how you want to continue</p>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authChoiceSignInBtn">Sign in</button>
+                <button class="secondary" type="button" id="authChoiceSignUpBtn">Create account</button>
+                <button class="secondary" type="button" id="authChoiceGuestBtn">Continue as Guest</button>
+                <button class="secondary" type="button" id="authChoiceCloseBtn">Close</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="signin">
+              <p class="auth-step-title">Sign in</p>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>Email</span>
+                  <input type="email" id="authEmail" placeholder="you@example.com" />
+                </label>
+                <label class="control auth-control">
+                  <span>Password</span>
+                  <input type="password" id="authPassword" placeholder="Password" />
+                </label>
+              </div>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authSignInBtn">Sign in</button>
+                <button class="secondary" type="button" id="authResetPasswordBtn">Reset Password</button>
+                <button class="secondary" type="button" id="authBackFromSignInBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="reset">
+              <p class="auth-step-title">Reset Password</p>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>Email</span>
+                  <input type="email" id="authResetEmail" placeholder="you@example.com" />
+                </label>
+              </div>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authSendResetBtn">Send Reset Link</button>
+                <button class="secondary" type="button" id="authBackFromResetBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="reset-password">
+              <p class="auth-step-title">Set New Password</p>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>New password</span>
+                  <input type="password" id="authNewPassword" placeholder="New password" />
+                </label>
+              </div>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authSetNewPasswordBtn">Update Password</button>
+                <button class="secondary" type="button" id="authBackFromNewPasswordBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="signup">
+              <p class="auth-step-title">Create account</p>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>First Name <span class="required">*</span></span>
+                  <input type="text" id="authSignUpFirstName" placeholder="First name" required />
+                </label>
+                <label class="control auth-control">
+                  <span>Last Name <span class="required">*</span></span>
+                  <input type="text" id="authSignUpLastName" placeholder="Last name" required />
+                </label>
+              </div>
+              <div class="auth-row">
+                <label class="control auth-control">
+                  <span>Email <span class="required">*</span></span>
+                  <input type="email" id="authSignUpEmail" placeholder="you@example.com" required />
+                </label>
+                <label class="control auth-control">
+                  <span>Password <span class="required">*</span></span>
+                  <input type="password" id="authSignUpPassword" placeholder="Password" required />
+                </label>
+              </div>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authSignUpBtn">Create account</button>
+                <button class="secondary" type="button" id="authBackFromSignUpBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="guest">
+              <p class="auth-step-title">Continue as Guest</p>
+              <p class="auth-warning">
+                Guest mode keeps notes only on this device and may be cleared by the browser.
+              </p>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authGuestBtn">Continue as Guest</button>
+                <button class="secondary" type="button" id="authBackFromGuestBtn">Back</button>
+              </div>
+            </div>
+
+            <div class="auth-step" data-step="confirm">
+              <p class="auth-step-title">All set</p>
+              <p class="auth-confirm" id="authConfirmMessage"></p>
+              <div class="auth-actions">
+                <button class="secondary" type="button" id="authConfirmBtn">Continue to Notes</button>
+                <button class="secondary" type="button" id="authSignOutBtn">Sign out</button>
+              </div>
+            </div>
+          </div>
+
+          <p class="auth-status is-info" id="authStatus">Sync not configured.</p>
+          <p class="auth-warning" id="authWarning">
+            Guest mode keeps notes only on this device and may be cleared by the browser.
+          </p>
+        </div>
+        <div class="notes-content" id="notesContent">
+          <div id="notesList" class="notes-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="annotation-modal" id="annotationModal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="annotation-modal-card" role="document">
+        <div class="annotation-header">
+          <div>
+            <h2>Annotation</h2>
+            <p id="annotationRef">Stanza</p>
+          </div>
+          <div class="annotation-actions">
+            <span class="annotation-count" id="annotationCount">0 / 500</span>
+            <button class="secondary" type="button" id="annotationCloseBtn">Close</button>
+          </div>
+        </div>
+        <label class="annotation-field">
+          <span>Your notes</span>
+          <textarea id="annotationInput" maxlength="500" placeholder="Write your annotation..."></textarea>
+        </label>
+        <p class="annotation-status" id="annotationStatus">Saved.</p>
+      </div>
+    </div>
+
+    <footer class="page-footer">
+      <p>
+        Text sourced from the provided PDF and segmented into stanza references for study and
+        discussion. Use Print / Save as PDF for downloadable copies.
+      </p>
+      <p class="version">Version <span id="appVersion"></span></p>
+    </footer>
+
+    <div class="profile-modal is-hidden" id="profileModal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="profile-modal-backdrop"></div>
+      <div class="profile-modal-content panel">
+        <div class="profile-header">
+          <h2>Profile Settings</h2>
+          <button class="secondary" type="button" id="profileCloseBtn">Close</button>
+        </div>
+        <form class="profile-form" id="profileForm">
+          <div class="profile-row">
+            <label class="control profile-control">
+              <span>First Name <span class="required">*</span></span>
+              <input type="text" id="profileFirstName" required />
+            </label>
+            <label class="control profile-control">
+              <span>Last Name <span class="required">*</span></span>
+              <input type="text" id="profileLastName" required />
+            </label>
+          </div>
+          <div class="profile-row">
+            <label class="control profile-control">
+              <span>Email</span>
+              <input type="email" id="profileEmail" disabled />
+            </label>
+            <label class="control profile-control">
+              <span>Nickname</span>
+              <input type="text" id="profileNickname" placeholder="Optional" />
+            </label>
+          </div>
+          <div class="profile-row">
+            <label class="control profile-control">
+              <span>Middle Initial</span>
+              <input type="text" id="profileMiddleInitial" maxlength="1" placeholder="Optional" />
+            </label>
+            <label class="control profile-control">
+              <span>Phone</span>
+              <input type="tel" id="profilePhone" placeholder="Optional" />
+            </label>
+          </div>
+          <div class="profile-row profile-row-full">
+            <label class="control profile-control">
+              <span>Address</span>
+              <input type="text" id="profileAddress" placeholder="Optional" />
+            </label>
+          </div>
+          <p class="profile-status" id="profileStatus"></p>
+          <div class="profile-actions">
+            <button class="primary" type="submit">Save</button>
+            <button class="secondary" type="button" id="profileCancelBtn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="auth-sync.js?v=3.4.0"></script>
+    <script src="fallback-reader.js?v=3.4.0"></script>
+    <script src="reader.js?v=3.4.0" type="module"></script>
+  </body>
+</html>

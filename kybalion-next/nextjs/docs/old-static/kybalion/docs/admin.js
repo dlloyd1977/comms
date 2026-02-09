@@ -1,9 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Signal to fallback.js that the module loaded successfully
-window.__adminModuleLoaded = true;
-console.log("[admin.js] Module loaded");
-
 const body = document.body;
 const supabaseUrl = body.dataset.supabaseUrl;
 const supabaseAnonKey = body.dataset.supabaseAnonKey;
@@ -12,7 +8,7 @@ const adminEmails = (body.dataset.adminEmails || "")
   .map((email) => email.trim().toLowerCase())
   .filter(Boolean);
 const docsBucket = body.dataset.docsBucket || "kybalion-docs";
-let docsPrefix = body.dataset.docsPrefix || "";
+const docsPrefix = body.dataset.docsPrefix || "";
 let currentPrefix = docsPrefix; // mutable — changes when navigating into sub-folders
 const membersTable = body.dataset.membersTable || "active_members";
 
@@ -20,7 +16,9 @@ const DOCS_LAYOUT_KEY = "kybalion.docs.layout.order";
 const DOCS_LAYOUT_POS_KEY = "kybalion.docs.layout.positions";
 
 // Header elements
+const authOpenBtn = document.getElementById("authOpenBtn");
 const userDisplay = document.getElementById("userDisplay");
+const headerSignOutBtn = document.getElementById("headerSignOutBtn");
 const headerUploadBtn = document.getElementById("headerUploadBtn");
 const headerNewFolderBtn = document.getElementById("headerNewFolderBtn");
 const uploadInput = document.getElementById("uploadInput");
@@ -29,11 +27,6 @@ const menuBtn = document.getElementById("menuBtn");
 const menuPanel = document.getElementById("menuPanel");
 const menuWrapper = menuBtn?.closest(".menu-wrapper") || null;
 const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
-const menuAuthLink = document.getElementById("menuAuthLink");
-const menuSignOutLink = document.getElementById("menuSignOutLink");
-const menuChangePasswordLink = document.getElementById("menuChangePasswordLink");
-const menuSessionsBtn = document.getElementById("menuSessionsBtn");
-const menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
 
 // Move uploadInput out of header-actions so layout-freeform positioning doesn't interfere
 if (uploadInput && uploadInput.parentElement) {
@@ -47,22 +40,17 @@ function setDocsMenuOpen(open) {
   menuBtn.setAttribute("aria-expanded", String(open));
 }
 
-// Content elements (let — re-bound after SPA navigation)
-let docTableBody = document.querySelector(".doc-table tbody");
-let docsContent = document.querySelector("[data-docs-content]");
-let accessGate = document.getElementById("accessGate");
-let emptyState = document.getElementById("emptyState");
+// Content elements
+const docTableBody = document.querySelector(".doc-table tbody");
+const docsContent = document.querySelector("[data-docs-content]");
+const accessGate = document.getElementById("accessGate");
+const emptyState = document.getElementById("emptyState");
 
 // Auth modal elements
 let authModal = null;
 let moveModal = null;
 let trashSection = null;
 let currentAdminState = false; // tracks if current user is admin for table actions
-
-// Cached auth state for SPA navigation re-application
-let cachedUser = null;
-let cachedMember = null;
-let cachedIsActive = false;
 
 // Dynamic UI elements
 let docsProfileBtn = null;
@@ -289,7 +277,11 @@ function saveLayoutOrder() {
 
 // Only persist header items that exist for all visitors.
 const DOCS_SHARED_LAYOUT_KEYS = new Set([
+  "back",
+  "home",
+  "auth",
   "user",
+  "signout",
   "profile",
   "menu",
 ]);
@@ -328,11 +320,9 @@ async function saveDocsAdminLayout() {
     updated_by: getUserEmail(user),
   };
 
-  // Use UPDATE (not upsert) to avoid INSERT which may be blocked by RLS.
-  const { error, count } = await supabase
+  const { error } = await supabase
     .from(DOCS_LAYOUT_TABLE)
-    .update(layoutData)
-    .eq("id", DOCS_LAYOUT_ROW_ID);
+    .upsert(layoutData, { onConflict: "id" });
 
   if (error) {
     console.error("Failed to save docs admin layout:", error.message);
@@ -360,11 +350,7 @@ async function loadDocsAdminLayout() {
 
 async function applyDocsAdminLayoutFromDatabase() {
   const adminLayout = await loadDocsAdminLayout();
-  // Treat empty order/positions (from a reset) the same as no layout data.
-  const hasLayout = adminLayout &&
-    ((Array.isArray(adminLayout.order) && adminLayout.order.length > 0) ||
-     (adminLayout.positions && Object.keys(adminLayout.positions).length > 0));
-  if (hasLayout) {
+  if (adminLayout) {
     console.log("Loading docs admin layout from database");
     const sharedOrder = filterDocsLayoutOrder(adminLayout.order);
     const sharedPositions = filterDocsLayoutPositions(adminLayout.positions);
@@ -407,16 +393,9 @@ async function resetDocsAdminLayout() {
   const user = await getCurrentUser();
   if (!user) return;
 
-  // UPDATE with empty values instead of DELETE.
-  // This avoids needing INSERT (which RLS may block) when saving again later.
   const { error } = await supabase
     .from(DOCS_LAYOUT_TABLE)
-    .update({
-      positions: {},
-      order: [],
-      updated_at: new Date().toISOString(),
-      updated_by: getUserEmail(user),
-    })
+    .delete()
     .eq("id", DOCS_LAYOUT_ROW_ID);
 
   if (error) {
@@ -564,7 +543,11 @@ function initDocsLayoutUI() {
 
   // Assign data-layout-key to each actionable child
   const keyMap = [
+    { selector: "a[href='../']", key: "back" },
+    { selector: "a[href='/kybalion/']", key: "home" },
+    { selector: "#authOpenBtn", key: "auth" },
     { selector: "#userDisplay", key: "user" },
+    { selector: "#headerSignOutBtn", key: "signout" },
     { selector: "#headerUploadBtn", key: "upload" },
     { selector: "#headerNewFolderBtn", key: "newfolder" },
     { selector: "#docsProfileBtn", key: "profile" },
@@ -647,15 +630,15 @@ function initDocsLayoutUI() {
     setLayoutEditing(!isEditing);
   });
 
-  layoutResetBtn.addEventListener("click", async () => {
+  layoutResetBtn.addEventListener("click", () => {
     if (!defaultLayoutOrder.length) return;
     clearLayoutPositions();
     applyLayoutOrder(defaultLayoutOrder);
     localStorage.setItem(DOCS_LAYOUT_KEY, JSON.stringify(defaultLayoutOrder));
     localStorage.removeItem(DOCS_LAYOUT_POS_KEY);
     setLayoutEditing(false);
-    // Await Supabase delete so it completes before any navigation
-    await resetDocsAdminLayout();
+    // Also clear from Supabase so all members see the reset
+    resetDocsAdminLayout();
   });
 }
 
@@ -681,18 +664,11 @@ const getActiveMember = async (user) => {
   if (!email) return null;
   const { data, error } = await supabase
     .from(membersTable)
-    .select("status, group, first_name, nickname")
+    .select("status, group")
     .eq("email", email)
     .maybeSingle();
   if (error) return null;
   return data?.status === "active" ? data : null;
-};
-
-const getDisplayName = (user, member) => {
-  const email = getUserEmail(user);
-  const nickname = member?.nickname?.trim?.() || "";
-  const firstName = member?.first_name?.trim?.() || "";
-  return nickname || firstName || email || "";
 };
 
 const setUIState = (user, member) => {
@@ -701,54 +677,23 @@ const setUIState = (user, member) => {
   const isActive = Boolean(member);
   // Check admin from database group OR from hardcoded admin emails list
   const isAdmin = (member?.group === "admin") || (isSignedIn && adminEmails.includes(email));
-  const displayName = getDisplayName(user, member);
 
   console.log("setUIState:", { email, isSignedIn, isActive, isAdmin, memberGroup: member?.group, adminEmails });
 
   // User display
   if (userDisplay) {
-    userDisplay.textContent = displayName ? `Current User: ${displayName}` : "";
+    userDisplay.textContent = email ? `Signed in as ${email}` : "";
     userDisplay.classList.toggle("is-hidden", !isSignedIn);
   }
 
-  // Menu auth links
-  if (isSignedIn) {
-    if (menuAuthLink) {
-      menuAuthLink.classList.add("is-hidden");
-      menuAuthLink.setAttribute("aria-hidden", "true");
-      menuAuthLink.onclick = null;
-    }
-    if (menuChangePasswordLink) {
-      menuChangePasswordLink.classList.remove("is-hidden");
-      menuChangePasswordLink.setAttribute("aria-hidden", "false");
-    }
-    if (menuSignOutLink) {
-      menuSignOutLink.classList.remove("is-hidden");
-      menuSignOutLink.setAttribute("aria-hidden", "false");
-      menuSignOutLink.style.cursor = "pointer";
-      menuSignOutLink.onclick = async (e) => {
-        e.preventDefault();
-        if (typeof window.__authSync !== "undefined") window.__authSync.clearAll();
-        await supabase.auth.signOut();
-      };
-    }
-  } else {
-    if (menuAuthLink) {
-      menuAuthLink.classList.remove("is-hidden");
-      menuAuthLink.setAttribute("aria-hidden", "false");
-      menuAuthLink.setAttribute("href", `/auth/login?redirect=${encodeURIComponent(location.pathname)}`);
-      menuAuthLink.style.cursor = "pointer";
-      menuAuthLink.onclick = null;
-    }
-    if (menuChangePasswordLink) {
-      menuChangePasswordLink.classList.add("is-hidden");
-      menuChangePasswordLink.setAttribute("aria-hidden", "true");
-    }
-    if (menuSignOutLink) {
-      menuSignOutLink.classList.add("is-hidden");
-      menuSignOutLink.setAttribute("aria-hidden", "true");
-      menuSignOutLink.onclick = null;
-    }
+  // Auth button (show when not signed in)
+  if (authOpenBtn) {
+    authOpenBtn.classList.toggle("is-hidden", isSignedIn);
+  }
+
+  // Sign out button (show when signed in)
+  if (headerSignOutBtn) {
+    headerSignOutBtn.classList.toggle("is-hidden", !isSignedIn);
   }
 
   // Profile button (show when signed in)
@@ -772,9 +717,9 @@ const setUIState = (user, member) => {
     link.classList.toggle("is-hidden", !isAdmin);
     link.setAttribute("aria-hidden", String(!isAdmin));
   });
-  // Menu wrapper must always remain visible so unauthenticated visitors
-  // can reach the "Sign In / Create Account" link inside it.
-  // Individual admin-only links are already hidden above.
+  if (menuWrapper) {
+    menuWrapper.classList.toggle("is-hidden", !isActive && !isAdmin);
+  }
   if (!isActive && !isAdmin) {
     setDocsMenuOpen(false);
   }
@@ -812,11 +757,6 @@ const updateMemberAccess = async (user) => {
     try {
       const member = await getActiveMember(user);
       const { isActive } = setUIState(user, member);
-
-      // Cache auth state for SPA navigation
-      cachedUser = user;
-      cachedMember = member;
-      cachedIsActive = isActive;
       
       if (isActive) {
         await loadDocsFromBucket();
@@ -950,8 +890,10 @@ const appendTrashRow = ({ name, originalPath, trashedAt, size }, trashTbody) => 
   row.appendChild(trashedCell);
   row.appendChild(sizeCell);
   row.appendChild(actionsCell);
-  restoreBtn.addEventListener("click", () => handleRestoreFile(originalPath, name));
-  permaDeleteBtn.addEventListener("click", () => handlePermanentDelete(originalPath, name));
+  const restoreBtn = row.querySelector('[data-action="restore"]');
+  const permaDeleteBtn = row.querySelector('[data-action="permadelete"]');
+  if (restoreBtn) restoreBtn.addEventListener("click", () => handleRestoreFile(originalPath, name));
+  if (permaDeleteBtn) permaDeleteBtn.addEventListener("click", () => handlePermanentDelete(originalPath, name));
   trashTbody.appendChild(row);
 };
 
@@ -1344,10 +1286,9 @@ const createDocsProfileBtn = () => {
   docsProfileBtn.type = "button";
   docsProfileBtn.textContent = "Profile";
   docsProfileBtn.id = "docsProfileBtn";
-  // Insert before menu wrapper
-  const menuWrapperEl = document.querySelector(".menu-wrapper");
-  if (menuWrapperEl?.parentElement) {
-    menuWrapperEl.parentElement.insertBefore(docsProfileBtn, menuWrapperEl);
+  // Insert before sign-out button
+  if (headerSignOutBtn?.parentElement) {
+    headerSignOutBtn.parentElement.insertBefore(docsProfileBtn, headerSignOutBtn);
   }
   docsProfileBtn.addEventListener("click", openDocsProfileModal);
   return docsProfileBtn;
@@ -1586,7 +1527,7 @@ const handleUpload = async () => {
     showStatus(`Uploaded ${uploaded} file${uploaded !== 1 ? "s" : ""}. Refreshing…`);
   }
 
-  setTimeout(() => loadDocsFromBucket(), 1500);
+  setTimeout(() => window.location.reload(), 1500);
 };
 
 const showStatus = (message) => {
@@ -1624,7 +1565,7 @@ const handleNewFolder = async () => {
   }
 
   showStatus(`Folder "${folderName}" created. Refreshing…`);
-  setTimeout(() => loadDocsFromBucket(), 1000);
+  setTimeout(() => window.location.reload(), 1000);
 };
 
 // Create dynamic profile button (must run before layout init so it gets a layout key)
@@ -1634,6 +1575,23 @@ createDocsProfileBtn();
 initDocsLayoutUI();
 
 // Event listeners
+if (authOpenBtn) {
+  authOpenBtn.addEventListener("click", showAuthModal);
+}
+
+// Fallback: delegated handler in case the button is re-rendered or missed
+document.addEventListener("click", (event) => {
+  const target = event.target.closest("#authOpenBtn");
+  if (!target) return;
+  showAuthModal();
+});
+
+if (headerSignOutBtn) {
+  headerSignOutBtn.addEventListener("click", async () => {
+    await supabase.auth.signOut();
+  });
+}
+
 if (headerUploadBtn) {
   headerUploadBtn.addEventListener("click", () => {
     uploadInput?.click();
@@ -1658,192 +1616,14 @@ if (menuBtn && menuPanel) {
   menuPanel.addEventListener("click", (event) => {
     event.stopPropagation();
   });
-  document.addEventListener("click", () => {
-    setDocsMenuOpen(false);
-    if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
-  });
+  document.addEventListener("click", () => setDocsMenuOpen(false));
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      setDocsMenuOpen(false);
-      if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
-    }
+    if (event.key === "Escape") setDocsMenuOpen(false);
   });
 }
 
-// ── Sessions flyout sub-menu ─────────────────────────────────
-if (menuSessionsBtn && menuSessionsFlyout) {
-  let sessionsTimer = null;
-  const sessionsWrapper = menuSessionsBtn.closest(".menu-sessions-wrapper");
-
-  menuSessionsBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    menuSessionsFlyout.classList.toggle("is-hidden");
-  });
-
-  // Hover: open on enter, close on leave (with delay)
-  if (sessionsWrapper) {
-    sessionsWrapper.addEventListener("mouseenter", () => {
-      clearTimeout(sessionsTimer);
-      menuSessionsFlyout.classList.remove("is-hidden");
-    });
-    sessionsWrapper.addEventListener("mouseleave", () => {
-      sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
-    });
-  }
-  // Keep flyout open when hovering over it
-  menuSessionsFlyout.addEventListener("mouseenter", () => clearTimeout(sessionsTimer));
-  menuSessionsFlyout.addEventListener("mouseleave", () => {
-    sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
-  });
-}
-
-// ── SPA Navigation (persistent header across docs pages) ─────
-
-/**
- * Re-query <main> element references after SPA content swap.
- */
-function rebindMainElements() {
-  docTableBody = document.querySelector(".doc-table tbody");
-  docsContent = document.querySelector("[data-docs-content]");
-  accessGate = document.getElementById("accessGate");
-  emptyState = document.getElementById("emptyState");
-  trashSection = null; // will be recreated by ensureTrashSection if needed
-}
-
-/**
- * Returns true if the URL points to an internal docs HTML page.
- */
-function isDocsPageUrl(url) {
-  try {
-    const u = new URL(url, location.origin);
-    if (u.origin !== location.origin) return false;
-    if (!u.pathname.startsWith("/kybalion/docs")) return false;
-    // Don't intercept file downloads (URLs with file extensions like .pdf, .docx, etc.)
-    const lastSegment = u.pathname.split("/").filter(Boolean).pop() || "";
-    if (lastSegment.includes(".") && !lastSegment.endsWith(".html")) return false;
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Perform SPA navigation: fetch target docs page, swap <main> and brand,
- * keep the header (auth state, layout, buttons) intact.
- */
-let spaNavInProgress = false;
-async function spaNavigate(url, pushState = true) {
-  if (spaNavInProgress) return;
-  spaNavInProgress = true;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) { location.href = url; return; }
-    const html = await res.text();
-    const parsed = new DOMParser().parseFromString(html, "text/html");
-
-    // 1. Update page title
-    document.title = parsed.title;
-
-    // 2. Update brand section (session name, subtitle)
-    const newBrand = parsed.querySelector(".brand");
-    const curBrand = document.querySelector(".brand");
-    if (newBrand && curBrand) curBrand.innerHTML = newBrand.innerHTML;
-
-    // 3. Update data-docs-prefix for file loading
-    const newPrefix = parsed.body.dataset.docsPrefix || "";
-    document.body.dataset.docsPrefix = newPrefix;
-    docsPrefix = newPrefix;
-    currentPrefix = newPrefix;
-
-    // 4. Swap <main> content
-    const newMain = parsed.querySelector("main.page");
-    const curMain = document.querySelector("main.page");
-    if (newMain && curMain) curMain.innerHTML = newMain.innerHTML;
-
-    // 5. Re-bind element references that live inside <main>
-    rebindMainElements();
-
-    // 6. Re-apply auth visibility on the new <main> elements
-    if (cachedIsActive) {
-      if (docsContent) docsContent.classList.remove("is-hidden");
-      if (accessGate) accessGate.classList.add("is-hidden");
-    } else {
-      if (docsContent) docsContent.classList.add("is-hidden");
-      if (accessGate) accessGate.classList.remove("is-hidden");
-    }
-
-    // 7. Update URL
-    if (pushState) {
-      history.pushState({ docsUrl: url }, "", url);
-    }
-
-    // 8. Scroll to top
-    window.scrollTo(0, 0);
-
-    // 9. Highlight current page in the menu dropdown
-    if (menuPanel) {
-      menuPanel.querySelectorAll(".menu-link").forEach((link) => {
-        const href = link.getAttribute("href");
-        link.classList.toggle("is-active", href === url || url.startsWith(href));
-      });
-    }
-
-    // 10. Re-load files from Supabase if user has access
-    if (cachedIsActive && docTableBody) {
-      await loadDocsFromBucket();
-    }
-  } catch (err) {
-    console.error("SPA navigation failed, falling back:", err);
-    location.href = url;
-  } finally {
-    spaNavInProgress = false;
-  }
-}
-
-// Intercept clicks on internal docs links for SPA navigation.
-// Use CAPTURE PHASE so this fires before menuPanel's stopPropagation,
-// which otherwise prevents menu-link clicks from reaching a bubbling listener.
-document.addEventListener("click", (e) => {
-  // Don't intercept if modifier keys are pressed (allow open-in-new-tab etc.)
-  if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-
-  const link = e.target.closest("a[href]");
-  if (!link) return;
-
-  const href = link.getAttribute("href");
-  if (!href || href.startsWith("#") || href.startsWith("javascript:")) return;
-
-  // Resolve relative URLs against current location
-  const resolved = new URL(href, location.href).pathname;
-
-  if (isDocsPageUrl(resolved)) {
-    e.preventDefault();
-    e.stopPropagation(); // prevent any other handlers from also processing
-    // Close the menu dropdown if open
-    setDocsMenuOpen(false);
-    spaNavigate(resolved);
-  }
-}, true); // ← capture phase
-
-// Handle browser back/forward navigation
-window.addEventListener("popstate", () => {
-  if (location.pathname.startsWith("/kybalion/docs")) {
-    spaNavigate(location.pathname, false);
-  }
-});
-
-// Save initial page state for popstate
-history.replaceState({ docsUrl: location.pathname }, "", location.pathname);
-
-// Auth state changes — also sync session to cookies for Next.js SSO
+// Auth state changes
 supabase.auth.onAuthStateChange((_event, session) => {
-  if (typeof window.__authSync !== "undefined") {
-    if (session) {
-      window.__authSync.syncToCookies(session);
-    } else {
-      window.__authSync.clearCookies();
-    }
-  }
   void updateMemberAccess(session?.user || null);
 });
 
