@@ -772,9 +772,9 @@ const setUIState = (user, member) => {
     link.classList.toggle("is-hidden", !isAdmin);
     link.setAttribute("aria-hidden", String(!isAdmin));
   });
-  if (menuWrapper) {
-    menuWrapper.classList.toggle("is-hidden", !isActive && !isAdmin);
-  }
+  // Menu wrapper must always remain visible so unauthenticated visitors
+  // can reach the "Sign In / Create Account" link inside it.
+  // Individual admin-only links are already hidden above.
   if (!isActive && !isAdmin) {
     setDocsMenuOpen(false);
   }

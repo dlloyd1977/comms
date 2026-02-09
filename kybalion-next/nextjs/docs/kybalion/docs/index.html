@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kybalion Documents Library</title>
+    <meta
+      name="description"
+      content="Kybalion course materials and session resources library."
+    />
+    <link rel="stylesheet" href="styles.css?v=3.4.0" />
+  </head>
+  <body
+    data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
+    data-supabase-anon-key="sb_publishable_pGN0njb-9XysERIUFiYtPg_NbAQuZGT"
+    data-admin-emails="davidelloydjr@gmail.com"
+    data-docs-bucket="kybalion-docs"
+    data-docs-prefix=""
+    data-members-table="active_members"
+  >
+    <header class="page-header">
+      <div class="header-content">
+        <div class="brand">
+          <p class="eyebrow">Kybalion Docs</p>
+          <h1>Document Library</h1>
+          <p class="subtitle">
+            Session materials, templates, and facilitator resources for the Kybalion study series.
+          </p>
+        </div>
+        <div class="header-actions">
+          <span class="user-display is-hidden" id="userDisplay" data-layout-key="user" aria-live="polite"></span>
+          <button class="button primary is-hidden" type="button" id="headerUploadBtn">Upload</button>
+          <button class="button secondary is-hidden" type="button" id="headerNewFolderBtn">+ New</button>
+          <input type="file" id="uploadInput" class="file-input-hidden" multiple />
+          <div class="menu-wrapper" data-layout-key="menu">
+            <button class="button secondary" type="button" id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="menuPanel">Main Menu</button>
+            <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
+              <div class="menu-section">
+                <p class="menu-title">Navigation</p>
+                <a class="menu-link" href="/">Home</a>
+                <a class="menu-link" href="/kybalion/">Kybalion Home</a>
+                <a class="menu-link" href="/kybalion/reader.html">Reader</a>
+                <a class="menu-link" href="/kybalion/docs/">Document Library</a>
+                                <a class="menu-link" href="/auth/login?redirect=/kybalion/docs/" id="menuAuthLink">Sign In / Create Account</a>
+                <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
+                <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
+              </div>
+              <div class="menu-section">
+                <p class="menu-title">Documents</p>
+                <a class="menu-link" href="/kybalion/docs/general/">General</a>
+                <div class="menu-sessions-wrapper">
+                  <button class="menu-link menu-sessions-trigger" type="button" id="menuSessionsBtn">Sessions <span class="menu-arrow">&#9656;</span></button>
+                  <div class="menu-sessions-flyout is-hidden" id="menuSessionsFlyout">
+                    <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
+                    <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
+                    <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
+                    <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
+                    <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
+                    <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
+                    <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
+                    <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
+                    <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
+                    <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
+                    <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
+                    <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
+                  </div>
+                </div>
+                <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
+                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/">Assets</a>
+                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/">Master Documents</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <p class="upload-status is-hidden" id="uploadStatus"></p>
+      <section class="section">
+        <h2>Quick Links</h2>
+        <div class="card-grid">
+          <a class="card" href="general/">
+            <span class="card-title">General</span>
+            <span class="card-text">Syllabus, program overview, and logistics.</span>
+          </a>
+          <a class="card" href="session-01/">
+            <span class="card-title">Session 01</span>
+            <span class="card-text">Overview, worksheet, and slides.</span>
+          </a>
+          <a class="card" href="session-02/">
+            <span class="card-title">Session 02</span>
+            <span class="card-text">Materials and assignments.</span>
+          </a>
+          <a class="card" href="session-03/">
+            <span class="card-title">Session 03</span>
+            <span class="card-text">Materials and assignments.</span>
+          </a>
+          <a class="card" href="templates/">
+            <span class="card-title">Templates</span>
+            <span class="card-text">Reusable worksheets and facilitator templates.</span>
+          </a>
+          <a class="card" href="assets/">
+            <span class="card-title">Assets</span>
+            <span class="card-text">Images, logos, and supporting files.</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Suggested File Naming</h2>
+        <div class="panel">
+          <ul class="list">
+            <li>kybalion-course-syllabus-v1.0.pdf</li>
+            <li>session-01-facilitator-guide-v1.2.docx</li>
+            <li>session-01-worksheet-v1.0.pdf</li>
+            <li>session-02-slides-v1.0.pptx</li>
+            <li>session-03-homework-v1.0.pdf</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Upload Checklist</h2>
+        <div class="panel">
+          <ol class="list">
+            <li>Add files to the repo under kybalion/docs (general, session-01, session-02, etc.).</li>
+            <li>Commit + push to publish on GitHub Pages.</li>
+            <li>Use the naming convention above.</li>
+            <li>Update this index if you add a new session folder.</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <p>Questions or updates? Reach out to the facilitator team.</p>
+    </footer>
+    <script src="../auth-sync.js?v=3.4.0"></script>
+    <script src="fallback.js?v=3.4.0"></script>
+    <script type="module" src="admin.js?v=3.4.0"></script>
+  </body>
+</html>
