@@ -54,7 +54,9 @@ echo "✅ Synced to $NEXTJS_DIR/docs/"
 # ── Step 3: Sync to repo-root docs/ (GitHub Pages) ───────
 echo ""
 echo "▶ Step 3: Syncing out/ → repo-root docs/ (GitHub Pages)..."
-rsync -a --delete --exclude='CNAME' "$NEXTJS_DIR/out/" "$REPO_ROOT/docs/"
+rsync -a --delete --exclude='CNAME' --exclude='.nojekyll' "$NEXTJS_DIR/out/" "$REPO_ROOT/docs/"
+# .nojekyll MUST exist — without it GitHub Pages ignores _next/ directories
+touch "$REPO_ROOT/docs/.nojekyll"
 echo "✅ Synced to $REPO_ROOT/docs/"
 
 # ── Step 4: Git commit and push ──────────────────────────
