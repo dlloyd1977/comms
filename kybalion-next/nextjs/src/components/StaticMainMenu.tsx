@@ -220,22 +220,6 @@ export default function StaticMainMenu() {
           >
             Log Out
           </button>
-          <Link
-            className="menu-link is-hidden"
-            href="/app/user-settings"
-            id="menuChangePasswordLink"
-            aria-hidden="true"
-          >
-            Change Password
-          </Link>
-          <button
-            className="menu-link is-hidden"
-            type="button"
-            id="menuSignOutLink"
-            aria-hidden="true"
-          >
-            Log Out
-          </button>
         </div>
         <div className="menu-section">
           <p className="menu-title">Documents</p>
