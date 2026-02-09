@@ -5,7 +5,7 @@ window.__readerModuleLoaded = true;
 console.log("[reader.js] Module loaded");
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "3.5.0";
+const APP_VERSION = "3.6.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
@@ -861,6 +861,136 @@ function render() {
   applySearchHighlights();
   renderNotes();
   renderStandardView();
+  setupTocScrollHighlight();
+}
+
+/* ── TOC auto-highlight on scroll ──────────────────────────── */
+
+let _tocObserver = null;
+let _standardTocObserver = null;
+
+/**
+ * Uses IntersectionObserver to detect which chapter is currently
+ * visible in the viewport and highlights the matching TOC button.
+ * Works for both the stanza (typography) view and the standard view.
+ */
+function setupTocScrollHighlight() {
+  // --- Stanza / Typography view ---
+  if (_tocObserver) _tocObserver.disconnect();
+
+  const chapters = contentEl.querySelectorAll(".chapter");
+  const tocButtons = tocListEl.querySelectorAll("button[data-chapter-id]");
+  if (chapters.length && tocButtons.length) {
+    const visibleChapters = new Map();          // chapterId → intersectionRatio
+
+    _tocObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          visibleChapters.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+        });
+
+        // Pick the chapter with the largest visible ratio
+        let bestId = null;
+        let bestRatio = 0;
+        visibleChapters.forEach((ratio, id) => {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestId = id;
+          }
+        });
+
+        // If nothing is intersecting pick the nearest chapter above the viewport
+        if (!bestId) {
+          const headerOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--header-offset") || "200", 10);
+          let nearest = null;
+          let nearestDist = Infinity;
+          chapters.forEach((ch) => {
+            const rect = ch.getBoundingClientRect();
+            const dist = headerOffset - rect.bottom; // positive = above viewport
+            if (dist >= 0 && dist < nearestDist) {
+              nearestDist = dist;
+              nearest = ch.id;
+            }
+          });
+          bestId = nearest;
+        }
+
+        tocButtons.forEach((btn) => {
+          btn.classList.toggle("is-active", btn.dataset.chapterId === bestId);
+        });
+
+        // Scroll active TOC button into view within the TOC panel
+        const activeBtn = tocListEl.querySelector("button.is-active");
+        if (activeBtn) {
+          activeBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+      },
+      {
+        rootMargin: "-80px 0px -40% 0px",
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+      }
+    );
+
+    chapters.forEach((ch) => _tocObserver.observe(ch));
+  }
+
+  // --- Standard view ---
+  if (_standardTocObserver) _standardTocObserver.disconnect();
+
+  if (standardContent && standardTocListEl) {
+    const stdChapters = standardContent.querySelectorAll(".standard-chapter");
+    const stdTocButtons = standardTocListEl.querySelectorAll("button[data-chapter-id]");
+    if (stdChapters.length && stdTocButtons.length) {
+      const visibleStd = new Map();
+
+      _standardTocObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            visibleStd.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+          });
+
+          let bestId = null;
+          let bestRatio = 0;
+          visibleStd.forEach((ratio, id) => {
+            if (ratio > bestRatio) {
+              bestRatio = ratio;
+              bestId = id;
+            }
+          });
+
+          if (!bestId) {
+            const headerOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--header-offset") || "200", 10);
+            let nearest = null;
+            let nearestDist = Infinity;
+            stdChapters.forEach((ch) => {
+              const rect = ch.getBoundingClientRect();
+              const dist = headerOffset - rect.bottom;
+              if (dist >= 0 && dist < nearestDist) {
+                nearestDist = dist;
+                nearest = ch.id;
+              }
+            });
+            bestId = nearest;
+          }
+
+          stdTocButtons.forEach((btn) => {
+            btn.classList.toggle("is-active", btn.dataset.chapterId === bestId);
+          });
+
+          const activeBtn = standardTocListEl.querySelector("button.is-active");
+          if (activeBtn) {
+            activeBtn.scrollIntoView({ block: "nearest", behavior: "smooth" });
+          }
+        },
+        {
+          rootMargin: "-80px 0px -40% 0px",
+          threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+        }
+      );
+
+      stdChapters.forEach((ch) => _standardTocObserver.observe(ch));
+    }
+  }
 }
 
 function getSelectedStanzaRef() {

@@ -681,6 +681,22 @@ body[data-view-mode="standard"] .toc {
   background: #f2f6fb;
 }
 
+.toc button.is-active,
+.toc-list button.is-active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(47, 95, 143, 0.25);
+}
+
+.toc button.is-active:hover,
+.toc-list button.is-active:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: #ffffff;
+}
+
 /* ── Content area (Stanza view) ───── */
 .content {
   display: flex;
