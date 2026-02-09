@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import KybalionMenuDropdown from "@/components/KybalionMenuDropdown";
+import UserGreeting from "@/components/UserGreeting";
 
 export default function Home() {
   const productName = process.env.NEXT_PUBLIC_PRODUCTNAME || "Kybalion";
@@ -31,6 +32,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <UserGreeting className="text-sm font-semibold text-slate-700" />
             <KybalionMenuDropdown />
           </div>
         </div>

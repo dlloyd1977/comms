@@ -1,5 +1,6 @@
 import Link from "next/link";
 import KybalionMenuDropdown from "@/components/KybalionMenuDropdown";
+import UserGreeting from "@/components/UserGreeting";
 
 export default function KybalionHubPage() {
   return (
@@ -28,6 +29,7 @@ export default function KybalionHubPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <UserGreeting className="text-sm font-semibold text-[#1f1c1a]" />
             <KybalionMenuDropdown />
           </div>
         </div>
