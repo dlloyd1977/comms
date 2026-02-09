@@ -289,9 +289,7 @@ function saveLayoutOrder() {
 
 // Only persist header items that exist for all visitors.
 const DOCS_SHARED_LAYOUT_KEYS = new Set([
-  "auth",
   "user",
-  "signout",
   "profile",
   "menu",
 ]);
@@ -1697,6 +1695,7 @@ if (menuSessionsBtn && menuSessionsFlyout) {
   menuSessionsFlyout.addEventListener("mouseleave", () => {
     sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
   });
+}
 
 // ── SPA Navigation (persistent header across docs pages) ─────
 
