@@ -280,6 +280,10 @@
     text-decoration: none;
     color: var(--menu-ink);
     font-weight: 600;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font: inherit;
 }
 
 .menu-link:hover {

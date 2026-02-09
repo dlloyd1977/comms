@@ -32,6 +32,10 @@ const menuPanel = document.getElementById("menuPanel");
 const menuWrapper = menuBtn?.closest(".menu-wrapper") || null;
 const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
 const menuAuthLink = document.getElementById("menuAuthLink");
+const menuSignOutLink = document.getElementById("menuSignOutLink");
+const menuChangePasswordLink = document.getElementById("menuChangePasswordLink");
+const menuSignOutLink = document.getElementById("menuSignOutLink");
+const menuChangePasswordLink = document.getElementById("menuChangePasswordLink");
 const menuSessionsBtn = document.getElementById("menuSessionsBtn");
 const menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
 
@@ -725,19 +729,31 @@ const setUIState = (user, member) => {
     headerSignOutBtn.classList.toggle("is-hidden", !isSignedIn);
   }
 
-  // Menu auth link: toggle Sign In ↔ Log Out
-  if (menuAuthLink) {
-    if (isSignedIn) {
-      menuAuthLink.textContent = "Log Out";
-      menuAuthLink.removeAttribute("href");
-      menuAuthLink.style.cursor = "pointer";
-      menuAuthLink.onclick = async (e) => {
+  // Menu auth links
+  if (isSignedIn) {
+    if (menuAuthLink) {
+      menuAuthLink.classList.add("is-hidden");
+      menuAuthLink.setAttribute("aria-hidden", "true");
+      menuAuthLink.onclick = null;
+    }
+    if (menuChangePasswordLink) {
+      menuChangePasswordLink.classList.remove("is-hidden");
+      menuChangePasswordLink.setAttribute("aria-hidden", "false");
+    }
+    if (menuSignOutLink) {
+      menuSignOutLink.classList.remove("is-hidden");
+      menuSignOutLink.setAttribute("aria-hidden", "false");
+      menuSignOutLink.style.cursor = "pointer";
+      menuSignOutLink.onclick = async (e) => {
         e.preventDefault();
         if (typeof window.__authSync !== "undefined") window.__authSync.clearAll();
         await supabase.auth.signOut();
       };
-    } else {
-      menuAuthLink.textContent = "Sign In";
+    }
+  } else {
+    if (menuAuthLink) {
+      menuAuthLink.classList.remove("is-hidden");
+      menuAuthLink.setAttribute("aria-hidden", "false");
       menuAuthLink.removeAttribute("href");
       menuAuthLink.style.cursor = "pointer";
       menuAuthLink.onclick = (e) => {
@@ -746,6 +762,15 @@ const setUIState = (user, member) => {
         menuPanel?.classList.add("is-hidden");
         showAuthModal();
       };
+    }
+    if (menuChangePasswordLink) {
+      menuChangePasswordLink.classList.add("is-hidden");
+      menuChangePasswordLink.setAttribute("aria-hidden", "true");
+    }
+    if (menuSignOutLink) {
+      menuSignOutLink.classList.add("is-hidden");
+      menuSignOutLink.setAttribute("aria-hidden", "true");
+      menuSignOutLink.onclick = null;
     }
   }
 
