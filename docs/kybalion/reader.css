@@ -159,6 +159,10 @@ h1 {
   text-decoration: none;
   color: var(--ink);
   font-weight: 600;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
 }
 
 .menu-link:hover {

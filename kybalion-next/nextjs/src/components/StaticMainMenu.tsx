@@ -27,6 +27,8 @@ export default function StaticMainMenu() {
     const menuSessionsBtn = document.getElementById("menuSessionsBtn");
     const menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
     const menuAuthLink = document.getElementById("menuAuthLink");
+    const menuSignOutLink = document.getElementById("menuSignOutLink");
+    const menuChangePasswordLink = document.getElementById("menuChangePasswordLink");
     const userDisplay = document.getElementById("userDisplay");
     const menuWrapper = menuBtn?.closest(".menu-wrapper") || null;
     const adminLinks = document.querySelectorAll(".menu-link.admin-only");
@@ -109,10 +111,18 @@ export default function StaticMainMenu() {
           }
 
           if (menuAuthLink) {
-            menuAuthLink.textContent = "Log Out";
-            menuAuthLink.removeAttribute("href");
-            menuAuthLink.style.cursor = "pointer";
-            menuAuthLink.onclick = async (e) => {
+            menuAuthLink.classList.add("is-hidden");
+            menuAuthLink.setAttribute("aria-hidden", "true");
+          }
+          if (menuChangePasswordLink) {
+            menuChangePasswordLink.classList.remove("is-hidden");
+            menuChangePasswordLink.setAttribute("aria-hidden", "false");
+          }
+          if (menuSignOutLink) {
+            menuSignOutLink.classList.remove("is-hidden");
+            menuSignOutLink.setAttribute("aria-hidden", "false");
+            menuSignOutLink.style.cursor = "pointer";
+            menuSignOutLink.onclick = async (e) => {
               e.preventDefault();
               try {
                 const ref = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).host.split(".")[0];
@@ -144,10 +154,20 @@ export default function StaticMainMenu() {
         link.setAttribute("aria-hidden", "true");
       });
       if (menuAuthLink) {
-        menuAuthLink.textContent = "Sign In";
+        menuAuthLink.classList.remove("is-hidden");
+        menuAuthLink.setAttribute("aria-hidden", "false");
         menuAuthLink.setAttribute("href", "/auth/login");
         menuAuthLink.style.cursor = "pointer";
         menuAuthLink.onclick = null;
+      }
+      if (menuChangePasswordLink) {
+        menuChangePasswordLink.classList.add("is-hidden");
+        menuChangePasswordLink.setAttribute("aria-hidden", "true");
+      }
+      if (menuSignOutLink) {
+        menuSignOutLink.classList.add("is-hidden");
+        menuSignOutLink.setAttribute("aria-hidden", "true");
+        menuSignOutLink.onclick = null;
       }
     };
 
@@ -184,6 +204,38 @@ export default function StaticMainMenu() {
           <Link className="menu-link" href="/auth/login" id="menuAuthLink">
             Sign In
           </Link>
+          <Link
+            className="menu-link is-hidden"
+            href="/app/user-settings"
+            id="menuChangePasswordLink"
+            aria-hidden="true"
+          >
+            Change Password
+          </Link>
+          <button
+            className="menu-link is-hidden"
+            type="button"
+            id="menuSignOutLink"
+            aria-hidden="true"
+          >
+            Log Out
+          </button>
+          <Link
+            className="menu-link is-hidden"
+            href="/app/user-settings"
+            id="menuChangePasswordLink"
+            aria-hidden="true"
+          >
+            Change Password
+          </Link>
+          <button
+            className="menu-link is-hidden"
+            type="button"
+            id="menuSignOutLink"
+            aria-hidden="true"
+          >
+            Log Out
+          </button>
         </div>
         <div className="menu-section">
           <p className="menu-title">Documents</p>
