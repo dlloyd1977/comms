@@ -711,7 +711,7 @@ const setUIState = (user, member) => {
 
   // User display
   if (userDisplay) {
-    userDisplay.textContent = displayName ? `Hi ${displayName}` : "";
+    userDisplay.textContent = displayName ? `Current User: ${displayName}` : "";
     userDisplay.classList.toggle("is-hidden", !isSignedIn);
   }
 

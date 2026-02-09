@@ -1,7 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
-import AuthAwareButtons from "@/components/AuthAwareButtons";
-import UserGreeting from "@/components/UserGreeting";
+import StaticMainMenu from "@/components/StaticMainMenu";
 
 type InviteShellProps = {
   eyebrow: string;
@@ -32,20 +30,7 @@ export default function InviteShell({
             <p className="text-lg font-semibold text-slate-900">{title}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <UserGreeting className="text-sm font-semibold text-slate-700" />
-            <Link
-              href="/"
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50"
-            >
-              New home
-            </Link>
-            <Link
-              href="/old"
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50"
-            >
-              Legacy pages
-            </Link>
-            <AuthAwareButtons variant="nav" />
+            <StaticMainMenu />
           </div>
         </div>
       </nav>
