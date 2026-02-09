@@ -34,11 +34,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         router.push('/kybalion/')
     };
 
-    const getInitials = (email: string) => {
-        const parts = email.split('@')[0].split(/[._-]/);
+    const getInitials = (value: string) => {
+        const base = value.includes('@') ? value.split('@')[0] : value;
+        const parts = base.trim().split(/[._\s-]+/).filter(Boolean);
         return parts.length > 1
             ? (parts[0][0] + parts[1][0]).toUpperCase()
-            : parts[0].slice(0, 2).toUpperCase();
+            : base.slice(0, 2).toUpperCase();
     };
 
     const productName = process.env.NEXT_PUBLIC_PRODUCTNAME;
@@ -109,26 +110,34 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </button>
 
                     <div className="relative ml-auto">
+                        {user?.display_name || user?.email ? (
+                            <span className="mr-4 text-sm font-semibold text-gray-700">
+                                Hi {user?.display_name || user?.email}
+                            </span>
+                        ) : null}
                         <button
                             onClick={() => setUserDropdownOpen(!isUserDropdownOpen)}
                             className="flex items-center space-x-2 text-sm text-gray-700 hover:text-gray-900"
                         >
                             <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
                                 <span className="text-primary-700 font-medium">
-                                    {user ? getInitials(user.email) : '??'}
+                                    {user ? getInitials(user.display_name || user.email) : '??'}
                                 </span>
                             </div>
-                            <span>{user?.email || 'Loading...'}</span>
+                            <span>{user?.display_name || user?.email || 'Loading...'}</span>
                             <ChevronDown className="h-4 w-4"/>
                         </button>
 
                         {isUserDropdownOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg border">
                                 <div className="p-2 border-b border-gray-100">
-                                    <p className="text-xs text-gray-500">Signed in as</p>
+                                    <p className="text-xs text-gray-500">Current user</p>
                                     <p className="text-sm font-medium text-gray-900 truncate">
-                                        {user?.email}
+                                        {user?.display_name || user?.email}
                                     </p>
+                                    {user?.email && user?.display_name ? (
+                                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                                    ) : null}
                                 </div>
                                 <div className="py-1">
                                     <button

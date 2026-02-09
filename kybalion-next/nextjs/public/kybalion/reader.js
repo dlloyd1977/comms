@@ -110,6 +110,7 @@ let layoutPositions = {};
 let layoutResizeObserver = null;
 
 const preferences = loadPreferences();
+const MEMBERS_TABLE = "active_members";
 
 const state = {
   data: null,
@@ -127,6 +128,8 @@ const state = {
     mode: "local",
     url: "",
     broadcastChannel: null,
+    profile: null,
+    profileEmail: "",
   },
   access: {
     activeMember: false,
@@ -158,6 +161,23 @@ function getUserEmail(user) {
     user?.identities?.[0]?.identity_data?.email ||
     ""
   ).toLowerCase();
+}
+
+function pickDisplayName(nickname, firstName, email) {
+  const nick = (nickname || "").trim();
+  const first = (firstName || "").trim();
+  return nick || first || email || "";
+}
+
+async function fetchMemberProfile(email) {
+  if (!state.auth.client || !email) return null;
+  const { data, error } = await state.auth.client
+    .from(MEMBERS_TABLE)
+    .select("nickname, first_name")
+    .eq("email", email)
+    .maybeSingle();
+  if (error) return null;
+  return data || null;
 }
 
 function isAdminUser(user) {
@@ -1271,7 +1291,7 @@ function updateAuthUI() {
   if (!authStatus || !authWarning || !authSignOutBtn || !authGuestBtn) return;
   const { client, user, ready, mode } = state.auth;
 
-  updateUserDisplay(user);
+  void updateUserDisplay(user);
   updateStickyOffsets();
   updateLayoutAdminUI();
   updateMenuAdminUI();
@@ -1310,11 +1330,13 @@ function updateAuthUI() {
   authSignOutBtn.style.display = "none";
 }
 
-function updateUserDisplay(user) {
+async function updateUserDisplay(user) {
   if (!userDisplay || !authOpenBtn) return;
   if (user) {
-    const label = user.email || "Signed in";
-    userDisplay.textContent = label;
+    const email = getUserEmail(user);
+    const meta = user.user_metadata || {};
+    const initialName = pickDisplayName(meta.nickname, meta.first_name, email);
+    userDisplay.textContent = initialName ? `Hi ${initialName}` : "";
     userDisplay.classList.remove("is-hidden");
     authOpenBtn.classList.add("is-hidden");
     authOpenBtn.setAttribute("aria-hidden", "true");
@@ -1323,6 +1345,23 @@ function updateUserDisplay(user) {
     }
     if (headerProfileBtn) {
       headerProfileBtn.classList.remove("is-hidden");
+    }
+    // If we don't have a nickname/first name from metadata, try active_members
+    if (!meta.nickname && !meta.first_name && email) {
+      if (state.auth.profileEmail !== email) {
+        state.auth.profileEmail = email;
+        state.auth.profile = null;
+      }
+      if (!state.auth.profile) {
+        const profile = await fetchMemberProfile(email);
+        if (profile) state.auth.profile = profile;
+      }
+      const profileName = pickDisplayName(
+        state.auth.profile?.nickname,
+        state.auth.profile?.first_name,
+        email
+      );
+      userDisplay.textContent = profileName ? `Hi ${profileName}` : "";
     }
     // Menu auth link: show Log Out
     if (menuAuthLink) {

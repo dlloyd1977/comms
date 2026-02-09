@@ -9,6 +9,9 @@ type User = {
     email: string;
     id: string;
     registered_at: Date;
+    first_name?: string | null;
+    nickname?: string | null;
+    display_name?: string | null;
 };
 
 interface GlobalContextType {
@@ -31,10 +34,39 @@ export function GlobalProvider({ children }: { children: React.ReactNode }) {
                 // Get user data
                 const { data: { user } } = await client.auth.getUser();
                 if (user) {
+                    const email = user.email!;
+                    let displayName = (user.user_metadata?.nickname || "").trim()
+                        || (user.user_metadata?.first_name || "").trim()
+                        || email;
+                    let firstName: string | null = user.user_metadata?.first_name ?? null;
+                    let nickname: string | null = user.user_metadata?.nickname ?? null;
+
+                    try {
+                        const { data: profileData } = await client
+                            .from("active_members")
+                            .select("nickname, first_name")
+                            .eq("email", email)
+                            .maybeSingle();
+                        if (profileData?.nickname) {
+                            nickname = profileData.nickname;
+                        }
+                        if (profileData?.first_name) {
+                            firstName = profileData.first_name;
+                        }
+                        displayName = (nickname || "").trim()
+                            || (firstName || "").trim()
+                            || email;
+                    } catch (error) {
+                        console.warn("Profile lookup failed:", error);
+                    }
+
                     setUser({
-                        email: user.email!,
+                        email,
                         id: user.id,
-                        registered_at: new Date(user.created_at)
+                        registered_at: new Date(user.created_at),
+                        first_name: firstName,
+                        nickname,
+                        display_name: displayName,
                     });
                 } else {
                     throw new Error('User not found');

@@ -685,11 +685,18 @@ const getActiveMember = async (user) => {
   if (!email) return null;
   const { data, error } = await supabase
     .from(membersTable)
-    .select("status, group")
+    .select("status, group, first_name, nickname")
     .eq("email", email)
     .maybeSingle();
   if (error) return null;
   return data?.status === "active" ? data : null;
+};
+
+const getDisplayName = (user, member) => {
+  const email = getUserEmail(user);
+  const nickname = member?.nickname?.trim?.() || "";
+  const firstName = member?.first_name?.trim?.() || "";
+  return nickname || firstName || email || "";
 };
 
 const setUIState = (user, member) => {
@@ -698,12 +705,13 @@ const setUIState = (user, member) => {
   const isActive = Boolean(member);
   // Check admin from database group OR from hardcoded admin emails list
   const isAdmin = (member?.group === "admin") || (isSignedIn && adminEmails.includes(email));
+  const displayName = getDisplayName(user, member);
 
   console.log("setUIState:", { email, isSignedIn, isActive, isAdmin, memberGroup: member?.group, adminEmails });
 
   // User display
   if (userDisplay) {
-    userDisplay.textContent = email ? `Signed in as ${email}` : "";
+    userDisplay.textContent = displayName ? `Hi ${displayName}` : "";
     userDisplay.classList.toggle("is-hidden", !isSignedIn);
   }
 
@@ -725,6 +733,7 @@ const setUIState = (user, member) => {
       menuAuthLink.style.cursor = "pointer";
       menuAuthLink.onclick = async (e) => {
         e.preventDefault();
+        if (typeof window.__authSync !== "undefined") window.__authSync.clearAll();
         await supabase.auth.signOut();
       };
     } else {
@@ -1635,6 +1644,7 @@ document.addEventListener("click", (event) => {
 
 if (headerSignOutBtn) {
   headerSignOutBtn.addEventListener("click", async () => {
+    if (typeof window.__authSync !== "undefined") window.__authSync.clearAll();
     await supabase.auth.signOut();
   });
 }
@@ -1839,8 +1849,15 @@ window.addEventListener("popstate", () => {
 // Save initial page state for popstate
 history.replaceState({ docsUrl: location.pathname }, "", location.pathname);
 
-// Auth state changes
+// Auth state changes — also sync session to cookies for Next.js SSO
 supabase.auth.onAuthStateChange((_event, session) => {
+  if (typeof window.__authSync !== "undefined") {
+    if (session) {
+      window.__authSync.syncToCookies(session);
+    } else {
+      window.__authSync.clearCookies();
+    }
+  }
   void updateMemberAccess(session?.user || null);
 });
 

@@ -685,11 +685,18 @@ const getActiveMember = async (user) => {
   if (!email) return null;
   const { data, error } = await supabase
     .from(membersTable)
-    .select("status, group")
+    .select("status, group, first_name, nickname")
     .eq("email", email)
     .maybeSingle();
   if (error) return null;
   return data?.status === "active" ? data : null;
+};
+
+const getDisplayName = (user, member) => {
+  const email = getUserEmail(user);
+  const nickname = member?.nickname?.trim?.() || "";
+  const firstName = member?.first_name?.trim?.() || "";
+  return nickname || firstName || email || "";
 };
 
 const setUIState = (user, member) => {
@@ -698,12 +705,13 @@ const setUIState = (user, member) => {
   const isActive = Boolean(member);
   // Check admin from database group OR from hardcoded admin emails list
   const isAdmin = (member?.group === "admin") || (isSignedIn && adminEmails.includes(email));
+  const displayName = getDisplayName(user, member);
 
   console.log("setUIState:", { email, isSignedIn, isActive, isAdmin, memberGroup: member?.group, adminEmails });
 
   // User display
   if (userDisplay) {
-    userDisplay.textContent = email ? `Signed in as ${email}` : "";
+    userDisplay.textContent = displayName ? `Hi ${displayName}` : "";
     userDisplay.classList.toggle("is-hidden", !isSignedIn);
   }
 
