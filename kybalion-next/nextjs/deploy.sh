@@ -3,9 +3,8 @@
 #
 # This script:
 #   1. Runs `npx next build` to generate static export in out/
-#   2. Syncs out/ → local nextjs docs/ (working copy)
-#   3. Syncs out/ → repo-root docs/ (what GitHub Pages serves)
-#   4. Commits and pushes to origin/main
+#   2. Syncs out/ → repo-root docs/ (what GitHub Pages serves)
+#   3. Commits and pushes to origin/main
 #
 # GitHub Pages is configured to serve from the repo-root docs/ folder.
 # The git repo root is at comms/ (two levels above this script).
@@ -45,26 +44,20 @@ if [[ ! -d "$NEXTJS_DIR/out" ]]; then
     exit 1
 fi
 
-# ── Step 2: Sync to local nextjs docs/ ────────────────────
+# ── Step 2: Sync to repo-root docs/ (GitHub Pages) ───────
 echo ""
-echo "▶ Step 2: Syncing out/ → nextjs docs/ (working copy)..."
-rsync -a --delete "$NEXTJS_DIR/out/" "$NEXTJS_DIR/docs/"
-echo "✅ Synced to $NEXTJS_DIR/docs/"
-
-# ── Step 3: Sync to repo-root docs/ (GitHub Pages) ───────
-echo ""
-echo "▶ Step 3: Syncing out/ → repo-root docs/ (GitHub Pages)..."
+echo "▶ Step 2: Syncing out/ → repo-root docs/ (GitHub Pages)..."
 rsync -a --delete --exclude='CNAME' --exclude='.nojekyll' "$NEXTJS_DIR/out/" "$REPO_ROOT/docs/"
 # .nojekyll MUST exist — without it GitHub Pages ignores _next/ directories
 touch "$REPO_ROOT/docs/.nojekyll"
 echo "✅ Synced to $REPO_ROOT/docs/"
 
-# ── Step 4: Git commit and push ──────────────────────────
+# ── Step 3: Git commit and push ──────────────────────────
 echo ""
-echo "▶ Step 4: Committing and pushing..."
+echo "▶ Step 3: Committing and pushing..."
 cd "$REPO_ROOT"
 
-git add -A docs/ kybalion-next/nextjs/docs/
+git add -A docs/
 CHANGES=$(git diff --cached --stat | tail -1)
 
 if [[ -z "$CHANGES" ]]; then
