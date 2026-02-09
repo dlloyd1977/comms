@@ -5,7 +5,7 @@ window.__readerModuleLoaded = true;
 console.log("[reader.js] Module loaded");
 
 const DATA_URL = "data/kybalion.json";
-const APP_VERSION = "3.2.0";
+const APP_VERSION = "3.5.0";
 const STORAGE_KEY = "kybalion.tags";
 const NOTES_KEY = "kybalion.notes";
 const NOTES_GUEST_KEY = "kybalion.notes.guest";
