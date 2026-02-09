@@ -1,46 +1,18 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import {usePathname, useRouter} from 'next/navigation';
+import {usePathname} from 'next/navigation';
 import {
     Home,
     Menu,
     X,
-    ChevronDown,
-    LogOut,
-    Key,
 } from 'lucide-react';
-import { useGlobal } from "@/lib/context/GlobalContext";
-import { createSPASassClient } from "@/lib/supabase/client";
+import StaticMainMenu from "@/components/StaticMainMenu";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [isUserDropdownOpen, setUserDropdownOpen] = useState(false);
     const pathname = usePathname();
-    const router = useRouter();
-
-
-    const { user } = useGlobal();
-
-    const handleLogout = async () => {
-        try {
-            const client = await createSPASassClient();
-            await client.logout();
-        } catch (error) {
-            console.error('Error logging out:', error);
-        }
-    };
-    const handleChangePassword = async () => {
-        router.push('/kybalion/')
-    };
-
-    const getInitials = (value: string) => {
-        const base = value.includes('@') ? value.split('@')[0] : value;
-        const parts = base.trim().split(/[._\s-]+/).filter(Boolean);
-        return parts.length > 1
-            ? (parts[0][0] + parts[1][0]).toUpperCase()
-            : base.slice(0, 2).toUpperCase();
-    };
+    
 
     const productName = process.env.NEXT_PUBLIC_PRODUCTNAME;
 
@@ -110,59 +82,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     </button>
 
                     <div className="relative ml-auto">
-                        {user?.display_name || user?.email ? (
-                            <span className="mr-4 text-sm font-semibold text-gray-700">
-                                Current User: {user?.display_name || user?.email}
-                            </span>
-                        ) : null}
-                        <button
-                            onClick={() => setUserDropdownOpen(!isUserDropdownOpen)}
-                            className="flex items-center space-x-2 text-sm text-gray-700 hover:text-gray-900"
-                        >
-                            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-                                <span className="text-primary-700 font-medium">
-                                    {user ? getInitials(user.display_name || user.email) : '??'}
-                                </span>
-                            </div>
-                            <span>{user?.display_name || user?.email || 'Loading...'}</span>
-                            <ChevronDown className="h-4 w-4"/>
-                        </button>
-
-                        {isUserDropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg border">
-                                <div className="p-2 border-b border-gray-100">
-                                    <p className="text-xs text-gray-500">Current User</p>
-                                    <p className="text-sm font-medium text-gray-900 truncate">
-                                        {user?.display_name || user?.email}
-                                    </p>
-                                    {user?.email && user?.display_name ? (
-                                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                                    ) : null}
-                                </div>
-                                <div className="py-1">
-                                    <button
-                                        onClick={() => {
-                                            setUserDropdownOpen(false);
-                                            handleChangePassword()
-                                        }}
-                                        className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                    >
-                                        <Key className="mr-3 h-4 w-4 text-gray-400"/>
-                                        Change Password
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            handleLogout();
-                                            setUserDropdownOpen(false);
-                                        }}
-                                        className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                    >
-                                        <LogOut className="mr-3 h-4 w-4 text-red-400"/>
-                                        Sign Out
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                        <StaticMainMenu />
                     </div>
                 </div>
 
