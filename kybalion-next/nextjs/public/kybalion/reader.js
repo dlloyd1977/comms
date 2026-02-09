@@ -1333,18 +1333,13 @@ function updateAuthUI() {
 }
 
 async function updateUserDisplay(user) {
-  if (!userDisplay || !authOpenBtn) return;
+  if (!userDisplay) return;
   if (user) {
     const email = getUserEmail(user);
     const meta = user.user_metadata || {};
     const initialName = pickDisplayName(meta.nickname, meta.first_name, email);
     userDisplay.textContent = initialName ? `Current User: ${initialName}` : "";
     userDisplay.classList.remove("is-hidden");
-    authOpenBtn.classList.add("is-hidden");
-    authOpenBtn.setAttribute("aria-hidden", "true");
-    if (headerSignOutBtn) {
-      headerSignOutBtn.classList.remove("is-hidden");
-    }
     if (headerProfileBtn) {
       headerProfileBtn.classList.remove("is-hidden");
     }
@@ -1388,11 +1383,6 @@ async function updateUserDisplay(user) {
   }
   userDisplay.textContent = "";
   userDisplay.classList.add("is-hidden");
-  authOpenBtn.classList.remove("is-hidden");
-  authOpenBtn.setAttribute("aria-hidden", "false");
-  if (headerSignOutBtn) {
-    headerSignOutBtn.classList.add("is-hidden");
-  }
   if (headerProfileBtn) {
     headerProfileBtn.classList.add("is-hidden");
   }
@@ -1400,18 +1390,9 @@ async function updateUserDisplay(user) {
   if (menuAuthLink) {
     menuAuthLink.classList.remove("is-hidden");
     menuAuthLink.setAttribute("aria-hidden", "false");
-    menuAuthLink.removeAttribute("href");
+    menuAuthLink.setAttribute("href", `/auth/login?redirect=${encodeURIComponent(location.pathname)}`);
     menuAuthLink.style.cursor = "pointer";
-    menuAuthLink.onclick = (e) => {
-      e.preventDefault();
-      // Close menu panel first
-      menuPanel?.classList.add("is-hidden");
-      // Open notes modal with auth panel visible
-      setNotesModalOpen(true);
-      setNotesVisibility(false);
-      setAuthPanelVisible(true);
-      authEmail?.focus();
-    };
+    menuAuthLink.onclick = null;
   }
   if (menuChangePasswordLink) {
     menuChangePasswordLink.classList.add("is-hidden");
@@ -2111,20 +2092,11 @@ async function init() {
         closeAnnotationModal();
       }
     });
-    headerSignOutBtn?.addEventListener("click", handleHeaderSignOut);
 
     // Profile settings
     headerProfileBtn?.addEventListener("click", openProfileModal);
     initProfileModal();
 
-    // authOpenBtn: intercept click to open inline auth panel (works in iframe/Simple Browser)
-    authOpenBtn?.addEventListener("click", (e) => {
-      e.preventDefault();
-      setNotesModalOpen(true);
-      setNotesVisibility(false);
-      setAuthPanelVisible(true);
-      authEmail?.focus();
-    });
     if (menuBtn && menuPanel) {
       menuBtn.addEventListener("click", (event) => {
         event.stopPropagation();

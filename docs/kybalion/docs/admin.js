@@ -20,9 +20,7 @@ const DOCS_LAYOUT_KEY = "kybalion.docs.layout.order";
 const DOCS_LAYOUT_POS_KEY = "kybalion.docs.layout.positions";
 
 // Header elements
-const authOpenBtn = document.getElementById("authOpenBtn");
 const userDisplay = document.getElementById("userDisplay");
-const headerSignOutBtn = document.getElementById("headerSignOutBtn");
 const headerUploadBtn = document.getElementById("headerUploadBtn");
 const headerNewFolderBtn = document.getElementById("headerNewFolderBtn");
 const uploadInput = document.getElementById("uploadInput");
@@ -568,9 +566,7 @@ function initDocsLayoutUI() {
 
   // Assign data-layout-key to each actionable child
   const keyMap = [
-    { selector: "#authOpenBtn", key: "auth" },
     { selector: "#userDisplay", key: "user" },
-    { selector: "#headerSignOutBtn", key: "signout" },
     { selector: "#headerUploadBtn", key: "upload" },
     { selector: "#headerNewFolderBtn", key: "newfolder" },
     { selector: "#docsProfileBtn", key: "profile" },
@@ -717,16 +713,6 @@ const setUIState = (user, member) => {
     userDisplay.classList.toggle("is-hidden", !isSignedIn);
   }
 
-  // Auth button (show when not signed in)
-  if (authOpenBtn) {
-    authOpenBtn.classList.toggle("is-hidden", isSignedIn);
-  }
-
-  // Sign out button (show when signed in)
-  if (headerSignOutBtn) {
-    headerSignOutBtn.classList.toggle("is-hidden", !isSignedIn);
-  }
-
   // Menu auth links
   if (isSignedIn) {
     if (menuAuthLink) {
@@ -752,14 +738,9 @@ const setUIState = (user, member) => {
     if (menuAuthLink) {
       menuAuthLink.classList.remove("is-hidden");
       menuAuthLink.setAttribute("aria-hidden", "false");
-      menuAuthLink.removeAttribute("href");
+      menuAuthLink.setAttribute("href", `/auth/login?redirect=${encodeURIComponent(location.pathname)}`);
       menuAuthLink.style.cursor = "pointer";
-      menuAuthLink.onclick = (e) => {
-        e.preventDefault();
-        // Close menu panel first
-        menuPanel?.classList.add("is-hidden");
-        showAuthModal();
-      };
+      menuAuthLink.onclick = null;
     }
     if (menuChangePasswordLink) {
       menuChangePasswordLink.classList.add("is-hidden");
@@ -1365,9 +1346,10 @@ const createDocsProfileBtn = () => {
   docsProfileBtn.type = "button";
   docsProfileBtn.textContent = "Profile";
   docsProfileBtn.id = "docsProfileBtn";
-  // Insert before sign-out button
-  if (headerSignOutBtn?.parentElement) {
-    headerSignOutBtn.parentElement.insertBefore(docsProfileBtn, headerSignOutBtn);
+  // Insert before menu wrapper
+  const menuWrapperEl = document.querySelector(".menu-wrapper");
+  if (menuWrapperEl?.parentElement) {
+    menuWrapperEl.parentElement.insertBefore(docsProfileBtn, menuWrapperEl);
   }
   docsProfileBtn.addEventListener("click", openDocsProfileModal);
   return docsProfileBtn;
@@ -1654,24 +1636,6 @@ createDocsProfileBtn();
 initDocsLayoutUI();
 
 // Event listeners
-if (authOpenBtn) {
-  authOpenBtn.addEventListener("click", showAuthModal);
-}
-
-// Fallback: delegated handler in case the button is re-rendered or missed
-document.addEventListener("click", (event) => {
-  const target = event.target.closest("#authOpenBtn");
-  if (!target) return;
-  showAuthModal();
-});
-
-if (headerSignOutBtn) {
-  headerSignOutBtn.addEventListener("click", async () => {
-    if (typeof window.__authSync !== "undefined") window.__authSync.clearAll();
-    await supabase.auth.signOut();
-  });
-}
-
 if (headerUploadBtn) {
   headerUploadBtn.addEventListener("click", () => {
     uploadInput?.click();
