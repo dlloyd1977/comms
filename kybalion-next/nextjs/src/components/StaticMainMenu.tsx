@@ -202,7 +202,7 @@ export default function StaticMainMenu() {
           <Link className="menu-link" href="/kybalion/reader.html">Reader</Link>
           <Link className="menu-link" href="/kybalion/docs/">Document Library</Link>
           <Link className="menu-link" href={`/auth/login?redirect=${encodeURIComponent(pathname)}`} id="menuAuthLink">
-            Sign In
+            Sign In / Create Account
           </Link>
           <Link
             className="menu-link is-hidden"
