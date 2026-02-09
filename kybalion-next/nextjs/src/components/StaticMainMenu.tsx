@@ -156,7 +156,7 @@ export default function StaticMainMenu() {
       if (menuAuthLink) {
         menuAuthLink.classList.remove("is-hidden");
         menuAuthLink.setAttribute("aria-hidden", "false");
-        menuAuthLink.setAttribute("href", "/auth/login");
+        menuAuthLink.setAttribute("href", `/auth/login?redirect=${encodeURIComponent(pathname)}`);
         menuAuthLink.style.cursor = "pointer";
         menuAuthLink.onclick = null;
       }
@@ -201,7 +201,7 @@ export default function StaticMainMenu() {
           <Link className="menu-link" href="/kybalion/">Kybalion Home</Link>
           <Link className="menu-link" href="/kybalion/reader.html">Reader</Link>
           <Link className="menu-link" href="/kybalion/docs/">Document Library</Link>
-          <Link className="menu-link" href="/auth/login" id="menuAuthLink">
+          <Link className="menu-link" href={`/auth/login?redirect=${encodeURIComponent(pathname)}`} id="menuAuthLink">
             Sign In
           </Link>
           <Link
