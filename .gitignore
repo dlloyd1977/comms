@@ -6,6 +6,12 @@
 # Project-specific ignores
 backups/
 kybalion-next/nextjs/docs/
+kybalion-next/supabase-expo-template/
+kybalion-next/.idea/
+kybalion-next/.github/
+kybalion-next/supabase/migrations_for_old/
+kybalion-next/nextjs/yarn.lock
+.DS_Store
 
 # User-specific files
 *.rsuser
