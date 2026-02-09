@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import StaticMainMenu from '@/components/StaticMainMenu';
 
 export default function AuthLayout({
                                        children,
@@ -29,15 +29,17 @@ export default function AuthLayout({
     ];
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex flex-col min-h-screen">
+            <nav className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
+                <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+                    <Link href="/" className="text-sm font-medium text-slate-700 hover:text-slate-900">
+                        ← Home
+                    </Link>
+                    <StaticMainMenu />
+                </div>
+            </nav>
+            <div className="flex flex-1">
             <div className="w-full lg:w-1/2 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-white relative">
-                <Link
-                    href="/"
-                    className="absolute left-8 top-8 flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Homepage
-                </Link>
 
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
                     <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -90,6 +92,7 @@ export default function AuthLayout({
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     );

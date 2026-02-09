@@ -1,8 +1,8 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, FileText, ShieldAlert, RefreshCw } from 'lucide-react';
+import { FileText, ShieldAlert, RefreshCw } from 'lucide-react';
+import StaticMainMenu from '@/components/StaticMainMenu';
 
 const legalDocuments = [
     {
@@ -26,20 +26,17 @@ const legalDocuments = [
 ];
 
 export default function LegalLayout({ children } : { children: React.ReactNode }) {
-    const router = useRouter();
-
     return (
         <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="py-6">
-                    <button
-                        onClick={() => router.back()}
-                        className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back
-                    </button>
+            <nav className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
+                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+                    <Link href="/" className="text-sm font-medium text-slate-700 hover:text-slate-900">
+                        ← Home
+                    </Link>
+                    <StaticMainMenu />
                 </div>
+            </nav>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Sidebar Navigation */}
