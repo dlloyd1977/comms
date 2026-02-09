@@ -34,8 +34,6 @@ const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
 const menuAuthLink = document.getElementById("menuAuthLink");
 const menuSignOutLink = document.getElementById("menuSignOutLink");
 const menuChangePasswordLink = document.getElementById("menuChangePasswordLink");
-const menuSignOutLink = document.getElementById("menuSignOutLink");
-const menuChangePasswordLink = document.getElementById("menuChangePasswordLink");
 const menuSessionsBtn = document.getElementById("menuSessionsBtn");
 const menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
 
