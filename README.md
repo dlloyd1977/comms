@@ -2,7 +2,7 @@
 A hub for invites, quick updates, and links shared through emails, texts, and group messages.
 
 ## Version
-v3.7.0 — Kybalion header/navigation standardization across hub, invite, quick, docs, and reader pages with finalized audit + handoff reporting
+v3.7.1 — Reader Standard View update: increased default visible TOC area for improved chapter navigation
 
 ## URL scheme
 
