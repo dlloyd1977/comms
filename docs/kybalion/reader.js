@@ -275,6 +275,21 @@ function setMenuOpen(open) {
   if (!menuBtn || !menuPanel) return;
   menuPanel.classList.toggle("is-hidden", !open);
   menuBtn.setAttribute("aria-expanded", String(open));
+  if (!open) {
+    setReaderSessionsFlyoutOpen(false);
+  }
+}
+
+function setReaderSessionsFlyoutOpen(open) {
+  if (!menuSessionsBtn || !menuSessionsFlyout) return;
+  menuSessionsFlyout.classList.toggle("is-hidden", !open);
+  menuSessionsBtn.setAttribute("aria-expanded", String(open));
+}
+
+function initReaderSessionsFlyoutAria() {
+  if (!menuSessionsBtn || !menuSessionsFlyout) return;
+  menuSessionsBtn.setAttribute("aria-controls", "menuSessionsFlyout");
+  menuSessionsBtn.setAttribute("aria-expanded", "false");
 }
 
 function getLayoutContainer() {
@@ -2270,26 +2285,28 @@ async function init() {
 
     // Sessions flyout sub-menu
     if (menuSessionsBtn && menuSessionsFlyout) {
+      initReaderSessionsFlyoutAria();
       let sessionsTimer = null;
       const sessionsWrapper = menuSessionsBtn.closest(".menu-sessions-wrapper");
 
       menuSessionsBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        menuSessionsFlyout.classList.toggle("is-hidden");
+        const willOpen = menuSessionsFlyout.classList.contains("is-hidden");
+        setReaderSessionsFlyoutOpen(willOpen);
       });
 
       if (sessionsWrapper) {
         sessionsWrapper.addEventListener("mouseenter", () => {
           clearTimeout(sessionsTimer);
-          menuSessionsFlyout.classList.remove("is-hidden");
+          setReaderSessionsFlyoutOpen(true);
         });
         sessionsWrapper.addEventListener("mouseleave", () => {
-          sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
+          sessionsTimer = setTimeout(() => setReaderSessionsFlyoutOpen(false), 200);
         });
       }
       menuSessionsFlyout.addEventListener("mouseenter", () => clearTimeout(sessionsTimer));
       menuSessionsFlyout.addEventListener("mouseleave", () => {
-        sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
+        sessionsTimer = setTimeout(() => setReaderSessionsFlyoutOpen(false), 200);
       });
     }
 

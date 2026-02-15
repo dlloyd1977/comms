@@ -521,6 +521,73 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 		lines.append(
 			"- Menu section label / ARIA contract violations found: " + ", ".join(section_aria_violations)
 		)
+
+	sessions_aria_violations: list[str] = []
+	runtime_scripts = {
+		"top_level": ROOT / "menu-shell.js",
+		"docs_module": ROOT / "docs/admin.js",
+		"docs_fallback": ROOT / "docs/fallback.js",
+		"reader_module": ROOT / "reader.js",
+		"reader_fallback": ROOT / "fallback-reader.js",
+	}
+
+	runtime_script_patterns = {
+		str(path.relative_to(ROOT).as_posix()): {
+			"has_controls": bool(re.search(r"setAttribute\(\s*[\"']aria-controls[\"']\s*,\s*[\"']menuSessionsFlyout[\"']", path.read_text(encoding="utf-8"))),
+			"has_expanded": bool(re.search(r"setAttribute\(\s*[\"']aria-expanded[\"']", path.read_text(encoding="utf-8"))),
+		}
+		for path in runtime_scripts.values()
+	}
+
+	for page in all_pages:
+		page_text = (ROOT / page).read_text(encoding="utf-8")
+
+		sessions_btn_match = re.search(r'<button[^>]*id="menuSessionsBtn"[^>]*>', page_text, flags=re.IGNORECASE)
+		sessions_flyout_match = re.search(r'<div[^>]*id="menuSessionsFlyout"[^>]*>', page_text, flags=re.IGNORECASE)
+		if not sessions_btn_match:
+			sessions_aria_violations.append(f"{page} (missing #menuSessionsBtn)")
+			continue
+		if not sessions_flyout_match:
+			sessions_aria_violations.append(f"{page} (missing #menuSessionsFlyout)")
+			continue
+
+		sessions_btn_tag = sessions_btn_match.group(0)
+		has_controls_attr = bool(re.search(r'aria-controls="menuSessionsFlyout"', sessions_btn_tag, flags=re.IGNORECASE))
+		has_expanded_default = bool(re.search(r'aria-expanded="false"', sessions_btn_tag, flags=re.IGNORECASE))
+
+		if has_controls_attr and has_expanded_default:
+			continue
+
+		if page.startswith("docs/"):
+			required_runtime_keys = ["docs_module", "docs_fallback"]
+		elif page == "reader.html":
+			required_runtime_keys = ["reader_module", "reader_fallback"]
+		else:
+			required_runtime_keys = ["top_level"]
+
+		missing_runtime = []
+		for runtime_key in required_runtime_keys:
+			runtime_path = runtime_scripts[runtime_key]
+			rel_runtime = runtime_path.relative_to(ROOT).as_posix()
+			runtime_meta = runtime_script_patterns.get(rel_runtime, {})
+			has_runtime_include = runtime_path.name in page_text
+			has_runtime_contract = runtime_meta.get("has_controls") and runtime_meta.get("has_expanded")
+			if not (has_runtime_include and has_runtime_contract):
+				missing_runtime.append(runtime_path.name)
+
+		if missing_runtime:
+			sessions_aria_violations.append(
+				f"{page} (sessions ARIA contract missing; expected runtime wiring via {', '.join(missing_runtime)})"
+			)
+
+	if not sessions_aria_violations:
+		lines.append(
+			"- Sessions flyout ARIA linkage is enforced across all audited pages: `#menuSessionsBtn` and `#menuSessionsFlyout` are present and wired with `aria-controls=\"menuSessionsFlyout\"` plus synchronized `aria-expanded` state (via explicit markup or page runtime initialization)."
+		)
+	else:
+		lines.append(
+			"- Sessions flyout ARIA linkage violations found: " + ", ".join(sessions_aria_violations)
+		)
 	lines.append("")
 
 	lines.append("## Cleanup Kickoff")

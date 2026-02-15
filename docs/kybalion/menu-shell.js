@@ -22,10 +22,25 @@
     if (!menuBtn || !menuPanel) return;
     menuPanel.classList.add("is-hidden");
     menuBtn.setAttribute("aria-expanded", "false");
+    setSessionsFlyoutOpen(false);
+  }
+
+  function setSessionsFlyoutOpen(open) {
+    if (!menuSessionsBtn || !menuSessionsFlyout) return;
+    menuSessionsFlyout.classList.toggle("is-hidden", !open);
+    menuSessionsBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function initSessionsFlyoutAria() {
+    if (!menuSessionsBtn || !menuSessionsFlyout) return;
+    menuSessionsBtn.setAttribute("aria-controls", "menuSessionsFlyout");
+    menuSessionsBtn.setAttribute("aria-expanded", "false");
   }
 
   function initMenuToggle() {
     if (!menuBtn || !menuPanel) return;
+
+    initSessionsFlyoutAria();
 
     menuBtn.addEventListener("click", function () {
       const willOpen = menuPanel.classList.contains("is-hidden");
@@ -41,7 +56,8 @@
 
     if (menuSessionsBtn && menuSessionsFlyout) {
       menuSessionsBtn.addEventListener("click", function () {
-        menuSessionsFlyout.classList.toggle("is-hidden");
+        const willOpen = menuSessionsFlyout.classList.contains("is-hidden");
+        setSessionsFlyoutOpen(willOpen);
       });
     }
   }

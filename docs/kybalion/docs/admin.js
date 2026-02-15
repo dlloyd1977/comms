@@ -45,6 +45,21 @@ function setDocsMenuOpen(open) {
   if (!menuBtn || !menuPanel) return;
   menuPanel.classList.toggle("is-hidden", !open);
   menuBtn.setAttribute("aria-expanded", String(open));
+  if (!open) {
+    setDocsSessionsFlyoutOpen(false);
+  }
+}
+
+function setDocsSessionsFlyoutOpen(open) {
+  if (!menuSessionsBtn || !menuSessionsFlyout) return;
+  menuSessionsFlyout.classList.toggle("is-hidden", !open);
+  menuSessionsBtn.setAttribute("aria-expanded", String(open));
+}
+
+function initDocsSessionsFlyoutAria() {
+  if (!menuSessionsBtn || !menuSessionsFlyout) return;
+  menuSessionsBtn.setAttribute("aria-controls", "menuSessionsFlyout");
+  menuSessionsBtn.setAttribute("aria-expanded", "false");
 }
 
 // Content elements (let — re-bound after SPA navigation)
@@ -1672,28 +1687,30 @@ if (menuBtn && menuPanel) {
 
 // ── Sessions flyout sub-menu ─────────────────────────────────
 if (menuSessionsBtn && menuSessionsFlyout) {
+  initDocsSessionsFlyoutAria();
   let sessionsTimer = null;
   const sessionsWrapper = menuSessionsBtn.closest(".menu-sessions-wrapper");
 
   menuSessionsBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    menuSessionsFlyout.classList.toggle("is-hidden");
+    const willOpen = menuSessionsFlyout.classList.contains("is-hidden");
+    setDocsSessionsFlyoutOpen(willOpen);
   });
 
   // Hover: open on enter, close on leave (with delay)
   if (sessionsWrapper) {
     sessionsWrapper.addEventListener("mouseenter", () => {
       clearTimeout(sessionsTimer);
-      menuSessionsFlyout.classList.remove("is-hidden");
+      setDocsSessionsFlyoutOpen(true);
     });
     sessionsWrapper.addEventListener("mouseleave", () => {
-      sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
+      sessionsTimer = setTimeout(() => setDocsSessionsFlyoutOpen(false), 200);
     });
   }
   // Keep flyout open when hovering over it
   menuSessionsFlyout.addEventListener("mouseenter", () => clearTimeout(sessionsTimer));
   menuSessionsFlyout.addEventListener("mouseleave", () => {
-    sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
+    sessionsTimer = setTimeout(() => setDocsSessionsFlyoutOpen(false), 200);
   });
 }
 
