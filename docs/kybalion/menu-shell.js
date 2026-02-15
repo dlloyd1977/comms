@@ -22,13 +22,23 @@
     if (!menuBtn || !menuPanel) return;
     menuPanel.classList.add("is-hidden");
     menuBtn.setAttribute("aria-expanded", "false");
-    setSessionsFlyoutOpen(false);
+    closeSessionsFlyout();
   }
 
   function setSessionsFlyoutOpen(open) {
     if (!menuSessionsBtn || !menuSessionsFlyout) return;
     menuSessionsFlyout.classList.toggle("is-hidden", !open);
     menuSessionsBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function closeSessionsFlyout(returnFocus) {
+    if (!menuSessionsBtn || !menuSessionsFlyout) return false;
+    const wasOpen = !menuSessionsFlyout.classList.contains("is-hidden");
+    setSessionsFlyoutOpen(false);
+    if (returnFocus && wasOpen) {
+      menuSessionsBtn.focus();
+    }
+    return wasOpen;
   }
 
   function initSessionsFlyoutAria() {
@@ -51,6 +61,21 @@
     document.addEventListener("click", function (event) {
       if (!menuPanel.contains(event.target) && event.target !== menuBtn) {
         closeMenu();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") return;
+
+      if (closeSessionsFlyout(true)) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+      if (!menuPanel.classList.contains("is-hidden")) {
+        closeMenu();
+        menuBtn.focus();
       }
     });
 
