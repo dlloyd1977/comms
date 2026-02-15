@@ -2078,6 +2078,22 @@ function findStanzaByRef(ref) {
   return null;
 }
 
+function getRequestedViewMode() {
+  try {
+    const params = new URLSearchParams(window.location.search || "");
+    const requested = (params.get("view") || "").trim().toLowerCase();
+    if (requested === "standard") {
+      return "standard";
+    }
+    if (requested === "stanza" || requested === "typography") {
+      return "typography";
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 async function init() {
   try {
     const response = await fetch(DATA_URL, { cache: "no-store" });
@@ -2102,6 +2118,10 @@ async function init() {
       viewModeStandardBtn.setAttribute("aria-selected", String(isStandard));
       viewModeStanzaBtn.classList.toggle("is-active", !isStandard);
       viewModeStanzaBtn.setAttribute("aria-selected", String(!isStandard));
+    }
+    const requestedViewMode = getRequestedViewMode();
+    if (requestedViewMode) {
+      state.viewMode = requestedViewMode;
     }
     render();
     setViewMode(state.viewMode);
