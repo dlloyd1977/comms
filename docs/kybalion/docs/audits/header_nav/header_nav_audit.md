@@ -185,6 +185,7 @@
 - `Assets` and `Master Documents` are consistently tagged as `admin-only` across all audited pages.
 - Top-level pages (`index`, `invite1`, `invite2`, `quick`) consistently implement auth-runtime contract wiring (required auth control IDs/default visibility, Supabase data attributes, and shared `auth-sync.js` + `menu-shell.js` includes).
 - Menu ordering contract is consistent on all audited pages: Navigation (`Home → Kybalion Home → Reader → Document Library`) and Documents (`General → Sessions ▸ → Session 1..12 → Templates → Assets → Master Documents`).
+- Exact menu section labels and ARIA contract are consistent on all audited pages: section titles start with `Navigation`, `Documents`; `#menuBtn` uses `aria-haspopup="true"`, `aria-expanded="false"`, and `aria-controls="menuPanel"`; `#menuPanel` exposes `role="menu"` with `aria-label="Documents"`.
 
 ## Cleanup Kickoff
 

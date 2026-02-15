@@ -454,6 +454,73 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 		lines.append(
 			"- Menu ordering contract violations found: " + ", ".join(ordering_violations)
 		)
+
+	section_aria_violations: list[str] = []
+	required_menu_titles = ["Navigation", "Documents"]
+	for page in all_pages:
+		page_text = (ROOT / page).read_text(encoding="utf-8")
+
+		title_matches = re.findall(
+			r'<p[^>]*class="[^"]*menu-title[^"]*"[^>]*>\s*([^<]+?)\s*</p>',
+			page_text,
+			flags=re.IGNORECASE,
+		)
+		normalized_titles = [re.sub(r"\s+", " ", value).strip().lower() for value in title_matches]
+		expected_titles = [title.lower() for title in required_menu_titles]
+		if normalized_titles[:2] != expected_titles:
+			section_aria_violations.append(
+				f"{page} (menu section titles must start with 'Navigation', 'Documents')"
+			)
+
+		menu_btn_match = re.search(
+			r'<button[^>]*id="menuBtn"[^>]*>',
+			page_text,
+			flags=re.IGNORECASE,
+		)
+		menu_panel_match = re.search(
+			r'<div[^>]*id="menuPanel"[^>]*>',
+			page_text,
+			flags=re.IGNORECASE,
+		)
+
+		if not menu_btn_match:
+			section_aria_violations.append(f"{page} (missing #menuBtn)")
+			continue
+		if not menu_panel_match:
+			section_aria_violations.append(f"{page} (missing #menuPanel)")
+			continue
+
+		menu_btn_tag = menu_btn_match.group(0)
+		menu_panel_tag = menu_panel_match.group(0)
+
+		controls_match = re.search(r'aria-controls="([^"]+)"', menu_btn_tag, flags=re.IGNORECASE)
+		if not controls_match:
+			section_aria_violations.append(f"{page} (#menuBtn missing aria-controls)")
+		else:
+			controlled_id = controls_match.group(1).strip()
+			if controlled_id != "menuPanel":
+				section_aria_violations.append(
+					f"{page} (#menuBtn aria-controls='{controlled_id}' expected 'menuPanel')"
+				)
+
+		if not re.search(r'aria-haspopup="true"', menu_btn_tag, flags=re.IGNORECASE):
+			section_aria_violations.append(f"{page} (#menuBtn missing aria-haspopup='true')")
+		if not re.search(r'aria-expanded="false"', menu_btn_tag, flags=re.IGNORECASE):
+			section_aria_violations.append(f"{page} (#menuBtn missing aria-expanded='false')")
+
+		if not re.search(r'\brole="menu"', menu_panel_tag, flags=re.IGNORECASE):
+			section_aria_violations.append(f"{page} (#menuPanel missing role='menu')")
+		if not re.search(r'\baria-label="Documents"', menu_panel_tag, flags=re.IGNORECASE):
+			section_aria_violations.append(f"{page} (#menuPanel missing aria-label='Documents')")
+
+	if not section_aria_violations:
+		lines.append(
+			"- Exact menu section labels and ARIA contract are consistent on all audited pages: section titles start with `Navigation`, `Documents`; `#menuBtn` uses `aria-haspopup=\"true\"`, `aria-expanded=\"false\"`, and `aria-controls=\"menuPanel\"`; `#menuPanel` exposes `role=\"menu\"` with `aria-label=\"Documents\"`."
+		)
+	else:
+		lines.append(
+			"- Menu section label / ARIA contract violations found: " + ", ".join(section_aria_violations)
+		)
 	lines.append("")
 
 	lines.append("## Cleanup Kickoff")
