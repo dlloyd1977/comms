@@ -46,7 +46,7 @@
         color: var(--text);
       }
 
-      .page {
+      .page-wrap {
         margin: 0 auto;
         max-width: 1140px;
         padding: 24px;
@@ -75,6 +75,85 @@
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+      }
+
+      .menu-wrapper {
+        position: relative;
+      }
+
+      .button.secondary {
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        background: #ffffff;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .menu-panel {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 10px);
+        width: min(360px, 85vw);
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 8px 26px rgba(35, 74, 112, 0.12);
+        z-index: 30;
+      }
+
+      .is-hidden {
+        display: none;
+      }
+
+      .menu-section + .menu-section {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+      }
+
+      .menu-title {
+        margin: 4px 8px 8px;
+        color: var(--muted);
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .menu-link {
+        display: block;
+        width: 100%;
+        text-align: left;
+        color: var(--accent);
+        background: #ffffff;
+        border: 1px solid var(--accent);
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 7px 10px;
+        font-size: 0.86rem;
+        font-weight: 700;
+      }
+
+      .menu-link + .menu-link,
+      .menu-sessions-wrapper + .menu-link,
+      .menu-link + .menu-sessions-wrapper {
+        margin-top: 7px;
+      }
+
+      .menu-link.menu-sessions-trigger {
+        cursor: pointer;
+      }
+
+      .menu-arrow {
+        margin-left: 6px;
+      }
+
+      .menu-sessions-flyout {
+        margin-top: 7px;
+        padding-left: 10px;
       }
 
       .nav-links a {
@@ -229,15 +308,65 @@
       }
     </style>
   </head>
-  <body>
-    <div class="page">
+  <body
+    data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
+    data-supabase-anon-key="sb_publishable_pGN0njb-9XysERIUFiYtPg_NbAQuZGT"
+    data-admin-emails="davidelloydjr@gmail.com"
+    data-members-table="active_members"
+  >
+    <div class="page-wrap">
       <header class="topbar">
         <p class="brand">The Kybalion</p>
-        <nav class="nav-links" aria-label="Primary">
-          <a href="/">Home</a>
-          <a href="/kybalion/reader.html">Reader</a>
-          <a href="/kybalion/docs/">Document Library</a>
-        </nav>
+        <div class="menu-wrapper">
+          <button
+            class="button secondary"
+            type="button"
+            id="menuBtn"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="menuPanel"
+          >
+            Main Menu
+          </button>
+          <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
+            <div class="menu-section">
+              <p class="menu-title">Navigation</p>
+              <a class="menu-link" href="/">Home</a>
+              <a class="menu-link" href="/kybalion/">Kybalion Home</a>
+              <a class="menu-link" href="/kybalion/reader.html">Reader</a>
+              <a class="menu-link" href="/kybalion/docs/">Document Library</a>
+              <a class="menu-link" href="/auth/login?redirect=/kybalion/" id="menuAuthLink">Sign In / Create Account</a>
+              <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
+              <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
+            </div>
+            <div class="menu-section">
+              <p class="menu-title">Documents</p>
+              <a class="menu-link" href="/kybalion/docs/general/">General</a>
+              <div class="menu-sessions-wrapper">
+                <button class="menu-link menu-sessions-trigger" type="button" id="menuSessionsBtn">
+                  Sessions <span class="menu-arrow">&#9656;</span>
+                </button>
+                <div class="menu-sessions-flyout is-hidden" id="menuSessionsFlyout">
+                  <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
+                  <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
+                  <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
+                  <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
+                  <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
+                  <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
+                  <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
+                  <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
+                  <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
+                  <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
+                  <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
+                  <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
+                </div>
+              </div>
+              <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
+              <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/" aria-hidden="true">Assets</a>
+              <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/" aria-hidden="true">Master Documents</a>
+            </div>
+          </div>
+        </div>
       </header>
 
       <section class="hero" aria-label="Kybalion overview">
@@ -266,7 +395,7 @@
         <article class="card card-1b">
           <p class="card-label">Card 1B</p>
           <h2 class="card-title">Next Session Meetup</h2>
-          <p class="card-copy">Saturday, March 7th at 3:00 PM EST</p>
+          <p class="card-copy">Saturday, March 7, 2026 @ 3pm EST</p>
           <div class="card-actions">
             <a class="button-primary" href="https://comms.davidelloyd.com/kybalion/invite2/" target="_blank" rel="noopener noreferrer">You Are Invited</a>
             <a class="button-primary" href="https://calendar.app.google/y2JU3eVKPJNWajWo6" target="_blank" rel="noopener noreferrer">Calendar Invite</a>
@@ -295,7 +424,7 @@
           <div class="card-actions">
             <a class="button-secondary button-whatsapp" href="https://chat.whatsapp.com/DqFQx0Q16OBDxCluzhtiW2" target="_blank" rel="noopener noreferrer">
               <img class="whatsapp-logo" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp logo" />
-              Join WhatsApp
+              Join us on WhatsApp!
             </a>
           </div>
         </article>
@@ -328,5 +457,8 @@
 
       <p class="footer">Kybalion Study Group &mdash; online reader, meetup guidance, and session resources.</p>
     </div>
+    <script src="/kybalion/auth-sync.js?v=3.7.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/kybalion/menu-shell.js?v=3.7.0"></script>
   </body>
 </html>
