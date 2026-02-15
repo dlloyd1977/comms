@@ -26,6 +26,7 @@
 | `reader_profile_button_1` | Reader account/profile action controls | Reader header controls area |
 
 ## Control Glossary
+- Reference audit index: [Header Navigation Audit — Canonical Controls Index](header_nav_audit.md#canonical-controls-index).
 | Canonical Name | Selector Pattern | Visual Contract (Color/Style) | Interaction Pattern | Placement Contract | Behavior Contract |
 |---|---|---|---|---|---|
 | `main_menu_button_1` | Trigger: `#menuBtn.button.secondary` + Panel: `#menuPanel.menu-panel` + Sessions: `#menuSessionsBtn`/`#menuSessionsFlyout` | Pill-shaped secondary outline button; accent-colored text/border (`--accent` or `--text-link`) on light background; paired white menu panel with bordered `menu-link` items | Menu button opening a flyout/dropdown panel (`menuPanel`) with nested Sessions flyout (`menuSessionsFlyout`) | Header/topbar global control in `.menu-wrapper`, right-aligned with other header actions, consistently present on hub/invite/quick/docs/reader pages | `aria-haspopup/expanded/controls` parity, section labels (`Navigation`/`Documents`), ordered nav/doc/session links, role-aware auth/admin visibility, Sessions keyboard contracts (`Escape` close + focus return, first-item focus on open, `Tab`/`Shift+Tab` containment, `ArrowDown`/`ArrowUp`/`Home`/`End` roving focus) |
