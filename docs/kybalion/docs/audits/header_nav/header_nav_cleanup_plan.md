@@ -11,6 +11,13 @@
 2. Standardize control class/style patterns for shared controls.
 3. Decide and document intentional no-header behavior for invite/quick pages.
 
+## Current Status
+- Status: Phase 1 cleanup complete for structural header/menu standardization.
+- Latest audit snapshot:
+  - Pages scanned: 22
+  - Header/menu controls found: 618
+  - Pages without header/menu controls: 0
+
 ## Priority Actions (Kickoff)
 
 ### P1 — Navigation Contract
@@ -40,10 +47,14 @@
 - Avoid page-specific variants for identical global controls.
 
 ## Initial Cleanup Backlog
-- [ ] Unify hub page (`index.html`) with chosen nav pattern.
-- [ ] Normalize reader/docs shared controls and class tokens.
-- [ ] Decide invite/quick behavior (add minimal header or explicitly document no-header design).
-- [ ] Re-run audit script and compare control frequency/placement deltas.
+- [x] Unify hub page (`index.html`) with chosen nav pattern.
+- [x] Normalize reader/docs shared controls and class tokens.
+- [x] Decide invite/quick behavior (add minimal header or explicitly document no-header design).
+- [x] Re-run audit script and compare control frequency/placement deltas.
+
+## Remaining Follow-Ups
+- [ ] Optional runtime parity: verify auth-state behavior wiring for `Change Password` / `Log Out` on hub/invite/quick beyond structural parity.
+- [ ] Optional long-tail cleanup: normalize page-specific non-global controls if a stricter token contract is desired (`view-pill-button`, reader-only tools).
 
 ## Verification
 - Re-run:
