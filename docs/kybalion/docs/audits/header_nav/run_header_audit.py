@@ -344,6 +344,62 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 			"- Admin-only contract violations found for `Assets`/`Master Documents`: "
 			+ ", ".join(admin_only_violations)
 		)
+
+	top_level_pages = ["index.html", "invite1/index.html", "invite2/index.html", "quick/index.html"]
+	required_top_level_ids = {
+		"menuAuthLink": {"tag": "a", "must_include": ["menu-link"], "must_exclude": ["is-hidden"]},
+		"menuChangePasswordLink": {"tag": "a", "must_include": ["menu-link", "is-hidden"], "must_exclude": []},
+		"menuSignOutLink": {"tag": "button", "must_include": ["menu-link", "is-hidden"], "must_exclude": []},
+	}
+	required_data_attrs = [
+		"data-supabase-url",
+		"data-supabase-anon-key",
+		"data-admin-emails",
+		"data-members-table",
+	]
+	required_scripts = ["/kybalion/auth-sync.js", "/kybalion/menu-shell.js"]
+	top_level_contract_violations: list[str] = []
+
+	for page in top_level_pages:
+		page_rows = page_to_rows.get(page, [])
+		for control_id, rule in required_top_level_ids.items():
+			matches = [row for row in page_rows if row.get("id") == control_id]
+			if not matches:
+				top_level_contract_violations.append(f"{page} (missing #{control_id})")
+				continue
+			if not any(row.get("control_type") == rule["tag"] for row in matches):
+				top_level_contract_violations.append(
+					f"{page} (#{control_id} is not <{rule['tag']}>)"
+				)
+				continue
+
+			for token in rule["must_include"]:
+				if not any(token in row.get("classes", "").split() for row in matches):
+					top_level_contract_violations.append(
+						f"{page} (#{control_id} missing class '{token}')"
+					)
+			for token in rule["must_exclude"]:
+				if any(token in row.get("classes", "").split() for row in matches):
+					top_level_contract_violations.append(
+						f"{page} (#{control_id} should not include class '{token}')"
+					)
+
+		page_text = (ROOT / page).read_text(encoding="utf-8")
+		for attr in required_data_attrs:
+			if attr not in page_text:
+				top_level_contract_violations.append(f"{page} (missing {attr})")
+		for script in required_scripts:
+			if script not in page_text:
+				top_level_contract_violations.append(f"{page} (missing script {script})")
+
+	if not top_level_contract_violations:
+		lines.append(
+			"- Top-level pages (`index`, `invite1`, `invite2`, `quick`) consistently implement auth-runtime contract wiring (required auth control IDs/default visibility, Supabase data attributes, and shared `auth-sync.js` + `menu-shell.js` includes)."
+		)
+	else:
+		lines.append(
+			"- Top-level auth-runtime contract violations found: " + ", ".join(top_level_contract_violations)
+		)
 	lines.append("")
 
 	lines.append("## Cleanup Kickoff")

@@ -53,7 +53,7 @@
 - [x] Re-run audit script and compare control frequency/placement deltas.
 
 ## Remaining Follow-Ups
-- [ ] Optional runtime parity: verify auth-state behavior wiring for `Change Password` / `Log Out` on hub/invite/quick beyond structural parity.
+- [x] Optional runtime parity: enforce auth-state behavior wiring contract for `Change Password` / `Log Out` on hub/invite/quick via audit assertion (IDs/default visibility/body data attrs/shared scripts).
 - [ ] Optional long-tail cleanup: normalize page-specific non-global controls if a stricter token contract is desired (`view-pill-button`, reader-only tools).
 
 ## Verification
