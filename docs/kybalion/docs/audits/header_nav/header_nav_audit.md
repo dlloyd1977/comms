@@ -52,14 +52,14 @@
 | Class Tokens | Count |
 |---|---:|
 | menu-link | 426 |
-| is-hidden menu-link | 44 |
-| admin-only is-hidden menu-link | 36 |
+| menu-link is-hidden | 44 |
+| menu-link admin-only is-hidden | 36 |
 | button secondary | 32 |
 | menu-link menu-sessions-trigger | 22 |
-| button is-hidden secondary | 18 |
-| button is-hidden primary | 17 |
+| button secondary is-hidden | 18 |
+| button primary is-hidden | 17 |
 | file-input-hidden | 17 |
-| button search-button secondary | 1 |
+| button secondary search-button | 1 |
 | is-active view-pill-button | 1 |
 | view-pill-button | 1 |
 

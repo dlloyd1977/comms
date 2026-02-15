@@ -91,7 +91,27 @@ def find_html_files() -> list[Path]:
 
 def class_tokens(attrs: dict[str, str]) -> list[str]:
 	classes = attrs.get("class", "")
-	return sorted({token.strip() for token in classes.split() if token.strip()})
+	tokens = {token.strip() for token in classes.split() if token.strip()}
+	preferred_order = [
+		"button",
+		"primary",
+		"secondary",
+		"menu-link",
+		"menu-sessions-trigger",
+		"search-button",
+		"admin-only",
+		"is-active",
+		"is-hidden",
+		"file-input-hidden",
+		"view-pill-button",
+	]
+	ordered: list[str] = []
+	for token in preferred_order:
+		if token in tokens:
+			ordered.append(token)
+			tokens.remove(token)
+	ordered.extend(sorted(tokens))
+	return ordered
 
 
 def detect_header_context(element: Element) -> bool:
