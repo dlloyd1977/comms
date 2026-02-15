@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  --bg: #f5f6f8;
+  --bg: #f8fbff;
   --panel: #ffffff;
   --ink: #323130;
   --muted: #605e5c;
@@ -8,8 +8,8 @@
   --accent-dark: #005a9e;
   --border: #e1dfdd;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --header-bg: #ffffff;
-  --header-border: #edebe9;
+  --header-bg: #f8fbff;
+  --header-border: #c7def8;
   --row-hover: #f3f2f1;
 }
 
@@ -61,9 +61,9 @@ body.layout-editing .page-header {
   grid-template-columns: auto;
   gap: 2px;
   padding: 8px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--header-border);
   border-radius: 10px;
-  background: #faf9f8;
+  background: #ffffff;
   box-shadow: var(--shadow);
 }
 
@@ -131,14 +131,14 @@ h1 {
 
 .button.secondary {
   background: #ffffff;
-  color: var(--ink);
-  border-color: #c8c6c4;
+  color: var(--accent-dark);
+  border-color: var(--accent);
 }
 
 .button.secondary:hover {
-  background: #f3f2f1;
-  color: var(--ink);
-  border-color: #c8c6c4;
+  background: #eef5ff;
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
 }
 
 /* ── Menu dropdown ───────────────────── */
@@ -188,10 +188,10 @@ h1 {
   padding: 6px 8px;
   border-radius: 8px;
   text-decoration: none;
-  color: var(--ink);
+  color: var(--accent-dark);
   font-weight: 600;
-  background: transparent;
-  border: none;
+  background: #ffffff;
+  border: 1px solid var(--accent);
   cursor: pointer;
   font: inherit;
 }
@@ -199,6 +199,7 @@ h1 {
 .menu-link:hover {
   background: #f1f5fb;
   color: var(--accent-dark);
+  border-color: var(--accent-dark);
 }
 
 /* ── Sessions flyout sub-menu ──────── */
