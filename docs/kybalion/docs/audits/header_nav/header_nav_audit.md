@@ -179,6 +179,7 @@
 
 - Docs/reader pages follow the Main Menu panel pattern with `menu-link` controls.
 - The hub page now uses the shared Main Menu panel contract.
+- `Main Menu` is present on all audited pages, so the global entry point is consistent for visitor/member/admin states.
 - All audited pages now include header/menu navigation controls.
 - `menu-link` is now the dominant shared control token across pages.
 

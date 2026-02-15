@@ -299,6 +299,17 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 	else:
 		lines.append("- The hub page still uses direct topbar links instead of the Main Menu panel.")
 
+	pages_with_main_menu = [
+		page for page in all_pages if "Main Menu" in page_labels.get(page, set())
+	]
+	missing_main_menu = [page for page in all_pages if page not in pages_with_main_menu]
+	if not missing_main_menu:
+		lines.append("- `Main Menu` is present on all audited pages, so the global entry point is consistent for visitor/member/admin states.")
+	else:
+		lines.append(
+			f"- `Main Menu` is missing on: {', '.join(missing_main_menu)}."
+		)
+
 	if pages_without_controls:
 		lines.append(
 			f"- Pages without header/menu controls remain: {', '.join(pages_without_controls)}."
