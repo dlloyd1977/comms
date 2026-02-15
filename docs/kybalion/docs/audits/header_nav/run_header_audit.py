@@ -191,6 +191,7 @@ def parse_controls(file_path: Path) -> list[dict[str, str]]:
 			"target": element.attrs.get("href", "") or element.attrs.get("id", ""),
 			"id": element.attrs.get("id", ""),
 			"classes": " ".join(class_tokens(element.attrs)),
+			"context_signature": re.sub(r"\s+", " ", element.path_hints).strip(),
 			"is_menu_item": "yes" if in_menu else "no",
 			"is_dropdown_trigger": "yes" if "trigger" in context_hints or "flyout" in context_hints else "no",
 			"placement": infer_placement(element.path, element.attrs, context_hints),
@@ -221,6 +222,7 @@ def write_csv(rows: list[dict[str, str]]) -> None:
 		"target",
 		"id",
 		"classes",
+		"context_signature",
 		"is_menu_item",
 		"is_dropdown_trigger",
 		"placement",
@@ -244,6 +246,7 @@ STRICT_IDENTITY_FIELDS = [
 	"target",
 	"id",
 	"classes",
+	"context_signature",
 	"is_menu_item",
 	"is_dropdown_trigger",
 	"placement",
@@ -326,7 +329,13 @@ def target_slug_from_row(row: dict[str, str]) -> str:
 
 def friendly_variant_name(base_name: str, row: dict[str, str], signature: tuple[str, ...]) -> str:
 	if base_name == "main_menu_button_1":
-		return "main_menu_button_1"
+		context = row.get("context_signature", "")
+		if "header-actions" in context:
+			return "main_menu_button_docs_header_actions"
+		if "topbar" in context:
+			return "main_menu_button_topbar"
+		short_sig = hashlib.sha1("|".join(signature).encode("utf-8")).hexdigest()[:8]
+		return f"main_menu_button_context_{short_sig}"
 
 	label_slug = slugify_label(row.get("label", ""))
 	target_slug = target_slug_from_row(row)
