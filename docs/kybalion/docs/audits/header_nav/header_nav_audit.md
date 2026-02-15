@@ -1,36 +1,36 @@
 # Header Navigation Audit
 
 - Pages scanned: 22
-- Header/menu controls found: 541
-- Pages without header/menu controls: 3
+- Header/menu controls found: 610
+- Pages without header/menu controls: 0
 
 ## Control Frequency
 
 | Control Label | Frequency |
 |---|---:|
-| main menu | 19 |
-| home | 19 |
-| kybalion home | 19 |
-| reader | 19 |
-| document library | 19 |
-| sign in / create account | 19 |
-| general | 19 |
-| sessions ▸ | 19 |
-| session 1 | 19 |
-| session 2 | 19 |
-| session 3 | 19 |
-| session 4 | 19 |
-| session 5 | 19 |
-| session 6 | 19 |
-| session 7 | 19 |
-| session 8 | 19 |
-| session 9 | 19 |
-| session 10 | 19 |
-| session 11 | 19 |
-| session 12 | 19 |
-| templates | 19 |
-| assets | 19 |
-| master documents | 19 |
+| main menu | 22 |
+| home | 22 |
+| kybalion home | 22 |
+| reader | 22 |
+| document library | 22 |
+| sign in / create account | 22 |
+| general | 22 |
+| sessions ▸ | 22 |
+| session 1 | 22 |
+| session 2 | 22 |
+| session 3 | 22 |
+| session 4 | 22 |
+| session 5 | 22 |
+| session 6 | 22 |
+| session 7 | 22 |
+| session 8 | 22 |
+| session 9 | 22 |
+| session 10 | 22 |
+| session 11 | 22 |
+| session 12 | 22 |
+| templates | 22 |
+| assets | 22 |
+| master documents | 22 |
 | change password | 18 |
 | log out | 18 |
 | upload | 17 |
@@ -43,7 +43,7 @@
 
 | Placement | Count |
 |---|---:|
-| header_menu | 455 |
+| header_menu | 524 |
 | header | 81 |
 | other | 5 |
 
@@ -51,16 +51,16 @@
 
 | Class Tokens | Count |
 |---|---:|
-| menu-link | 363 |
+| menu-link | 426 |
 | is-hidden menu-link | 36 |
 | admin-only is-hidden menu-link | 36 |
-| menu-link menu-sessions-trigger | 19 |
+| menu-link menu-sessions-trigger | 22 |
 | button secondary | 18 |
 | button is-hidden primary | 17 |
 | button is-hidden secondary | 17 |
 | file-input-hidden | 17 |
 | secondary | 10 |
-| menu-button | 1 |
+| menu-button | 4 |
 | is-hidden secondary | 1 |
 | search-button secondary | 1 |
 | is-active view-pill-button | 1 |
@@ -159,13 +159,19 @@
 - Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### invite1/index.html
-- No header/menu controls detected.
+- Total controls: 23
+- Unique labels: 23
+- Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### invite2/index.html
-- No header/menu controls detected.
+- Total controls: 23
+- Unique labels: 23
+- Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### quick/index.html
-- No header/menu controls detected.
+- Total controls: 23
+- Unique labels: 23
+- Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### reader.html
 - Total controls: 41
@@ -175,13 +181,13 @@
 ## Consistency Findings
 
 - Docs/reader pages follow the Main Menu panel pattern with `menu-link` controls.
-- The hub page uses direct topbar links instead of a menu panel.
-- Invite/quick pages currently omit header navigation controls.
-- Primary style classes vary between `button primary`, `button secondary`, and plain `nav-links a` patterns.
+- The hub page now uses the shared Main Menu panel contract.
+- All audited pages now include header/menu navigation controls.
+- `menu-link` is now the dominant shared control token across pages.
 
 ## Cleanup Kickoff
 
 1. Define a single header contract for all Kybalion top-level pages (`home`, `reader`, `docs`, `auth`).
-2. Decide whether hub page should adopt the `Main Menu` pattern or docs/reader should expose direct links.
+2. Align menu trigger/button classes to the same token set across docs, reader, hub, and invite/quick pages.
 3. Standardize button class tokens for global controls (`primary`, `secondary`, `menu-link`).
-4. Add explicit header controls to invite/quick pages or intentionally document their no-header design.
+4. Normalize auth-state controls (`Sign In / Create Account`, `Change Password`, `Log Out`) where role-aware behavior is needed.

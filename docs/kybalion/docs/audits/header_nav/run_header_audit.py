@@ -205,6 +205,9 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 	label_counter = Counter(normalize_label(row["label"]) for row in rows if row["label"].strip())
 	placement_counter = Counter(row["placement"] for row in rows)
 	class_counter = Counter(row["classes"] for row in rows if row["classes"])
+	page_labels: dict[str, set[str]] = defaultdict(set)
+	for row in rows:
+		page_labels[row["file"]].add(row["label"])
 
 	lines: list[str] = []
 	lines.append("# Header Navigation Audit")
@@ -256,18 +259,43 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 
 	lines.append("## Consistency Findings")
 	lines.append("")
-	lines.append("- Docs/reader pages follow the Main Menu panel pattern with `menu-link` controls.")
-	lines.append("- The hub page uses direct topbar links instead of a menu panel.")
-	lines.append("- Invite/quick pages currently omit header navigation controls.")
-	lines.append("- Primary style classes vary between `button primary`, `button secondary`, and plain `nav-links a` patterns.")
+	docs_reader_pages = [
+		page for page in page_to_rows if page.startswith("docs/") or page == "reader.html"
+	]
+	docs_reader_main_menu_count = sum(
+		1 for page in docs_reader_pages if "Main Menu" in page_labels.get(page, set())
+	)
+	hub_has_main_menu = "Main Menu" in page_labels.get("index.html", set())
+
+	if docs_reader_main_menu_count == len(docs_reader_pages) and docs_reader_pages:
+		lines.append("- Docs/reader pages follow the Main Menu panel pattern with `menu-link` controls.")
+	else:
+		lines.append("- Docs/reader pages are mixed; some still deviate from the Main Menu panel pattern.")
+
+	if hub_has_main_menu:
+		lines.append("- The hub page now uses the shared Main Menu panel contract.")
+	else:
+		lines.append("- The hub page still uses direct topbar links instead of the Main Menu panel.")
+
+	if pages_without_controls:
+		lines.append(
+			f"- Pages without header/menu controls remain: {', '.join(pages_without_controls)}."
+		)
+	else:
+		lines.append("- All audited pages now include header/menu navigation controls.")
+
+	if class_counter.get("menu-link", 0) > 0:
+		lines.append("- `menu-link` is now the dominant shared control token across pages.")
+	else:
+		lines.append("- Shared control style tokens are still fragmented across page types.")
 	lines.append("")
 
 	lines.append("## Cleanup Kickoff")
 	lines.append("")
 	lines.append("1. Define a single header contract for all Kybalion top-level pages (`home`, `reader`, `docs`, `auth`).")
-	lines.append("2. Decide whether hub page should adopt the `Main Menu` pattern or docs/reader should expose direct links.")
+	lines.append("2. Align menu trigger/button classes to the same token set across docs, reader, hub, and invite/quick pages.")
 	lines.append("3. Standardize button class tokens for global controls (`primary`, `secondary`, `menu-link`).")
-	lines.append("4. Add explicit header controls to invite/quick pages or intentionally document their no-header design.")
+	lines.append("4. Normalize auth-state controls (`Sign In / Create Account`, `Change Password`, `Log Out`) where role-aware behavior is needed.")
 	lines.append("")
 
 	return "\n".join(lines)

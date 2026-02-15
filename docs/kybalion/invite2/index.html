@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kybalion Session 2 Invite — Saturday, March 7, 2026 @ 7:00 PM</title>
+    <title>Kybalion Session 2 Invite — Saturday, March 7, 2026 @ 3:00 PM EST</title>
     <meta
       name="description"
-      content="Session 2 invite for Universal Laws &amp; Principles, The Kybalion — Saturday, March 7, 2026 at 7:00 PM."
+      content="Session 2 invite for Universal Laws &amp; Principles, The Kybalion — Saturday, March 7, 2026 at 3:00 PM EST."
     />
     <link rel="canonical" href="https://comms.davidelloyd.com/kybalion/invite2/" />
 
-    <meta property="og:title" content="Session 2 — Saturday, March 7, 2026 @ 7:00 PM" />
+    <meta property="og:title" content="Session 2 — Saturday, March 7, 2026 @ 3:00 PM EST" />
     <meta
       property="og:description"
       content="Thank you for joining Session 1. Session 2 covers Chapter 2: The Seven Hermetic Principles. Includes study guide links and preparation steps."
@@ -20,7 +20,7 @@
     <meta property="og:image" content="https://comms.davidelloyd.com/kybalion/images/me/me_3.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Session 2 — Saturday, March 7, 2026 @ 7:00 PM" />
+    <meta name="twitter:title" content="Session 2 — Saturday, March 7, 2026 @ 3:00 PM EST" />
     <meta
       name="twitter:description"
       content="Session 2: Chapter 2, The Seven Hermetic Principles. Study guides included."
@@ -54,6 +54,105 @@
         max-width: 920px;
         margin: 0 auto;
         padding: 28px 18px 56px;
+      }
+
+      .topbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--card-bg);
+      }
+
+      .brand {
+        margin: 0;
+        color: var(--text-main);
+        font-size: 1rem;
+        font-weight: 700;
+      }
+
+      .menu-wrapper {
+        position: relative;
+      }
+
+      .menu-button {
+        color: var(--text-link);
+        border: 1px solid var(--text-link);
+        background: #ffffff;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 0.88rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .menu-panel {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 8px);
+        width: min(360px, 85vw);
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 8px 24px rgba(20, 20, 20, 0.12);
+        z-index: 30;
+      }
+
+      .is-hidden {
+        display: none;
+      }
+
+      .menu-section + .menu-section {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+      }
+
+      .menu-title {
+        margin: 4px 8px 8px;
+        color: var(--text-sub);
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .menu-link {
+        display: block;
+        width: 100%;
+        text-align: left;
+        color: var(--text-link);
+        background: #ffffff;
+        border: 1px solid var(--text-link);
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 7px 10px;
+        font-size: 0.86rem;
+        font-weight: 700;
+      }
+
+      .menu-link + .menu-link,
+      .menu-sessions-wrapper + .menu-link,
+      .menu-link + .menu-sessions-wrapper {
+        margin-top: 7px;
+      }
+
+      .menu-link.menu-sessions-trigger {
+        cursor: pointer;
+      }
+
+      .menu-arrow {
+        margin-left: 6px;
+      }
+
+      .menu-sessions-flyout {
+        margin-top: 7px;
+        padding-left: 10px;
       }
 
       .card {
@@ -189,6 +288,58 @@
   </head>
   <body>
     <div class="page-wrap">
+      <header class="topbar">
+        <p class="brand">The Kybalion</p>
+        <div class="menu-wrapper">
+          <button
+            class="menu-button"
+            type="button"
+            id="menuBtn"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="menuPanel"
+          >
+            Main Menu
+          </button>
+          <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
+            <div class="menu-section">
+              <p class="menu-title">Navigation</p>
+              <a class="menu-link" href="/">Home</a>
+              <a class="menu-link" href="/kybalion/">Kybalion Home</a>
+              <a class="menu-link" href="/kybalion/reader.html">Reader</a>
+              <a class="menu-link" href="/kybalion/docs/">Document Library</a>
+              <a class="menu-link" href="/auth/login?redirect=/kybalion/invite2/">Sign In / Create Account</a>
+            </div>
+            <div class="menu-section">
+              <p class="menu-title">Documents</p>
+              <a class="menu-link" href="/kybalion/docs/general/">General</a>
+              <div class="menu-sessions-wrapper">
+                <button class="menu-link menu-sessions-trigger" type="button" id="menuSessionsBtn">
+                  Sessions <span class="menu-arrow">&#9656;</span>
+                </button>
+                <div class="menu-sessions-flyout is-hidden" id="menuSessionsFlyout">
+                  <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
+                  <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
+                  <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
+                  <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
+                  <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
+                  <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
+                  <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
+                  <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
+                  <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
+                  <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
+                  <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
+                  <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
+                </div>
+              </div>
+              <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
+              <a class="menu-link" href="/kybalion/docs/assets/">Assets</a>
+              <a class="menu-link" href="/kybalion/docs/master-docs/">Master Documents</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
       <div class="card">
         <img
           class="hero"
@@ -203,7 +354,7 @@
           <p class="meta">Universal Laws &amp; Principles, The Kybalion</p>
 
           <div class="calendar-invite">
-            <p>Add Session 2 to your calendar:</p>
+            <p>Add Session 2 to Your Calendar:</p>
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -217,14 +368,14 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://calendar.app.google/y2JU3eVKPJNWajWo6"
-                >Open Google Calendar invite</a
+                >Open Google Calendar Invite</a
               >
             </p>
           </div>
 
           <p>
             Thank you to everyone who joined me for our kickoff meeting on Saturday, February 7,
-            2026, at 7:00 PM. I truly appreciate you being there and bringing your attention,
+            2026, at 3:00 PM. I truly appreciate you being there and bringing your attention,
             curiosity, and openness to the conversation. During our time together, we explored the
             <strong>Introduction</strong> and <strong>Chapter 1, The Hermetic Philosophy</strong>,
             from <em>The Kybalion</em> by <strong>The Three Initiates</strong>, and we began setting
@@ -280,5 +431,40 @@
         </div>
       </div>
     </div>
+    <script>
+      (function () {
+        const menuBtn = document.getElementById("menuBtn");
+        const menuPanel = document.getElementById("menuPanel");
+        const menuSessionsBtn = document.getElementById("menuSessionsBtn");
+        const menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
+
+        if (!menuBtn || !menuPanel) {
+          return;
+        }
+
+        function closeMenu() {
+          menuPanel.classList.add("is-hidden");
+          menuBtn.setAttribute("aria-expanded", "false");
+        }
+
+        menuBtn.addEventListener("click", function () {
+          const willOpen = menuPanel.classList.contains("is-hidden");
+          menuPanel.classList.toggle("is-hidden", !willOpen);
+          menuBtn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+        });
+
+        document.addEventListener("click", function (event) {
+          if (!menuPanel.contains(event.target) && event.target !== menuBtn) {
+            closeMenu();
+          }
+        });
+
+        if (menuSessionsBtn && menuSessionsFlyout) {
+          menuSessionsBtn.addEventListener("click", function () {
+            menuSessionsFlyout.classList.toggle("is-hidden");
+          });
+        }
+      })();
+    </script>
   </body>
 </html>
