@@ -26,10 +26,7 @@ const RESOURCE_LINKS = [
 
 /* ── Styles ─────────────────────────────────────────────── */
 
-const linkClass =
-  "rounded-lg px-2 py-1.5 text-sm font-semibold no-underline hover:bg-[#f1f5fb] block";
-const linkStyle: React.CSSProperties = { color: "#1f1c1a" };
-const headingStyle: React.CSSProperties = { color: "#888" };
+const linkClass = "menu-link block text-sm";
 
 /**
  * Centralised Main Menu dropdown for every Next.js page (homepage, hub).
@@ -124,10 +121,8 @@ export default function KybalionMenuDropdown() {
       {/* ── Trigger ────────────────────────────── */}
       <button
         type="button"
-        className="rounded-full border px-4 py-2 text-sm font-medium"
-        style={{ background: "#fff", color: "#2f5f8f", borderColor: "#2f5f8f" }}
+        className="button secondary inline-flex items-center gap-2 text-sm shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
         aria-haspopup="true"
-        aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
         Main Menu
@@ -136,13 +131,11 @@ export default function KybalionMenuDropdown() {
       {/* ── Dropdown panel ─────────────────────── */}
       {open && (
         <div
-          className="absolute right-0 z-[100] mt-2 max-h-[70vh] min-w-[240px] overflow-visible rounded-xl border bg-white p-3 shadow-lg"
-          style={{ top: "calc(100% + 4px)", borderColor: "#e2ddd7" }}
-          role="menu"
+          className="menu-panel menu-dropdown absolute right-0 z-[100] mt-2 max-h-[70vh] min-w-[240px] overflow-visible rounded-xl p-3 shadow-lg"
         >
           {/* ── Navigation ──────────────────────── */}
           <div className="flex flex-col gap-1">
-            <p className="px-2 text-[0.7rem] font-semibold uppercase tracking-[0.12em]" style={headingStyle}>
+            <p className="menu-heading px-2 text-[0.7rem] font-semibold uppercase tracking-[0.12em]">
               Navigation
             </p>
             {NAV_LINKS.map(({ href, label }) => (
@@ -150,7 +143,6 @@ export default function KybalionMenuDropdown() {
                 key={href}
                 href={href}
                 className={linkClass}
-                style={linkStyle}
                 onClick={() => setOpen(false)}
               >
                 {label}
@@ -160,8 +152,7 @@ export default function KybalionMenuDropdown() {
             {isAuthed ? (
               <button
                 type="button"
-                className="rounded-lg px-2 py-1.5 text-left text-sm font-semibold hover:bg-[#f1f5fb]"
-                style={linkStyle}
+                className="menu-link block w-full text-left text-sm"
                 onClick={handleSignOut}
               >
                 Log Out
@@ -170,7 +161,6 @@ export default function KybalionMenuDropdown() {
               <Link
                 href={`/auth/login?redirect=${encodeURIComponent(pathname)}`}
                 className={linkClass}
-                style={linkStyle}
                 onClick={() => setOpen(false)}
               >
                 Sign In
@@ -178,11 +168,11 @@ export default function KybalionMenuDropdown() {
             )}
           </div>
 
-          <hr className="my-2 border-t" style={{ borderColor: "#e2ddd7" }} />
+          <hr className="menu-divider my-2 border-t" />
 
           {/* ── Documents ───────────────────────── */}
           <div className="flex flex-col gap-1">
-            <p className="px-2 text-[0.7rem] font-semibold uppercase tracking-[0.12em]" style={headingStyle}>
+            <p className="menu-heading px-2 text-[0.7rem] font-semibold uppercase tracking-[0.12em]">
               Documents
             </p>
 
@@ -190,7 +180,6 @@ export default function KybalionMenuDropdown() {
             <Link
               href="/kybalion/docs/general/"
               className={linkClass}
-              style={linkStyle}
               onClick={() => setOpen(false)}
             >
               General
@@ -204,21 +193,15 @@ export default function KybalionMenuDropdown() {
             >
               <button
                 type="button"
-                className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-sm font-semibold hover:bg-[#f1f5fb]"
-                style={linkStyle}
+                className="menu-link menu-sessions-trigger text-left text-sm"
                 onClick={() => setSessionsHover((v) => !v)}
               >
                 Sessions
-                <span className="text-xs" style={headingStyle}>▸</span>
+                <span className="menu-caret text-xs">▸</span>
               </button>
               {sessionsHover && (
                 <div
-                  className="absolute z-[110] min-w-[160px] rounded-xl border bg-white p-2 shadow-lg"
-                  style={{
-                    top: 0,
-                    right: "calc(100% + 6px)",
-                    borderColor: "#e2ddd7",
-                  }}
+                  className="menu-panel menu-flyout absolute z-[110] min-w-[160px] rounded-xl p-2 shadow-lg"
                   onMouseEnter={openSessions}
                   onMouseLeave={closeSessions}
                 >
@@ -226,8 +209,7 @@ export default function KybalionMenuDropdown() {
                     <Link
                       key={href}
                       href={href}
-                      className="block rounded-lg px-3 py-1.5 text-sm font-semibold no-underline hover:bg-[#f1f5fb]"
-                      style={linkStyle}
+                      className="menu-link block text-sm"
                       onClick={() => { setOpen(false); setSessionsHover(false); }}
                     >
                       {label}
@@ -243,7 +225,6 @@ export default function KybalionMenuDropdown() {
                 key={href}
                 href={href}
                 className={linkClass}
-                style={linkStyle}
                 onClick={() => setOpen(false)}
               >
                 {label}
