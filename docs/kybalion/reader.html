@@ -16,14 +16,14 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://comms.davidelloyd.com/kybalion/reader.html" />
-    <meta property="og:image" content="https://comms.davidelloyd.com/kybalion/images/me/kybalion_landscape_1920x1080.jpg" />
+    <meta property="og:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="The Kybalion Reader — Facilitator Edition" />
     <meta
       name="twitter:description"
       content="Elevated reader with hyperlinked TOC, highlights, notes, and stanza-based navigation."
     />
-    <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/me/kybalion_landscape_1920x1080.jpg" />
+    <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/preview.png" />
     <link rel="stylesheet" href="reader.css?v=3.3.0" />
   </head>
   <body
@@ -32,56 +32,6 @@
     data-admin-emails="davidelloydjr@gmail.com"
     data-members-table="active_members"
   >
-    <div class="page-wrap">
-      <header class="topbar">
-        <p class="brand topbar-brand">The Kybalion</p>
-        <div class="menu-wrapper" data-layout-key="menu">
-          <button
-            class="button secondary"
-            type="button"
-            id="menuBtn"
-            aria-haspopup="true"
-            aria-expanded="false"
-            aria-controls="menuPanel"
-          >Main Menu</button>
-          <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
-            <div class="menu-section">
-              <p class="menu-title">Navigation</p>
-              <a class="menu-link" href="/">Home</a>
-              <a class="menu-link" href="/kybalion/">Kybalion Home</a>
-              <a class="menu-link" href="/kybalion/reader.html">Reader</a>
-              <a class="menu-link" href="/kybalion/docs/">Document Library</a>
-                              <a class="menu-link" href="/auth/login?redirect=/kybalion/reader.html" id="menuAuthLink">Sign In / Create Account</a>
-              <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
-              <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
-            </div>
-            <div class="menu-section">
-              <p class="menu-title">Documents</p>
-              <a class="menu-link" href="/kybalion/docs/general/">General</a>
-              <div class="menu-sessions-wrapper">
-                <button class="menu-link menu-sessions-trigger" type="button" id="menuSessionsBtn">Sessions <span class="menu-arrow">&#9656;</span></button>
-                <div class="menu-sessions-flyout is-hidden" id="menuSessionsFlyout">
-                  <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
-                  <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
-                  <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
-                  <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
-                  <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
-                  <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
-                  <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
-                  <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
-                  <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
-                  <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
-                  <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
-                  <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
-                </div>
-              </div>
-              <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
-              <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/">Assets</a>
-              <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/">Master Documents</a>
-            </div>
-          </div>
-        </div>
-      </header>
     <header class="page-header">
       <div class="header-content">
         <div>
@@ -91,9 +41,55 @@
         </div>
         <div class="header-actions">
           <span class="user-display is-hidden" id="userDisplay" aria-live="polite"></span>
-          <button class="button secondary is-hidden" type="button" id="headerProfileBtn">Profile</button>
-          <button class="button secondary" type="button" id="layoutEditBtn">Edit layout</button>
-          <button class="button secondary" type="button" id="layoutResetBtn">Reset layout</button>
+          <button class="secondary is-hidden" type="button" id="headerProfileBtn">Profile</button>
+          <div class="menu-wrapper" data-layout-key="menu">
+            <button
+              class="button secondary"
+              type="button"
+              id="menuBtn"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="menuPanel"
+            >Main Menu</button>
+            <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
+              <div class="menu-section">
+                <p class="menu-title">Navigation</p>
+                <a class="menu-link" href="/">Home</a>
+                <a class="menu-link" href="/kybalion/">Kybalion Home</a>
+                <a class="menu-link" href="/kybalion/reader.html">Reader</a>
+                <a class="menu-link" href="/kybalion/docs/">Document Library</a>
+                                <a class="menu-link" href="/auth/login?redirect=/kybalion/reader.html" id="menuAuthLink">Sign In / Create Account</a>
+                <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
+                <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
+              </div>
+              <div class="menu-section">
+                <p class="menu-title">Documents</p>
+                <a class="menu-link" href="/kybalion/docs/general/">General</a>
+                <div class="menu-sessions-wrapper">
+                  <button class="menu-link menu-sessions-trigger" type="button" id="menuSessionsBtn">Sessions <span class="menu-arrow">&#9656;</span></button>
+                  <div class="menu-sessions-flyout is-hidden" id="menuSessionsFlyout">
+                    <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
+                    <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
+                    <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
+                    <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
+                    <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
+                    <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
+                    <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
+                    <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
+                    <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
+                    <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
+                    <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
+                    <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
+                  </div>
+                </div>
+                <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
+                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/">Assets</a>
+                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/">Master Documents</a>
+              </div>
+            </div>
+          </div>
+          <button class="secondary" type="button" id="layoutEditBtn">Edit layout</button>
+          <button class="secondary" type="button" id="layoutResetBtn">Reset layout</button>
         </div>
       </div>
       <div class="controls">
@@ -101,7 +97,7 @@
           <span>Search</span>
           <div class="search-row">
             <input type="search" id="searchInput" placeholder="Search the text..." />
-            <button class="button secondary search-button" type="button" id="searchBtn">Search</button>
+            <button class="secondary search-button" type="button" id="searchBtn">Search</button>
           </div>
         </label>
         <label class="control" data-layout-key="tag">
@@ -137,12 +133,12 @@
         </div>
         <div class="standard-tools header-reader-tools" id="standardTools" data-layout-key="reader-tools">
           <span class="standard-tools-label">Reader tools</span>
-          <button class="button secondary" type="button" id="standardSaveHighlightBtn">
+          <button class="secondary" type="button" id="standardSaveHighlightBtn">
             Save highlight as Note
           </button>
-          <button class="button secondary" type="button" id="standardAddTagBtn">Add Tag</button>
-          <button class="button secondary" type="button" id="standardAnnotateBtn">Annotate</button>
-          <button class="button secondary" type="button" id="standardViewNotesBtn">View Notes</button>
+          <button class="secondary" type="button" id="standardAddTagBtn">Add Tag</button>
+          <button class="secondary" type="button" id="standardAnnotateBtn">Annotate</button>
+          <button class="secondary" type="button" id="standardViewNotesBtn">View Notes</button>
         </div>
       </div>
     </header>
@@ -171,8 +167,8 @@
           <p class="invite-cta">Sign Up&hellip; Click Here</p>
           <img
             class="invite-image"
-            src="images/calendar/calendarMonthRed.png"
-            alt="Saturday, March 7, 2026 @ 3pm EST — Kybalion kick-off meeting"
+            src="images/7-february.jpg"
+            alt="February 7, 2026 — Kybalion kick-off meeting"
           />
         </a>
       </aside>
@@ -199,8 +195,8 @@
             <p class="invite-cta">Sign Up&hellip; Click Here</p>
             <img
               class="invite-image"
-              src="images/calendar/calendarMonthRed.png"
-              alt="Saturday, March 7, 2026 @ 3pm EST — Kybalion kick-off meeting"
+              src="images/7-february.jpg"
+              alt="February 7, 2026 — Kybalion kick-off meeting"
             />
           </a>
         </aside>
@@ -212,12 +208,11 @@
         <div class="notes-header">
           <div>
             <h2 id="notesTitle">Notes</h2>
-        </div>
             <p>Highlights saved from the text appear here.</p>
           </div>
           <div class="notes-modal-actions">
-            <button class="button secondary" type="button" id="copyNotesBtn">Copy All Notes</button>
-            <button class="button secondary" type="button" id="closeNotesBtn">Close</button>
+            <button class="secondary" type="button" id="copyNotesBtn">Copy All Notes</button>
+            <button class="secondary" type="button" id="closeNotesBtn">Close</button>
           </div>
         </div>
         <div class="auth-panel" id="authPanel">
@@ -225,10 +220,10 @@
             <div class="auth-step is-active" data-step="choice">
               <p class="auth-step-title">Choose how you want to continue</p>
               <div class="auth-actions">
-                <button class="button secondary" type="button" id="authChoiceSignInBtn">Sign in</button>
-                <button class="button secondary" type="button" id="authChoiceSignUpBtn">Create account</button>
-                <button class="button secondary" type="button" id="authChoiceGuestBtn">Continue as Guest</button>
-                <button class="button secondary" type="button" id="authChoiceCloseBtn">Close</button>
+                <button class="secondary" type="button" id="authChoiceSignInBtn">Sign in</button>
+                <button class="secondary" type="button" id="authChoiceSignUpBtn">Create account</button>
+                <button class="secondary" type="button" id="authChoiceGuestBtn">Continue as Guest</button>
+                <button class="secondary" type="button" id="authChoiceCloseBtn">Close</button>
               </div>
             </div>
 
@@ -245,9 +240,9 @@
                 </label>
               </div>
               <div class="auth-actions">
-                <button class="button secondary" type="button" id="authSignInBtn">Sign in</button>
-                <button class="button secondary" type="button" id="authResetPasswordBtn">Reset Password</button>
-                <button class="button secondary" type="button" id="authBackFromSignInBtn">Back</button>
+                <button class="secondary" type="button" id="authSignInBtn">Sign in</button>
+                <button class="secondary" type="button" id="authResetPasswordBtn">Reset Password</button>
+                <button class="secondary" type="button" id="authBackFromSignInBtn">Back</button>
               </div>
             </div>
 
@@ -260,8 +255,8 @@
                 </label>
               </div>
               <div class="auth-actions">
-                <button class="button secondary" type="button" id="authSendResetBtn">Send Reset Link</button>
-                <button class="button secondary" type="button" id="authBackFromResetBtn">Back</button>
+                <button class="secondary" type="button" id="authSendResetBtn">Send Reset Link</button>
+                <button class="secondary" type="button" id="authBackFromResetBtn">Back</button>
               </div>
             </div>
 
@@ -274,8 +269,8 @@
                 </label>
               </div>
               <div class="auth-actions">
-                <button class="button secondary" type="button" id="authSetNewPasswordBtn">Update Password</button>
-                <button class="button secondary" type="button" id="authBackFromNewPasswordBtn">Back</button>
+                <button class="secondary" type="button" id="authSetNewPasswordBtn">Update Password</button>
+                <button class="secondary" type="button" id="authBackFromNewPasswordBtn">Back</button>
               </div>
             </div>
 
@@ -302,8 +297,8 @@
                 </label>
               </div>
               <div class="auth-actions">
-                <button class="button secondary" type="button" id="authSignUpBtn">Create account</button>
-                <button class="button secondary" type="button" id="authBackFromSignUpBtn">Back</button>
+                <button class="secondary" type="button" id="authSignUpBtn">Create account</button>
+                <button class="secondary" type="button" id="authBackFromSignUpBtn">Back</button>
               </div>
             </div>
 
@@ -313,8 +308,8 @@
                 Guest mode keeps notes only on this device and may be cleared by the browser.
               </p>
               <div class="auth-actions">
-                <button class="button secondary" type="button" id="authGuestBtn">Continue as Guest</button>
-                <button class="button secondary" type="button" id="authBackFromGuestBtn">Back</button>
+                <button class="secondary" type="button" id="authGuestBtn">Continue as Guest</button>
+                <button class="secondary" type="button" id="authBackFromGuestBtn">Back</button>
               </div>
             </div>
 
@@ -322,8 +317,8 @@
               <p class="auth-step-title">All set</p>
               <p class="auth-confirm" id="authConfirmMessage"></p>
               <div class="auth-actions">
-                <button class="button secondary" type="button" id="authConfirmBtn">Continue to Notes</button>
-                <button class="button secondary" type="button" id="authSignOutBtn">Sign out</button>
+                <button class="secondary" type="button" id="authConfirmBtn">Continue to Notes</button>
+                <button class="secondary" type="button" id="authSignOutBtn">Sign out</button>
               </div>
             </div>
           </div>
@@ -348,7 +343,7 @@
           </div>
           <div class="annotation-actions">
             <span class="annotation-count" id="annotationCount">0 / 500</span>
-            <button class="button secondary" type="button" id="annotationCloseBtn">Close</button>
+            <button class="secondary" type="button" id="annotationCloseBtn">Close</button>
           </div>
         </div>
         <label class="annotation-field">
@@ -372,7 +367,7 @@
       <div class="profile-modal-content panel">
         <div class="profile-header">
           <h2>Profile Settings</h2>
-          <button class="button secondary" type="button" id="profileCloseBtn">Close</button>
+          <button class="secondary" type="button" id="profileCloseBtn">Close</button>
         </div>
         <form class="profile-form" id="profileForm">
           <div class="profile-row">
@@ -414,7 +409,7 @@
           <p class="profile-status" id="profileStatus"></p>
           <div class="profile-actions">
             <button class="primary" type="submit">Save</button>
-            <button class="button secondary" type="button" id="profileCancelBtn">Cancel</button>
+            <button class="secondary" type="button" id="profileCancelBtn">Cancel</button>
           </div>
         </form>
       </div>
