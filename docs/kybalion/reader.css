@@ -539,7 +539,7 @@ body.layout-freeform .controls [data-layout-key] {
 }
 
 .standard-toc {
-  max-height: calc(100vh - var(--header-offset, 100px) - 24px);
+  max-height: calc(100vh - var(--header-offset, 200px) - 24px);
 }
 
 .standard-tools {
