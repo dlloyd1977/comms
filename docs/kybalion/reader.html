@@ -32,6 +32,56 @@
     data-admin-emails="davidelloydjr@gmail.com"
     data-members-table="active_members"
   >
+    <div class="page-wrap">
+      <header class="topbar">
+        <p class="brand topbar-brand">The Kybalion</p>
+        <div class="menu-wrapper" data-layout-key="menu">
+          <button
+            class="button secondary"
+            type="button"
+            id="menuBtn"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="menuPanel"
+          >Main Menu</button>
+          <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
+            <div class="menu-section">
+              <p class="menu-title">Navigation</p>
+              <a class="menu-link" href="/">Home</a>
+              <a class="menu-link" href="/kybalion/">Kybalion Home</a>
+              <a class="menu-link" href="/kybalion/reader.html">Reader</a>
+              <a class="menu-link" href="/kybalion/docs/">Document Library</a>
+                              <a class="menu-link" href="/auth/login?redirect=/kybalion/reader.html" id="menuAuthLink">Sign In / Create Account</a>
+              <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
+              <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
+            </div>
+            <div class="menu-section">
+              <p class="menu-title">Documents</p>
+              <a class="menu-link" href="/kybalion/docs/general/">General</a>
+              <div class="menu-sessions-wrapper">
+                <button class="menu-link menu-sessions-trigger" type="button" id="menuSessionsBtn">Sessions <span class="menu-arrow">&#9656;</span></button>
+                <div class="menu-sessions-flyout is-hidden" id="menuSessionsFlyout">
+                  <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
+                  <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
+                  <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
+                  <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
+                  <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
+                  <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
+                  <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
+                  <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
+                  <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
+                  <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
+                  <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
+                  <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
+                </div>
+              </div>
+              <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
+              <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/">Assets</a>
+              <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/">Master Documents</a>
+            </div>
+          </div>
+        </div>
+      </header>
     <header class="page-header">
       <div class="header-content">
         <div>
@@ -42,52 +92,6 @@
         <div class="header-actions">
           <span class="user-display is-hidden" id="userDisplay" aria-live="polite"></span>
           <button class="button secondary is-hidden" type="button" id="headerProfileBtn">Profile</button>
-          <div class="menu-wrapper" data-layout-key="menu">
-            <button
-              class="button secondary"
-              type="button"
-              id="menuBtn"
-              aria-haspopup="true"
-              aria-expanded="false"
-              aria-controls="menuPanel"
-            >Main Menu</button>
-            <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
-              <div class="menu-section">
-                <p class="menu-title">Navigation</p>
-                <a class="menu-link" href="/">Home</a>
-                <a class="menu-link" href="/kybalion/">Kybalion Home</a>
-                <a class="menu-link" href="/kybalion/reader.html">Reader</a>
-                <a class="menu-link" href="/kybalion/docs/">Document Library</a>
-                                <a class="menu-link" href="/auth/login?redirect=/kybalion/reader.html" id="menuAuthLink">Sign In / Create Account</a>
-                <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
-                <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
-              </div>
-              <div class="menu-section">
-                <p class="menu-title">Documents</p>
-                <a class="menu-link" href="/kybalion/docs/general/">General</a>
-                <div class="menu-sessions-wrapper">
-                  <button class="menu-link menu-sessions-trigger" type="button" id="menuSessionsBtn">Sessions <span class="menu-arrow">&#9656;</span></button>
-                  <div class="menu-sessions-flyout is-hidden" id="menuSessionsFlyout">
-                    <a class="menu-link" href="/kybalion/docs/session-01/">Session 1</a>
-                    <a class="menu-link" href="/kybalion/docs/session-02/">Session 2</a>
-                    <a class="menu-link" href="/kybalion/docs/session-03/">Session 3</a>
-                    <a class="menu-link" href="/kybalion/docs/session-04/">Session 4</a>
-                    <a class="menu-link" href="/kybalion/docs/session-05/">Session 5</a>
-                    <a class="menu-link" href="/kybalion/docs/session-06/">Session 6</a>
-                    <a class="menu-link" href="/kybalion/docs/session-07/">Session 7</a>
-                    <a class="menu-link" href="/kybalion/docs/session-08/">Session 8</a>
-                    <a class="menu-link" href="/kybalion/docs/session-09/">Session 9</a>
-                    <a class="menu-link" href="/kybalion/docs/session-10/">Session 10</a>
-                    <a class="menu-link" href="/kybalion/docs/session-11/">Session 11</a>
-                    <a class="menu-link" href="/kybalion/docs/session-12/">Session 12</a>
-                  </div>
-                </div>
-                <a class="menu-link" href="/kybalion/docs/templates/">Templates</a>
-                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/">Assets</a>
-                <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/">Master Documents</a>
-              </div>
-            </div>
-          </div>
           <button class="button secondary" type="button" id="layoutEditBtn">Edit layout</button>
           <button class="button secondary" type="button" id="layoutResetBtn">Reset layout</button>
         </div>
@@ -208,6 +212,7 @@
         <div class="notes-header">
           <div>
             <h2 id="notesTitle">Notes</h2>
+        </div>
             <p>Highlights saved from the text appear here.</p>
           </div>
           <div class="notes-modal-actions">
