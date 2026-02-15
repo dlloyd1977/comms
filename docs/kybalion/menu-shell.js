@@ -9,6 +9,14 @@
   const menuAuthLink = document.getElementById("menuAuthLink");
   const menuChangePasswordLink = document.getElementById("menuChangePasswordLink");
   const menuSignOutLink = document.getElementById("menuSignOutLink");
+  const adminMenuLinks = document.querySelectorAll(".menu-link.admin-only");
+  const membersTable = body?.dataset?.membersTable || "active_members";
+  const adminEmails = (body?.dataset?.adminEmails || "")
+    .split(",")
+    .map(function (value) {
+      return value.trim().toLowerCase();
+    })
+    .filter(Boolean);
 
   function closeMenu() {
     if (!menuBtn || !menuPanel) return;
@@ -57,6 +65,28 @@
     }
   }
 
+  function getUserEmail(user) {
+    return (user?.email || user?.user_metadata?.email || "").toLowerCase();
+  }
+
+  async function fetchActiveMember(supabaseClient, email) {
+    if (!supabaseClient || !email) return null;
+    const { data, error } = await supabaseClient
+      .from(membersTable)
+      .select("status, group")
+      .eq("email", email)
+      .maybeSingle();
+    if (error) return null;
+    return data?.status === "active" ? data : null;
+  }
+
+  function setAdminMenuVisibility(isAdmin) {
+    adminMenuLinks.forEach(function (link) {
+      link.classList.toggle("is-hidden", !isAdmin);
+      link.setAttribute("aria-hidden", String(!isAdmin));
+    });
+  }
+
   function applySignedOutState() {
     if (menuAuthLink) {
       menuAuthLink.classList.remove("is-hidden");
@@ -72,9 +102,10 @@
       menuSignOutLink.setAttribute("aria-hidden", "true");
       menuSignOutLink.onclick = null;
     }
+    setAdminMenuVisibility(false);
   }
 
-  function applySignedInState(signOutHandler) {
+  function applySignedInState(signOutHandler, isAdmin) {
     if (menuAuthLink) {
       menuAuthLink.classList.add("is-hidden");
       menuAuthLink.setAttribute("aria-hidden", "true");
@@ -89,6 +120,7 @@
       menuSignOutLink.style.cursor = "pointer";
       menuSignOutLink.onclick = signOutHandler;
     }
+    setAdminMenuVisibility(Boolean(isAdmin));
   }
 
   async function initAuthState() {
@@ -98,6 +130,10 @@
 
     async function syncStateFromSession(session) {
       if (session) {
+        const user = session?.user || null;
+        const email = getUserEmail(user);
+        const activeMember = await fetchActiveMember(supabaseClient, email);
+        const isAdmin = (activeMember?.group === "admin") || adminEmails.includes(email);
         applySignedInState(async function (event) {
           event.preventDefault();
           try {
@@ -108,7 +144,7 @@
             window.__authSync?.clearAll?.();
             location.reload();
           }
-        });
+        }, isAdmin);
       } else {
         applySignedOutState();
       }
@@ -123,7 +159,20 @@
       return;
     }
 
-    await syncStateFromSession(getStorageSession());
+    const localSession = getStorageSession();
+    if (localSession) {
+      const user = localSession?.user || null;
+      const email = getUserEmail(user);
+      const isAdmin = adminEmails.includes(email);
+      applySignedInState(function (event) {
+        event.preventDefault();
+        window.__authSync?.clearAll?.();
+        location.reload();
+      }, isAdmin);
+      return;
+    }
+
+    applySignedOutState();
   }
 
   initMenuToggle();
