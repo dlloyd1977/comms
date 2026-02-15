@@ -51,9 +51,9 @@
 
 | Class Tokens | Count |
 |---|---:|
-| menu-link | 426 |
+| menu-link | 418 |
 | menu-link is-hidden | 44 |
-| menu-link admin-only is-hidden | 36 |
+| menu-link admin-only is-hidden | 44 |
 | button secondary | 32 |
 | menu-link menu-sessions-trigger | 22 |
 | button secondary is-hidden | 18 |

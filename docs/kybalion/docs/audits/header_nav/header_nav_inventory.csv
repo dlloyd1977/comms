@@ -476,106 +476,106 @@ docs/templates/index.html,60,a,Session 12,/kybalion/docs/session-12/,,menu-link,
 docs/templates/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
 docs/templates/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/templates/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
-index.html,319,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
-index.html,332,a,Home,/,,menu-link,yes,no,header_menu
-index.html,333,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
-index.html,334,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
-index.html,335,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
-index.html,336,a,Sign In / Create Account,/auth/login?redirect=/kybalion/,menuAuthLink,menu-link,yes,no,header_menu
-index.html,337,a,Change Password,/app/user-settings,menuChangePasswordLink,menu-link is-hidden,yes,no,header_menu
-index.html,338,button,Log Out,menuSignOutLink,menuSignOutLink,menu-link is-hidden,yes,no,header_menu
-index.html,342,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
-index.html,344,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
-index.html,348,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
-index.html,349,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
-index.html,350,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
-index.html,351,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
-index.html,352,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
-index.html,353,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
-index.html,354,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
-index.html,355,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
-index.html,356,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
-index.html,357,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
-index.html,358,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
-index.html,359,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
-index.html,362,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
-index.html,363,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
-index.html,364,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
-invite1/index.html,227,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
-invite1/index.html,240,a,Home,/,,menu-link,yes,no,header_menu
-invite1/index.html,241,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
-invite1/index.html,242,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
-invite1/index.html,243,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
-invite1/index.html,244,a,Sign In / Create Account,/auth/login?redirect=/kybalion/invite1/,menuAuthLink,menu-link,yes,no,header_menu
-invite1/index.html,245,a,Change Password,/app/user-settings,menuChangePasswordLink,menu-link is-hidden,yes,no,header_menu
-invite1/index.html,246,button,Log Out,menuSignOutLink,menuSignOutLink,menu-link is-hidden,yes,no,header_menu
-invite1/index.html,250,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
-invite1/index.html,252,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
-invite1/index.html,256,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
-invite1/index.html,257,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
-invite1/index.html,258,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
-invite1/index.html,259,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
-invite1/index.html,260,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
-invite1/index.html,261,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
-invite1/index.html,262,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
-invite1/index.html,263,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
-invite1/index.html,264,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
-invite1/index.html,265,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
-invite1/index.html,266,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
-invite1/index.html,267,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
-invite1/index.html,270,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
-invite1/index.html,271,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
-invite1/index.html,272,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
-invite2/index.html,297,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
-invite2/index.html,310,a,Home,/,,menu-link,yes,no,header_menu
-invite2/index.html,311,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
-invite2/index.html,312,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
-invite2/index.html,313,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
-invite2/index.html,314,a,Sign In / Create Account,/auth/login?redirect=/kybalion/invite2/,menuAuthLink,menu-link,yes,no,header_menu
-invite2/index.html,315,a,Change Password,/app/user-settings,menuChangePasswordLink,menu-link is-hidden,yes,no,header_menu
-invite2/index.html,316,button,Log Out,menuSignOutLink,menuSignOutLink,menu-link is-hidden,yes,no,header_menu
-invite2/index.html,320,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
-invite2/index.html,322,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
-invite2/index.html,326,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
-invite2/index.html,327,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
-invite2/index.html,328,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
-invite2/index.html,329,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
-invite2/index.html,330,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
-invite2/index.html,331,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
-invite2/index.html,332,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
-invite2/index.html,333,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
-invite2/index.html,334,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
-invite2/index.html,335,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
-invite2/index.html,336,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
-invite2/index.html,337,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
-invite2/index.html,340,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
-invite2/index.html,341,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
-invite2/index.html,342,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
-quick/index.html,227,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
-quick/index.html,240,a,Home,/,,menu-link,yes,no,header_menu
-quick/index.html,241,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
-quick/index.html,242,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
-quick/index.html,243,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
-quick/index.html,244,a,Sign In / Create Account,/auth/login?redirect=/kybalion/quick/,menuAuthLink,menu-link,yes,no,header_menu
-quick/index.html,245,a,Change Password,/app/user-settings,menuChangePasswordLink,menu-link is-hidden,yes,no,header_menu
-quick/index.html,246,button,Log Out,menuSignOutLink,menuSignOutLink,menu-link is-hidden,yes,no,header_menu
-quick/index.html,250,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
-quick/index.html,252,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
-quick/index.html,256,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
-quick/index.html,257,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
-quick/index.html,258,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
-quick/index.html,259,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
-quick/index.html,260,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
-quick/index.html,261,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
-quick/index.html,262,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
-quick/index.html,263,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
-quick/index.html,264,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
-quick/index.html,265,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
-quick/index.html,266,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
-quick/index.html,267,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
-quick/index.html,270,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
-quick/index.html,271,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
-quick/index.html,272,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
+index.html,321,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
+index.html,334,a,Home,/,,menu-link,yes,no,header_menu
+index.html,335,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
+index.html,336,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
+index.html,337,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
+index.html,338,a,Sign In / Create Account,/auth/login?redirect=/kybalion/,menuAuthLink,menu-link,yes,no,header_menu
+index.html,339,a,Change Password,/app/user-settings,menuChangePasswordLink,menu-link is-hidden,yes,no,header_menu
+index.html,340,button,Log Out,menuSignOutLink,menuSignOutLink,menu-link is-hidden,yes,no,header_menu
+index.html,344,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
+index.html,346,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
+index.html,350,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
+index.html,351,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
+index.html,352,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
+index.html,353,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
+index.html,354,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
+index.html,355,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
+index.html,356,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
+index.html,357,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
+index.html,358,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
+index.html,359,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
+index.html,360,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
+index.html,361,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
+index.html,364,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
+index.html,365,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
+index.html,366,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
+invite1/index.html,229,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
+invite1/index.html,242,a,Home,/,,menu-link,yes,no,header_menu
+invite1/index.html,243,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
+invite1/index.html,244,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
+invite1/index.html,245,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
+invite1/index.html,246,a,Sign In / Create Account,/auth/login?redirect=/kybalion/invite1/,menuAuthLink,menu-link,yes,no,header_menu
+invite1/index.html,247,a,Change Password,/app/user-settings,menuChangePasswordLink,menu-link is-hidden,yes,no,header_menu
+invite1/index.html,248,button,Log Out,menuSignOutLink,menuSignOutLink,menu-link is-hidden,yes,no,header_menu
+invite1/index.html,252,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
+invite1/index.html,254,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
+invite1/index.html,258,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
+invite1/index.html,259,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
+invite1/index.html,260,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
+invite1/index.html,261,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
+invite1/index.html,262,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
+invite1/index.html,263,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
+invite1/index.html,264,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
+invite1/index.html,265,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
+invite1/index.html,266,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
+invite1/index.html,267,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
+invite1/index.html,268,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
+invite1/index.html,269,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
+invite1/index.html,272,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
+invite1/index.html,273,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
+invite1/index.html,274,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
+invite2/index.html,299,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
+invite2/index.html,312,a,Home,/,,menu-link,yes,no,header_menu
+invite2/index.html,313,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
+invite2/index.html,314,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
+invite2/index.html,315,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
+invite2/index.html,316,a,Sign In / Create Account,/auth/login?redirect=/kybalion/invite2/,menuAuthLink,menu-link,yes,no,header_menu
+invite2/index.html,317,a,Change Password,/app/user-settings,menuChangePasswordLink,menu-link is-hidden,yes,no,header_menu
+invite2/index.html,318,button,Log Out,menuSignOutLink,menuSignOutLink,menu-link is-hidden,yes,no,header_menu
+invite2/index.html,322,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
+invite2/index.html,324,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
+invite2/index.html,328,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
+invite2/index.html,329,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
+invite2/index.html,330,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
+invite2/index.html,331,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
+invite2/index.html,332,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
+invite2/index.html,333,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
+invite2/index.html,334,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
+invite2/index.html,335,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
+invite2/index.html,336,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
+invite2/index.html,337,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
+invite2/index.html,338,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
+invite2/index.html,339,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
+invite2/index.html,342,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
+invite2/index.html,343,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
+invite2/index.html,344,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
+quick/index.html,229,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
+quick/index.html,242,a,Home,/,,menu-link,yes,no,header_menu
+quick/index.html,243,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
+quick/index.html,244,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
+quick/index.html,245,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
+quick/index.html,246,a,Sign In / Create Account,/auth/login?redirect=/kybalion/quick/,menuAuthLink,menu-link,yes,no,header_menu
+quick/index.html,247,a,Change Password,/app/user-settings,menuChangePasswordLink,menu-link is-hidden,yes,no,header_menu
+quick/index.html,248,button,Log Out,menuSignOutLink,menuSignOutLink,menu-link is-hidden,yes,no,header_menu
+quick/index.html,252,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
+quick/index.html,254,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
+quick/index.html,258,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
+quick/index.html,259,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
+quick/index.html,260,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
+quick/index.html,261,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
+quick/index.html,262,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
+quick/index.html,263,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
+quick/index.html,264,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
+quick/index.html,265,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
+quick/index.html,266,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
+quick/index.html,267,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
+quick/index.html,268,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
+quick/index.html,269,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
+quick/index.html,272,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
+quick/index.html,273,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
+quick/index.html,274,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 reader.html,44,button,Profile,headerProfileBtn,headerProfileBtn,button secondary is-hidden,no,no,header
 reader.html,46,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 reader.html,57,a,Home,/,,menu-link,yes,no,header_menu
