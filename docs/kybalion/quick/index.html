@@ -216,7 +216,10 @@
       }
     </style>
   </head>
-  <body>
+  <body
+    data-supabase-url="https://xcopajcpimrsqcqhydug.supabase.co"
+    data-supabase-anon-key="sb_publishable_pGN0njb-9XysERIUFiYtPg_NbAQuZGT"
+  >
     <div class="page-wrap">
       <header class="topbar">
         <p class="brand">The Kybalion</p>
@@ -238,7 +241,7 @@
               <a class="menu-link" href="/kybalion/">Kybalion Home</a>
               <a class="menu-link" href="/kybalion/reader.html">Reader</a>
               <a class="menu-link" href="/kybalion/docs/">Document Library</a>
-              <a class="menu-link" href="/auth/login?redirect=/kybalion/quick/">Sign In / Create Account</a>
+              <a class="menu-link" href="/auth/login?redirect=/kybalion/quick/" id="menuAuthLink">Sign In / Create Account</a>
               <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
               <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
             </div>
@@ -307,40 +310,8 @@
         </div>
       </div>
     </div>
-    <script>
-      (function () {
-        const menuBtn = document.getElementById("menuBtn");
-        const menuPanel = document.getElementById("menuPanel");
-        const menuSessionsBtn = document.getElementById("menuSessionsBtn");
-        const menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
-
-        if (!menuBtn || !menuPanel) {
-          return;
-        }
-
-        function closeMenu() {
-          menuPanel.classList.add("is-hidden");
-          menuBtn.setAttribute("aria-expanded", "false");
-        }
-
-        menuBtn.addEventListener("click", function () {
-          const willOpen = menuPanel.classList.contains("is-hidden");
-          menuPanel.classList.toggle("is-hidden", !willOpen);
-          menuBtn.setAttribute("aria-expanded", willOpen ? "true" : "false");
-        });
-
-        document.addEventListener("click", function (event) {
-          if (!menuPanel.contains(event.target) && event.target !== menuBtn) {
-            closeMenu();
-          }
-        });
-
-        if (menuSessionsBtn && menuSessionsFlyout) {
-          menuSessionsBtn.addEventListener("click", function () {
-            menuSessionsFlyout.classList.toggle("is-hidden");
-          });
-        }
-      })();
-    </script>
+    <script src="/kybalion/auth-sync.js?v=3.7.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/kybalion/menu-shell.js?v=3.7.0"></script>
   </body>
 </html>
