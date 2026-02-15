@@ -17,6 +17,7 @@
   - Pages scanned: 22
   - Header/menu controls found: 618
   - Pages without header/menu controls: 0
+- Additional contract checks now enforced in audit output: global Main Menu presence, admin-only tagging for `Assets`/`Master Documents`, top-level auth-runtime wiring parity, and menu ordering contract (`Navigation/Documents/session sequence`).
 
 ## Priority Actions (Kickoff)
 
