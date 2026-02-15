@@ -180,6 +180,13 @@ def parse_controls(file_path: Path) -> list[dict[str, str]]:
 			"line": str(element.line),
 			"control_type": element.tag,
 			"label": label,
+			"text": element.text(),
+			"title": element.attrs.get("title", ""),
+			"aria_label": element.attrs.get("aria-label", ""),
+			"role": element.attrs.get("role", ""),
+			"aria_controls": element.attrs.get("aria-controls", ""),
+			"aria_expanded": element.attrs.get("aria-expanded", ""),
+			"aria_haspopup": element.attrs.get("aria-haspopup", ""),
 			"target": element.attrs.get("href", "") or element.attrs.get("id", ""),
 			"id": element.attrs.get("id", ""),
 			"classes": " ".join(class_tokens(element.attrs)),
@@ -203,6 +210,13 @@ def write_csv(rows: list[dict[str, str]]) -> None:
 		"line",
 		"control_type",
 		"label",
+		"text",
+		"title",
+		"aria_label",
+		"role",
+		"aria_controls",
+		"aria_expanded",
+		"aria_haspopup",
 		"target",
 		"id",
 		"classes",
@@ -214,6 +228,134 @@ def write_csv(rows: list[dict[str, str]]) -> None:
 		writer = csv.DictWriter(handle, fieldnames=fieldnames)
 		writer.writeheader()
 		writer.writerows(rows)
+
+
+STRICT_IDENTITY_FIELDS = [
+	"control_type",
+	"label",
+	"text",
+	"title",
+	"aria_label",
+	"role",
+	"aria_controls",
+	"aria_expanded",
+	"aria_haspopup",
+	"target",
+	"id",
+	"classes",
+	"is_menu_item",
+	"is_dropdown_trigger",
+	"placement",
+]
+
+
+def has_class_token(classes_blob: str, token: str) -> bool:
+	return token in classes_blob.split()
+
+
+def row_is_doc_menu_link(row: dict[str, str]) -> bool:
+	if row.get("control_type") not in {"a", "button"}:
+		return False
+	if not has_class_token(row.get("classes", ""), "menu-link"):
+		return False
+	excluded_ids = {
+		"menuSessionsBtn",
+		"menuAuthLink",
+		"menuChangePasswordLink",
+		"menuSignOutLink",
+	}
+	if row.get("id") in excluded_ids:
+		return False
+	if has_class_token(row.get("classes", ""), "menu-sessions-trigger"):
+		return False
+	return True
+
+
+def strict_canonical_name_for_row(row: dict[str, str]) -> str | None:
+	row_id = row.get("id", "")
+	row_type = row.get("control_type", "")
+
+	if row_id == "menuBtn" and row_type == "button":
+		return "main_menu_button_1"
+	if row_id == "menuSessionsBtn" and row_type == "button":
+		return "sessions_trigger_1"
+	if row_id in {"menuAuthLink", "menuChangePasswordLink", "menuSignOutLink"} and row_type in {"a", "button"}:
+		return "auth_menu_link_1"
+	if row_id in {"headerUploadBtn", "headerNewFolderBtn", "uploadInput"} and row_type in {"button", "input"}:
+		return "docs_admin_action_button_1"
+	if row_id in {"headerProfileBtn", "headerSignOutBtn"} and row_type == "button":
+		return "reader_profile_button_1"
+	if row_is_doc_menu_link(row):
+		return "doc_menu_link_1"
+	return None
+
+
+def signature_for_row(row: dict[str, str]) -> tuple[str, ...]:
+	return tuple(row.get(field, "") for field in STRICT_IDENTITY_FIELDS)
+
+
+def format_signature_summary(signature: tuple[str, ...]) -> str:
+	parts: list[str] = []
+	for field, value in zip(STRICT_IDENTITY_FIELDS, signature):
+		if value:
+			parts.append(f"{field}={value}")
+	return "; ".join(parts)
+
+
+def collect_strict_identity_variants(rows: list[dict[str, str]]) -> list[dict[str, object]]:
+	base_to_rows: dict[str, list[dict[str, str]]] = defaultdict(list)
+	for row in rows:
+		base_name = strict_canonical_name_for_row(row)
+		if base_name:
+			base_to_rows[base_name].append(row)
+
+	ordered_bases = [
+		"main_menu_button_1",
+		"doc_menu_link_1",
+		"sessions_trigger_1",
+		"auth_menu_link_1",
+		"docs_admin_action_button_1",
+		"reader_profile_button_1",
+	]
+
+	results: list[dict[str, object]] = []
+	for base_name in ordered_bases:
+		matched_rows = base_to_rows.get(base_name, [])
+		signature_groups: dict[tuple[str, ...], list[dict[str, str]]] = defaultdict(list)
+		for row in matched_rows:
+			signature_groups[signature_for_row(row)].append(row)
+
+		sorted_groups = sorted(
+			signature_groups.items(),
+			key=lambda item: (-len(item[1]), item[0]),
+		)
+
+		variants: list[dict[str, object]] = []
+		for index, (signature, group_rows) in enumerate(sorted_groups, start=1):
+			auto_name = base_name if index == 1 else f"{base_name}_v{index}"
+			pages = sorted({row["file"] for row in group_rows})
+			variant = {
+				"name": auto_name,
+				"count": len(group_rows),
+				"pages": pages,
+				"signature": signature,
+				"signature_summary": format_signature_summary(signature),
+				"sample_label": group_rows[0].get("label", ""),
+				"sample_id": group_rows[0].get("id", ""),
+				"sample_classes": group_rows[0].get("classes", ""),
+			}
+			variants.append(variant)
+
+		result = {
+			"base_name": base_name,
+			"match_count": len(matched_rows),
+			"variant_count": len(sorted_groups),
+			"strict_status": "PASS" if len(sorted_groups) <= 1 else "MISMATCH",
+			"variants": variants,
+		}
+		results.append(result)
+
+	return results
 
 
 def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
@@ -251,6 +393,42 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 	lines.append("| `reader_profile_button_1` | Reader account/profile action controls | Reader header controls area |")
 	lines.append("- Reference glossary definitions: [Header Navigation Cleanup Plan — Control Glossary](header_nav_cleanup_plan.md#control-glossary).")
 	lines.append("")
+
+	strict_identity = collect_strict_identity_variants(rows)
+	lines.append("## Strict Canonical Identity Enforcement")
+	lines.append("")
+	lines.append("- Policy: canonical names are treated as strict identity names in this audit. All fields in the strict fingerprint must match exactly, otherwise variants are auto-renamed for uniqueness.")
+	lines.append(f"- Strict fingerprint fields: {', '.join(STRICT_IDENTITY_FIELDS)}")
+	lines.append("")
+	lines.append("| Base Canonical Name | Matched Controls | Unique Signatures | Strict Status |")
+	lines.append("|---|---:|---:|---|")
+	for entry in strict_identity:
+		lines.append(
+			f"| {entry['base_name']} | {entry['match_count']} | {entry['variant_count']} | {entry['strict_status']} |"
+		)
+	lines.append("")
+
+	mismatch_entries = [entry for entry in strict_identity if entry["strict_status"] == "MISMATCH"]
+	if mismatch_entries:
+		lines.append("### Auto-Rename Variants (Strict Mismatches)")
+		lines.append("")
+		for entry in mismatch_entries:
+			lines.append(f"#### {entry['base_name']}")
+			lines.append("")
+			lines.append("| Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |")
+			lines.append("|---|---:|---:|---|---|---|")
+			for variant in entry["variants"]:
+				lines.append(
+					f"| {variant['name']} | {variant['count']} | {len(variant['pages'])} | {variant['sample_label'] or '(none)'} | {variant['sample_id'] or '(none)'} | {variant['sample_classes'] or '(none)'} |"
+				)
+			lines.append("")
+			lines.append("- Signature details:")
+			for variant in entry["variants"]:
+				lines.append(f"  - `{variant['name']}`: {variant['signature_summary']}")
+			lines.append("")
+	else:
+		lines.append("- No strict mismatches found. Canonical controls currently resolve to one unique signature each.")
+		lines.append("")
 
 	lines.append("## Control Frequency")
 	lines.append("")
