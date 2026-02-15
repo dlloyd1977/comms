@@ -11,6 +11,10 @@
 2. Standardize control class/style patterns for shared controls.
 3. Decide and document intentional no-header behavior for invite/quick pages.
 
+## Naming Contract
+- `main_menu_button_1` is the canonical name for the shared Kybalion Main Menu button pattern (`#menuBtn` + `#menuPanel`) used across hub, invite, quick, docs, and reader experiences.
+- All future menu-button design references in audit/cleanup notes should use `main_menu_button_1` as the baseline contract name.
+
 ## Current Status
 - Status: Phase 1 cleanup complete for structural header/menu standardization.
 - Latest audit snapshot:
