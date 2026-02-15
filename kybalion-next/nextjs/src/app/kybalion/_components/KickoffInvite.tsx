@@ -15,9 +15,9 @@ export default function KickoffInvite() {
         respond to life with more intention.
       </p>
       <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-        <p className="font-semibold text-slate-900">Session 2</p>
-        <p>Saturday, March 7, 2026</p>
-        <p>3:00 PM Eastern Time (US) · Online via Zoom</p>
+        <p className="font-semibold text-slate-900">Kick-off meeting</p>
+        <p>Saturday, February 7, 2026</p>
+        <p>Online via Zoom</p>
       </div>
       <p className="font-semibold text-slate-900">What to bring</p>
       <ul className="list-disc space-y-2 pl-6 text-slate-700">
