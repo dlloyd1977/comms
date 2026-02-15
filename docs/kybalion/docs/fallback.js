@@ -16,6 +16,18 @@
   var menuSessionsBtn = document.getElementById("menuSessionsBtn");
   var menuSessionsFlyout = document.getElementById("menuSessionsFlyout");
 
+  function setFallbackSessionsFlyoutOpen(open) {
+    if (!menuSessionsBtn || !menuSessionsFlyout) return;
+    menuSessionsFlyout.classList.toggle("is-hidden", !open);
+    menuSessionsBtn.setAttribute("aria-expanded", String(open));
+  }
+
+  function initFallbackSessionsFlyoutAria() {
+    if (!menuSessionsBtn || !menuSessionsFlyout) return;
+    menuSessionsBtn.setAttribute("aria-controls", "menuSessionsFlyout");
+    menuSessionsBtn.setAttribute("aria-expanded", "false");
+  }
+
   if (menuBtn && menuPanel) {
     menuBtn.addEventListener("click", function (e) {
       if (window.__adminModuleLoaded) return;
@@ -46,10 +58,12 @@
 
   // ── Sessions flyout ──
   if (menuSessionsBtn && menuSessionsFlyout) {
+    initFallbackSessionsFlyoutAria();
     menuSessionsBtn.addEventListener("click", function (e) {
       if (window.__adminModuleLoaded) return;
       e.stopPropagation();
-      menuSessionsFlyout.classList.toggle("is-hidden");
+      var willOpen = menuSessionsFlyout.classList.contains("is-hidden");
+      setFallbackSessionsFlyoutOpen(willOpen);
     });
   }
 

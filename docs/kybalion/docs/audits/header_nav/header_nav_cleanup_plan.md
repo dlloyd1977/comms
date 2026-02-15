@@ -19,6 +19,7 @@
   - Pages without header/menu controls: 0
 - Additional contract checks now enforced in audit output: global Main Menu presence, admin-only tagging for `Assets`/`Master Documents`, top-level auth-runtime wiring parity, and menu ordering contract (`Navigation/Documents/session sequence`).
 - Additional accessibility/semantic contract now enforced in audit output: exact `menu-title` section labels (`Navigation`, `Documents`) and ARIA parity between `#menuBtn` and `#menuPanel` (`aria-controls`, `aria-haspopup`, `aria-expanded`, `role=menu`, `aria-label=Documents`).
+- Additional sessions accessibility contract now enforced in audit output: `#menuSessionsBtn` ↔ `#menuSessionsFlyout` linkage with `aria-controls="menuSessionsFlyout"` and synchronized `aria-expanded` state across top-level, docs, and reader runtimes.
 
 ## Priority Actions (Kickoff)
 
