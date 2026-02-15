@@ -27,7 +27,7 @@
 | doc_menu_link_1 | 440 | 40 | MISMATCH |
 | sessions_trigger_1 | 22 | 2 | MISMATCH |
 | auth_menu_link_1 | 66 | 26 | MISMATCH |
-| docs_admin_action_button_1 | 51 | 3 | MISMATCH |
+| docs_admin_action_button_1 | 51 | 6 | MISMATCH |
 | reader_profile_button_1 | 1 | 1 | PASS |
 
 ### Permanent Variant Names (Strict Mismatches)
@@ -36,57 +36,57 @@
 
 | Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |
 |---|---:|---:|---|---|---|
-| main_menu_button_docs_header_actions | 18 | 18 | Main Menu | menuBtn | button secondary |
-| main_menu_button_topbar | 4 | 4 | Main Menu | menuBtn | button secondary |
+| main_menu_button_docs_header_actions | 17 | 17 | Main Menu | menuBtn | button secondary |
+| menu_button_1 | 5 | 5 | Main Menu | menuBtn | button secondary |
 
 - Signature details:
   - `main_menu_button_docs_header_actions`: control_type=button; label=Main Menu; text=Main Menu; aria_controls=menuPanel; aria_expanded=false; aria_haspopup=true; target=menuBtn; id=menuBtn; classes=button secondary; context_signature=html body header page-header div header-content div header-actions div menu-wrapper button button secondary menubtn; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `main_menu_button_topbar`: control_type=button; label=Main Menu; text=Main Menu; aria_controls=menuPanel; aria_expanded=false; aria_haspopup=true; target=menuBtn; id=menuBtn; classes=button secondary; context_signature=html body div page-wrap header topbar div menu-wrapper button button secondary menubtn; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `menu_button_1`: control_type=button; label=Main Menu; text=Main Menu; aria_controls=menuPanel; aria_expanded=false; aria_haspopup=true; target=menuBtn; id=menuBtn; classes=button secondary; context_signature=html body div page-wrap header topbar div menu-wrapper button button secondary menubtn; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
 
 #### doc_menu_link_1
 
 | Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |
 |---|---:|---:|---|---|---|
-| doc_menu_link_assets | 18 | 18 | Assets | (none) | menu-link admin-only is-hidden |
-| doc_menu_link_document_library | 18 | 18 | Document Library | (none) | menu-link |
-| doc_menu_link_general | 18 | 18 | General | (none) | menu-link |
-| doc_menu_link_home | 18 | 18 | Home | (none) | menu-link |
-| doc_menu_link_kybalion_home | 18 | 18 | Kybalion Home | (none) | menu-link |
-| doc_menu_link_master_documents | 18 | 18 | Master Documents | (none) | menu-link admin-only is-hidden |
-| doc_menu_link_reader | 18 | 18 | Reader | (none) | menu-link |
-| doc_menu_link_session_1 | 18 | 18 | Session 1 | (none) | menu-link |
-| doc_menu_link_session_10 | 18 | 18 | Session 10 | (none) | menu-link |
-| doc_menu_link_session_11 | 18 | 18 | Session 11 | (none) | menu-link |
-| doc_menu_link_session_12 | 18 | 18 | Session 12 | (none) | menu-link |
-| doc_menu_link_session_2 | 18 | 18 | Session 2 | (none) | menu-link |
-| doc_menu_link_session_3 | 18 | 18 | Session 3 | (none) | menu-link |
-| doc_menu_link_session_4 | 18 | 18 | Session 4 | (none) | menu-link |
-| doc_menu_link_session_5 | 18 | 18 | Session 5 | (none) | menu-link |
-| doc_menu_link_session_6 | 18 | 18 | Session 6 | (none) | menu-link |
-| doc_menu_link_session_7 | 18 | 18 | Session 7 | (none) | menu-link |
-| doc_menu_link_session_8 | 18 | 18 | Session 8 | (none) | menu-link |
-| doc_menu_link_session_9 | 18 | 18 | Session 9 | (none) | menu-link |
-| doc_menu_link_templates | 18 | 18 | Templates | (none) | menu-link |
-| doc_menu_link_assets_6f3f30 | 4 | 4 | Assets | (none) | menu-link admin-only is-hidden |
-| doc_menu_link_document_library_d48bdb | 4 | 4 | Document Library | (none) | menu-link |
-| doc_menu_link_general_2e06b7 | 4 | 4 | General | (none) | menu-link |
-| doc_menu_link_home_c744a8 | 4 | 4 | Home | (none) | menu-link |
-| doc_menu_link_kybalion_home_5eba1b | 4 | 4 | Kybalion Home | (none) | menu-link |
-| doc_menu_link_master_documents_a25f72 | 4 | 4 | Master Documents | (none) | menu-link admin-only is-hidden |
-| doc_menu_link_reader_4d9073 | 4 | 4 | Reader | (none) | menu-link |
-| doc_menu_link_session_1_ef7726 | 4 | 4 | Session 1 | (none) | menu-link |
-| doc_menu_link_session_10_fa4588 | 4 | 4 | Session 10 | (none) | menu-link |
-| doc_menu_link_session_11_c23e39 | 4 | 4 | Session 11 | (none) | menu-link |
-| doc_menu_link_session_12_c94b4f | 4 | 4 | Session 12 | (none) | menu-link |
-| doc_menu_link_session_2_c4222a | 4 | 4 | Session 2 | (none) | menu-link |
-| doc_menu_link_session_3_4c45f6 | 4 | 4 | Session 3 | (none) | menu-link |
-| doc_menu_link_session_4_10aeee | 4 | 4 | Session 4 | (none) | menu-link |
-| doc_menu_link_session_5_87605e | 4 | 4 | Session 5 | (none) | menu-link |
-| doc_menu_link_session_6_39915e | 4 | 4 | Session 6 | (none) | menu-link |
-| doc_menu_link_session_7_9ac1e7 | 4 | 4 | Session 7 | (none) | menu-link |
-| doc_menu_link_session_8_2401a1 | 4 | 4 | Session 8 | (none) | menu-link |
-| doc_menu_link_session_9_8f1f6a | 4 | 4 | Session 9 | (none) | menu-link |
-| doc_menu_link_templates_358284 | 4 | 4 | Templates | (none) | menu-link |
+| doc_menu_link_assets | 17 | 17 | Assets | (none) | menu-link admin-only is-hidden |
+| doc_menu_link_document_library | 17 | 17 | Document Library | (none) | menu-link |
+| doc_menu_link_general | 17 | 17 | General | (none) | menu-link |
+| doc_menu_link_home | 17 | 17 | Home | (none) | menu-link |
+| doc_menu_link_kybalion_home | 17 | 17 | Kybalion Home | (none) | menu-link |
+| doc_menu_link_master_documents | 17 | 17 | Master Documents | (none) | menu-link admin-only is-hidden |
+| doc_menu_link_reader | 17 | 17 | Reader | (none) | menu-link |
+| doc_menu_link_session_1 | 17 | 17 | Session 1 | (none) | menu-link |
+| doc_menu_link_session_10 | 17 | 17 | Session 10 | (none) | menu-link |
+| doc_menu_link_session_11 | 17 | 17 | Session 11 | (none) | menu-link |
+| doc_menu_link_session_12 | 17 | 17 | Session 12 | (none) | menu-link |
+| doc_menu_link_session_2 | 17 | 17 | Session 2 | (none) | menu-link |
+| doc_menu_link_session_3 | 17 | 17 | Session 3 | (none) | menu-link |
+| doc_menu_link_session_4 | 17 | 17 | Session 4 | (none) | menu-link |
+| doc_menu_link_session_5 | 17 | 17 | Session 5 | (none) | menu-link |
+| doc_menu_link_session_6 | 17 | 17 | Session 6 | (none) | menu-link |
+| doc_menu_link_session_7 | 17 | 17 | Session 7 | (none) | menu-link |
+| doc_menu_link_session_8 | 17 | 17 | Session 8 | (none) | menu-link |
+| doc_menu_link_session_9 | 17 | 17 | Session 9 | (none) | menu-link |
+| doc_menu_link_templates | 17 | 17 | Templates | (none) | menu-link |
+| doc_menu_link_assets_6f3f30 | 5 | 5 | Assets | (none) | menu-link admin-only is-hidden |
+| doc_menu_link_document_library_d48bdb | 5 | 5 | Document Library | (none) | menu-link |
+| doc_menu_link_general_2e06b7 | 5 | 5 | General | (none) | menu-link |
+| doc_menu_link_home_c744a8 | 5 | 5 | Home | (none) | menu-link |
+| doc_menu_link_kybalion_home_5eba1b | 5 | 5 | Kybalion Home | (none) | menu-link |
+| doc_menu_link_master_documents_a25f72 | 5 | 5 | Master Documents | (none) | menu-link admin-only is-hidden |
+| doc_menu_link_reader_4d9073 | 5 | 5 | Reader | (none) | menu-link |
+| doc_menu_link_session_1_ef7726 | 5 | 5 | Session 1 | (none) | menu-link |
+| doc_menu_link_session_10_fa4588 | 5 | 5 | Session 10 | (none) | menu-link |
+| doc_menu_link_session_11_c23e39 | 5 | 5 | Session 11 | (none) | menu-link |
+| doc_menu_link_session_12_c94b4f | 5 | 5 | Session 12 | (none) | menu-link |
+| doc_menu_link_session_2_c4222a | 5 | 5 | Session 2 | (none) | menu-link |
+| doc_menu_link_session_3_4c45f6 | 5 | 5 | Session 3 | (none) | menu-link |
+| doc_menu_link_session_4_10aeee | 5 | 5 | Session 4 | (none) | menu-link |
+| doc_menu_link_session_5_87605e | 5 | 5 | Session 5 | (none) | menu-link |
+| doc_menu_link_session_6_39915e | 5 | 5 | Session 6 | (none) | menu-link |
+| doc_menu_link_session_7_9ac1e7 | 5 | 5 | Session 7 | (none) | menu-link |
+| doc_menu_link_session_8_2401a1 | 5 | 5 | Session 8 | (none) | menu-link |
+| doc_menu_link_session_9_8f1f6a | 5 | 5 | Session 9 | (none) | menu-link |
+| doc_menu_link_templates_358284 | 5 | 5 | Templates | (none) | menu-link |
 
 - Signature details:
   - `doc_menu_link_assets`: control_type=a; label=Assets; text=Assets; target=/kybalion/docs/assets/; classes=menu-link admin-only is-hidden; context_signature=html body header page-header div header-content div header-actions div menu-wrapper div menu-panel is-hidden menupanel div menu-section a menu-link admin-only is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
@@ -134,8 +134,8 @@
 
 | Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |
 |---|---:|---:|---|---|---|
-| sessions_trigger_button_menusessionsbtn | 18 | 18 | Sessions ▸ | menuSessionsBtn | menu-link menu-sessions-trigger |
-| sessions_trigger_button_menusessionsbtn_5c3df7 | 4 | 4 | Sessions ▸ | menuSessionsBtn | menu-link menu-sessions-trigger |
+| sessions_trigger_button_menusessionsbtn | 17 | 17 | Sessions ▸ | menuSessionsBtn | menu-link menu-sessions-trigger |
+| sessions_trigger_button_menusessionsbtn_5c3df7 | 5 | 5 | Sessions ▸ | menuSessionsBtn | menu-link menu-sessions-trigger |
 
 - Signature details:
   - `sessions_trigger_button_menusessionsbtn`: control_type=button; label=Sessions ▸; text=Sessions ▸; target=menuSessionsBtn; id=menuSessionsBtn; classes=menu-link menu-sessions-trigger; context_signature=html body header page-header div header-content div header-actions div menu-wrapper div menu-panel is-hidden menupanel div menu-section div menu-sessions-wrapper button menu-link menu-sessions-trigger menusessionsbtn; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
@@ -145,10 +145,10 @@
 
 | Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |
 |---|---:|---:|---|---|---|
-| auth_menu_change_password_link | 18 | 18 | Change Password | menuChangePasswordLink | menu-link is-hidden |
-| auth_menu_sign_out_button | 18 | 18 | Log Out | menuSignOutLink | menu-link is-hidden |
-| auth_menu_change_password_link_31960a | 4 | 4 | Change Password | menuChangePasswordLink | menu-link is-hidden |
-| auth_menu_sign_out_button_d61cea | 4 | 4 | Log Out | menuSignOutLink | menu-link is-hidden |
+| auth_menu_change_password_link | 17 | 17 | Change Password | menuChangePasswordLink | menu-link is-hidden |
+| auth_menu_sign_out_button | 17 | 17 | Log Out | menuSignOutLink | menu-link is-hidden |
+| auth_menu_change_password_link_31960a | 5 | 5 | Change Password | menuChangePasswordLink | menu-link is-hidden |
+| auth_menu_sign_out_button_d61cea | 5 | 5 | Log Out | menuSignOutLink | menu-link is-hidden |
 | auth_menu_sign_in_redirect_kybalion | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
 | auth_menu_sign_in_redirect_kybalion_docs | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
 | auth_menu_sign_in_redirect_kybalion_docs_assets | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
@@ -178,7 +178,7 @@
   - `auth_menu_change_password_link_31960a`: control_type=a; label=Change Password; text=Change Password; target=/app/user-settings; id=menuChangePasswordLink; classes=menu-link is-hidden; context_signature=html body div page-wrap header topbar div menu-wrapper div menu-panel is-hidden menupanel div menu-section a menu-link is-hidden menuchangepasswordlink; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
   - `auth_menu_sign_out_button_d61cea`: control_type=button; label=Log Out; text=Log Out; target=menuSignOutLink; id=menuSignOutLink; classes=menu-link is-hidden; context_signature=html body div page-wrap header topbar div menu-wrapper div menu-panel is-hidden menupanel div menu-section button menu-link is-hidden menusignoutlink; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
   - `auth_menu_sign_in_redirect_kybalion`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/; id=menuAuthLink; classes=menu-link; context_signature=html body div page-wrap header topbar div menu-wrapper div menu-panel is-hidden menupanel div menu-section a menu-link menuauthlink; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_sign_in_redirect_kybalion_docs`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/; id=menuAuthLink; classes=menu-link; context_signature=html body header page-header div header-content div header-actions div menu-wrapper div menu-panel is-hidden menupanel div menu-section a menu-link menuauthlink; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/; id=menuAuthLink; classes=menu-link; context_signature=html body div page-wrap header topbar div menu-wrapper div menu-panel is-hidden menupanel div menu-section a menu-link menuauthlink; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
   - `auth_menu_sign_in_redirect_kybalion_docs_assets`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/assets/; id=menuAuthLink; classes=menu-link; context_signature=html body header page-header div header-content div header-actions div menu-wrapper div menu-panel is-hidden menupanel div menu-section a menu-link menuauthlink; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
   - `auth_menu_sign_in_redirect_kybalion_docs_general`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/general/; id=menuAuthLink; classes=menu-link; context_signature=html body header page-header div header-content div header-actions div menu-wrapper div menu-panel is-hidden menupanel div menu-section a menu-link menuauthlink; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
   - `auth_menu_sign_in_redirect_kybalion_docs_master_docs`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/master-docs/; id=menuAuthLink; classes=menu-link; context_signature=html body header page-header div header-content div header-actions div menu-wrapper div menu-panel is-hidden menupanel div menu-section a menu-link menuauthlink; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
@@ -204,14 +204,20 @@
 
 | Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |
 |---|---:|---:|---|---|---|
-| docs_admin_new_folder_button | 17 | 17 | + New | headerNewFolderBtn | button secondary is-hidden |
-| docs_admin_upload_button | 17 | 17 | Upload | headerUploadBtn | button primary is-hidden |
-| docs_admin_upload_input | 17 | 17 | input:file | uploadInput | file-input-hidden |
+| docs_admin_new_folder_button | 16 | 16 | + New | headerNewFolderBtn | button secondary is-hidden |
+| docs_admin_upload_button | 16 | 16 | Upload | headerUploadBtn | button primary is-hidden |
+| docs_admin_upload_input | 16 | 16 | input:file | uploadInput | file-input-hidden |
+| docs_admin_new_folder_button_ef3d1a | 1 | 1 | + New | headerNewFolderBtn | button secondary is-hidden |
+| docs_admin_upload_button_feaaf7 | 1 | 1 | Upload | headerUploadBtn | button primary is-hidden |
+| docs_admin_upload_input_07c76e | 1 | 1 | input:file | uploadInput | file-input-hidden |
 
 - Signature details:
   - `docs_admin_new_folder_button`: control_type=button; label=+ New; text=+ New; target=headerNewFolderBtn; id=headerNewFolderBtn; classes=button secondary is-hidden; context_signature=html body header page-header div header-content div header-actions button button secondary is-hidden headernewfolderbtn; is_menu_item=no; is_dropdown_trigger=no; placement=header
   - `docs_admin_upload_button`: control_type=button; label=Upload; text=Upload; target=headerUploadBtn; id=headerUploadBtn; classes=button primary is-hidden; context_signature=html body header page-header div header-content div header-actions button button primary is-hidden headeruploadbtn; is_menu_item=no; is_dropdown_trigger=no; placement=header
   - `docs_admin_upload_input`: control_type=input; label=input:file; target=uploadInput; id=uploadInput; classes=file-input-hidden; context_signature=html body header page-header div header-content div header-actions input file-input-hidden uploadinput; is_menu_item=no; is_dropdown_trigger=no; placement=header
+  - `docs_admin_new_folder_button_ef3d1a`: control_type=button; label=+ New; text=+ New; target=headerNewFolderBtn; id=headerNewFolderBtn; classes=button secondary is-hidden; context_signature=html body div page-wrap div docs-header-meta div header-actions button button secondary is-hidden headernewfolderbtn; is_menu_item=no; is_dropdown_trigger=no; placement=other
+  - `docs_admin_upload_button_feaaf7`: control_type=button; label=Upload; text=Upload; target=headerUploadBtn; id=headerUploadBtn; classes=button primary is-hidden; context_signature=html body div page-wrap div docs-header-meta div header-actions button button primary is-hidden headeruploadbtn; is_menu_item=no; is_dropdown_trigger=no; placement=other
+  - `docs_admin_upload_input_07c76e`: control_type=input; label=input:file; target=uploadInput; id=uploadInput; classes=file-input-hidden; context_signature=html body div page-wrap div docs-header-meta div header-actions input file-input-hidden uploadinput; is_menu_item=no; is_dropdown_trigger=no; placement=other
 
 ## Control Frequency
 
@@ -253,8 +259,8 @@
 | Placement | Count |
 |---|---:|
 | header_menu | 550 |
-| header | 63 |
-| other | 5 |
+| header | 60 |
+| other | 8 |
 
 ## Style Token Patterns
 

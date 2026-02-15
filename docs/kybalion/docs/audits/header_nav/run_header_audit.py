@@ -333,7 +333,7 @@ def friendly_variant_name(base_name: str, row: dict[str, str], signature: tuple[
 		if "header-actions" in context:
 			return "main_menu_button_docs_header_actions"
 		if "topbar" in context:
-			return "main_menu_button_topbar"
+			return "menu_button_1"
 		short_sig = hashlib.sha1("|".join(signature).encode("utf-8")).hexdigest()[:8]
 		return f"main_menu_button_context_{short_sig}"
 
