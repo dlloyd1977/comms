@@ -539,7 +539,7 @@ body.layout-freeform .controls [data-layout-key] {
 }
 
 .standard-toc {
-  max-height: calc(100vh - var(--header-offset, 200px) - 120px);
+  max-height: calc(100vh - var(--header-offset, 200px) - 24px);
 }
 
 .standard-tools {
@@ -631,7 +631,7 @@ body.layout-freeform .controls [data-layout-key] {
 }
 
 body[data-view-mode="standard"] .toc {
-  max-height: calc(100vh - var(--header-offset, 200px) - 120px);
+  max-height: calc(100vh - var(--header-offset, 200px) - 24px);
 }
 
 #toc,
