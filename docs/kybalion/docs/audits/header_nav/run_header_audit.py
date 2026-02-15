@@ -400,6 +400,60 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 		lines.append(
 			"- Top-level auth-runtime contract violations found: " + ", ".join(top_level_contract_violations)
 		)
+
+	navigation_sequence = ["home", "kybalion home", "reader", "document library"]
+	documents_sequence = ["general", "sessions ▸"]
+	session_sequence = [f"session {number}" for number in range(1, 13)]
+	documents_tail_sequence = ["templates", "assets", "master documents"]
+	ordering_violations: list[str] = []
+
+	for page in all_pages:
+		page_rows = page_to_rows.get(page, [])
+		ordered_labels = [normalize_label(row["label"]) for row in page_rows if row["label"].strip()]
+
+		def first_index(label: str) -> int:
+			try:
+				return ordered_labels.index(label)
+			except ValueError:
+				return -1
+
+		def require_increasing(page_name: str, labels: list[str], group_name: str) -> None:
+			indices: list[int] = []
+			for label in labels:
+				idx = first_index(label)
+				if idx == -1:
+					ordering_violations.append(f"{page_name} ({group_name} missing '{label}')")
+					return
+				indices.append(idx)
+			if any(indices[index] >= indices[index + 1] for index in range(len(indices) - 1)):
+				ordering_violations.append(
+					f"{page_name} ({group_name} out of order: {' -> '.join(labels)})"
+				)
+
+		require_increasing(page, navigation_sequence, "navigation sequence")
+		require_increasing(page, documents_sequence, "documents sequence")
+		require_increasing(page, session_sequence, "session sequence")
+		require_increasing(page, documents_tail_sequence, "documents tail sequence")
+
+		sessions_trigger_idx = first_index("sessions ▸")
+		templates_idx = first_index("templates")
+		if sessions_trigger_idx != -1 and templates_idx != -1 and sessions_trigger_idx >= templates_idx:
+			ordering_violations.append(f"{page} (sessions trigger must appear before templates)")
+
+		session_indices = [first_index(label) for label in session_sequence if first_index(label) != -1]
+		if sessions_trigger_idx != -1 and session_indices and min(session_indices) <= sessions_trigger_idx:
+			ordering_violations.append(f"{page} (session links must appear after sessions trigger)")
+		if templates_idx != -1 and session_indices and max(session_indices) >= templates_idx:
+			ordering_violations.append(f"{page} (session links must appear before templates)")
+
+	if not ordering_violations:
+		lines.append(
+			"- Menu ordering contract is consistent on all audited pages: Navigation (`Home → Kybalion Home → Reader → Document Library`) and Documents (`General → Sessions ▸ → Session 1..12 → Templates → Assets → Master Documents`)."
+		)
+	else:
+		lines.append(
+			"- Menu ordering contract violations found: " + ", ".join(ordering_violations)
+		)
 	lines.append("")
 
 	lines.append("## Cleanup Kickoff")
