@@ -275,138 +275,6 @@ function setMenuOpen(open) {
   if (!menuBtn || !menuPanel) return;
   menuPanel.classList.toggle("is-hidden", !open);
   menuBtn.setAttribute("aria-expanded", String(open));
-  if (!open) {
-    closeReaderSessionsFlyout();
-  }
-}
-
-function setReaderSessionsFlyoutOpen(open) {
-  if (!menuSessionsBtn || !menuSessionsFlyout) return;
-  menuSessionsFlyout.classList.toggle("is-hidden", !open);
-  menuSessionsBtn.setAttribute("aria-expanded", String(open));
-  if (open) {
-    window.requestAnimationFrame(() => {
-      focusFirstSessionsFlyoutItem();
-    });
-  }
-}
-
-function getSessionsFlyoutFocusableItems() {
-  if (!menuSessionsFlyout) return [];
-  return Array.from(menuSessionsFlyout.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'));
-}
-
-function focusFirstSessionsFlyoutItem() {
-  const items = getSessionsFlyoutFocusableItems();
-  if (items.length) {
-    items[0].focus();
-  }
-}
-
-function focusLastSessionsFlyoutItem() {
-  const items = getSessionsFlyoutFocusableItems();
-  if (items.length) {
-    items[items.length - 1].focus();
-  }
-}
-
-function moveSessionsFlyoutFocus(step) {
-  const items = getSessionsFlyoutFocusableItems();
-  if (!items.length) {
-    menuSessionsBtn?.focus();
-    return;
-  }
-
-  const active = document.activeElement;
-  const currentIndex = items.indexOf(active);
-  const startIndex = currentIndex === -1 ? 0 : currentIndex;
-  const nextIndex = (startIndex + step + items.length) % items.length;
-  items[nextIndex].focus();
-}
-
-function handleSessionsFlyoutRovingKey(event) {
-  if (!menuSessionsBtn || !menuSessionsFlyout) return;
-
-  if (event.key === "ArrowDown") {
-    event.preventDefault();
-    if (menuSessionsFlyout.classList.contains("is-hidden")) {
-      setReaderSessionsFlyoutOpen(true);
-    } else {
-      moveSessionsFlyoutFocus(1);
-    }
-    return;
-  }
-
-  if (event.key === "ArrowUp") {
-    event.preventDefault();
-    if (menuSessionsFlyout.classList.contains("is-hidden")) {
-      setReaderSessionsFlyoutOpen(true);
-      window.requestAnimationFrame(() => {
-        focusLastSessionsFlyoutItem();
-      });
-    } else {
-      moveSessionsFlyoutFocus(-1);
-    }
-    return;
-  }
-
-  if (menuSessionsFlyout.classList.contains("is-hidden")) return;
-
-  if (event.key === "Home") {
-    event.preventDefault();
-    focusFirstSessionsFlyoutItem();
-    return;
-  }
-
-  if (event.key === "End") {
-    event.preventDefault();
-    focusLastSessionsFlyoutItem();
-  }
-}
-
-function handleSessionsFlyoutTabKey(event) {
-  if (event.key !== "Tab" || !menuSessionsBtn || !menuSessionsFlyout) return;
-  if (menuSessionsFlyout.classList.contains("is-hidden")) return;
-
-  const items = getSessionsFlyoutFocusableItems();
-  if (!items.length) {
-    event.preventDefault();
-    menuSessionsBtn.focus();
-    return;
-  }
-
-  const first = items[0];
-  const last = items[items.length - 1];
-  const active = document.activeElement;
-
-  if (event.shiftKey) {
-    if (active === first || active === menuSessionsBtn) {
-      event.preventDefault();
-      last.focus();
-    }
-    return;
-  }
-
-  if (active === menuSessionsBtn || active === last) {
-    event.preventDefault();
-    first.focus();
-  }
-}
-
-function closeReaderSessionsFlyout(returnFocus = false) {
-  if (!menuSessionsBtn || !menuSessionsFlyout) return false;
-  const wasOpen = !menuSessionsFlyout.classList.contains("is-hidden");
-  setReaderSessionsFlyoutOpen(false);
-  if (returnFocus && wasOpen) {
-    menuSessionsBtn.focus();
-  }
-  return wasOpen;
-}
-
-function initReaderSessionsFlyoutAria() {
-  if (!menuSessionsBtn || !menuSessionsFlyout) return;
-  menuSessionsBtn.setAttribute("aria-controls", "menuSessionsFlyout");
-  menuSessionsBtn.setAttribute("aria-expanded", "false");
 }
 
 function getLayoutContainer() {
@@ -2210,22 +2078,6 @@ function findStanzaByRef(ref) {
   return null;
 }
 
-function getRequestedViewMode() {
-  try {
-    const params = new URLSearchParams(window.location.search || "");
-    const requested = (params.get("view") || "").trim().toLowerCase();
-    if (requested === "standard") {
-      return "standard";
-    }
-    if (requested === "stanza" || requested === "typography") {
-      return "typography";
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
-
 async function init() {
   try {
     const response = await fetch(DATA_URL, { cache: "no-store" });
@@ -2250,10 +2102,6 @@ async function init() {
       viewModeStandardBtn.setAttribute("aria-selected", String(isStandard));
       viewModeStanzaBtn.classList.toggle("is-active", !isStandard);
       viewModeStanzaBtn.setAttribute("aria-selected", String(!isStandard));
-    }
-    const requestedViewMode = getRequestedViewMode();
-    if (requestedViewMode) {
-      state.viewMode = requestedViewMode;
     }
     render();
     setViewMode(state.viewMode);
@@ -2390,49 +2238,38 @@ async function init() {
       });
       document.addEventListener("click", () => {
         setMenuOpen(false);
+        if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
       });
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
-          if (closeReaderSessionsFlyout(true)) {
-            event.preventDefault();
-            event.stopPropagation();
-            return;
-          }
           setMenuOpen(false);
-          menuBtn?.focus();
+          if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
         }
       });
     }
 
     // Sessions flyout sub-menu
     if (menuSessionsBtn && menuSessionsFlyout) {
-      initReaderSessionsFlyoutAria();
       let sessionsTimer = null;
       const sessionsWrapper = menuSessionsBtn.closest(".menu-sessions-wrapper");
 
-      menuSessionsBtn.addEventListener("keydown", handleSessionsFlyoutTabKey);
-      menuSessionsFlyout.addEventListener("keydown", handleSessionsFlyoutTabKey);
-      menuSessionsBtn.addEventListener("keydown", handleSessionsFlyoutRovingKey);
-      menuSessionsFlyout.addEventListener("keydown", handleSessionsFlyoutRovingKey);
-
       menuSessionsBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        const willOpen = menuSessionsFlyout.classList.contains("is-hidden");
-        setReaderSessionsFlyoutOpen(willOpen);
+        menuSessionsFlyout.classList.toggle("is-hidden");
       });
 
       if (sessionsWrapper) {
         sessionsWrapper.addEventListener("mouseenter", () => {
           clearTimeout(sessionsTimer);
-          setReaderSessionsFlyoutOpen(true);
+          menuSessionsFlyout.classList.remove("is-hidden");
         });
         sessionsWrapper.addEventListener("mouseleave", () => {
-          sessionsTimer = setTimeout(() => setReaderSessionsFlyoutOpen(false), 200);
+          sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
         });
       }
       menuSessionsFlyout.addEventListener("mouseenter", () => clearTimeout(sessionsTimer));
       menuSessionsFlyout.addEventListener("mouseleave", () => {
-        sessionsTimer = setTimeout(() => setReaderSessionsFlyoutOpen(false), 200);
+        sessionsTimer = setTimeout(() => menuSessionsFlyout.classList.add("is-hidden"), 200);
       });
     }
 
