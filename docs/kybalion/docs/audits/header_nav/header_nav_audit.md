@@ -183,6 +183,7 @@
 - All audited pages now include header/menu navigation controls.
 - `menu-link` is now the dominant shared control token across pages.
 - `Assets` and `Master Documents` are consistently tagged as `admin-only` across all audited pages.
+- Top-level pages (`index`, `invite1`, `invite2`, `quick`) consistently implement auth-runtime contract wiring (required auth control IDs/default visibility, Supabase data attributes, and shared `auth-sync.js` + `menu-shell.js` includes).
 
 ## Cleanup Kickoff
 
