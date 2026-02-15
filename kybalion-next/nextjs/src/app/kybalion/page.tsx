@@ -1,190 +1,121 @@
 import Link from "next/link";
-import StaticMainMenu from "@/components/StaticMainMenu";
+import AuthAwareButtons from "@/components/AuthAwareButtons";
 
 export default function KybalionHubPage() {
   return (
-    <div
-      className="min-h-screen text-[#1f1c1a]"
-      style={{ background: "#f6f4f1", fontFamily: "'Atkinson Hyperlegible', 'Iowan Old Style', Garamond, Palatino, serif" }}
-    >
-      {/* ── Sticky nav ──────────────────────────── */}
-      <nav
-        className="sticky top-0 z-50 border-b"
-        style={{
-          background: "linear-gradient(140deg, #f8f5f1 0%, #ebe5dd 100%)",
-          borderColor: "#e2ddd7",
-        }}
-      >
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.12em]" style={{ color: "#5b5450" }}>
-              Annotated Facilitator Edition
-            </p>
-            <p
-              className="text-xl font-semibold"
-              style={{ fontFamily: "'Cormorant Garamond', 'Times New Roman', serif", color: "#1f1c1a" }}
-            >
-              The Kybalion
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50 text-slate-900">
+      <div className="absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,_rgba(14,116,144,0.12),_transparent_60%)]" />
+      <div className="absolute right-10 top-16 h-40 w-40 rounded-full bg-sky-100 blur-3xl opacity-60" />
+
+      <nav className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-sm font-semibold text-white">
+              K
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Kybalion</p>
+              <p className="text-lg font-semibold text-slate-900">Invite + Resources</p>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <StaticMainMenu />
+            <Link
+              href="/"
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+            >
+              New home
+            </Link>
+            <Link
+              href="/kybalion/docs/"
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+            >
+              Document library
+            </Link>
+            <Link
+              href="/old/kybalion"
+              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+            >
+              Legacy reading view
+            </Link>
+            <AuthAwareButtons variant="nav" />
           </div>
         </div>
       </nav>
 
-      {/* ── Hero ────────────────────────────────── */}
-      <main className="mx-auto max-w-6xl px-6 pb-16 pt-10">
-        <section className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
-          {/* Hero card */}
-          <div
-            className="rounded-3xl border p-8"
-            style={{ background: "#ffffff", borderColor: "#e2ddd7", boxShadow: "0 12px 30px rgba(20,20,20,0.08)" }}
-          >
-            <p className="text-xs uppercase tracking-[0.18em]" style={{ color: "#5b5450" }}>
-              Universal Laws &amp; Principles
+      <main className="relative mx-auto max-w-6xl px-6 pb-16 pt-10">
+        <section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+          <div className="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.32em] text-slate-500">Annotated facilitator edition</p>
+            <h1 className="mt-3 text-3xl font-semibold text-slate-900 md:text-4xl">The Kybalion</h1>
+            <p className="mt-4 text-base text-slate-600">
+              Universal Laws & Principles. This hub connects the invites, session materials, and the original reading
+              experience.
             </p>
-            <h1
-              className="mt-3 text-4xl font-semibold md:text-5xl"
-              style={{ fontFamily: "'Cormorant Garamond', 'Times New Roman', serif", color: "#1f1c1a" }}
-            >
-              The Kybalion
-            </h1>
-            <p className="mt-4 max-w-lg text-base leading-relaxed" style={{ color: "#5b5450" }}>
-              An annotated, stanza-based edition built for study and discussion. Read online,
-              save highlights, tag passages, and take notes — all from the facilitator reader.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/kybalion/reader.html"
-                className="rounded-full px-6 py-3 text-sm font-semibold"
-                style={{ background: "#2f5f8f", color: "#ffffff", border: "1px solid #2f5f8f" }}
-              >
-                Open the Reader
-              </Link>
+            <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/kybalion/invite2"
-                className="rounded-full border px-5 py-3 text-sm font-semibold"
-                style={{ background: "#fff", color: "#2f5f8f", borderColor: "#2f5f8f" }}
+                className="rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
               >
-                View Kick-off Invite
+                View kick-off invite
+              </Link>
+              <Link
+                href="/kybalion/quick"
+                className="rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Quick invite
               </Link>
               <Link
                 href="/kybalion/docs/"
-                className="rounded-full border px-5 py-3 text-sm font-semibold"
-                style={{ background: "#fff", color: "#2f5f8f", borderColor: "#2f5f8f" }}
+                className="rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
-                Session Documents
+                Session documents
               </Link>
             </div>
           </div>
 
-          {/* Highlights card */}
-          <div
-            className="rounded-3xl border p-7"
-            style={{ background: "#ffffff", borderColor: "#e2ddd7", boxShadow: "0 12px 30px rgba(20,20,20,0.08)" }}
-          >
-            <p className="text-xs uppercase tracking-[0.18em]" style={{ color: "#5b5450" }}>
-              How It Works
-            </p>
-            <ul className="mt-5 space-y-4 text-sm leading-relaxed" style={{ color: "#1f1c1a" }}>
-              <li className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ background: "#dfe7ef", color: "#234a70" }}>1</span>
-                <span>Meet once or twice a month for discussion and reflection on each chapter.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ background: "#dfe7ef", color: "#234a70" }}>2</span>
-                <span>Sessions focus on practical, everyday applications of the seven Hermetic principles.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ background: "#dfe7ef", color: "#234a70" }}>3</span>
-                <span>Use the Reader to highlight text, tag stanzas, write annotations, and save personal notes.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ background: "#dfe7ef", color: "#234a70" }}>4</span>
-                <span>Worksheets, slides, and templates are available in the document library.</span>
-              </li>
+          <div className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Highlights</p>
+            <ul className="mt-4 space-y-3 text-sm text-slate-700">
+              <li>Meet once or twice a month for discussion and reflection.</li>
+              <li>Sessions focus on practical, everyday applications.</li>
+              <li>Notes, worksheets, and slides live in the document library.</li>
+              <li>The original annotated reading view stays available in /old.</li>
             </ul>
           </div>
         </section>
 
-        {/* ── Three-card grid ───────────────────── */}
-        <section className="mt-10 grid gap-5 md:grid-cols-3">
-          {/* Reader card */}
-          <div
-            className="rounded-2xl border p-6"
-            style={{ background: "#ffffff", borderColor: "#e2ddd7", boxShadow: "0 12px 30px rgba(20,20,20,0.08)" }}
-          >
-            <p className="text-xs uppercase tracking-[0.18em]" style={{ color: "#5b5450" }}>
-              Reader
-            </p>
-            <p className="mt-3 text-lg font-semibold" style={{ color: "#1f1c1a" }}>
-              Annotated facilitator edition
-            </p>
-            <p className="mt-2 text-sm" style={{ color: "#5b5450" }}>
-              Full text with TOC, notes, highlights, tags, and search. Standard or stanza view.
-            </p>
+        <section className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Invites</p>
+            <p className="mt-3 text-lg font-semibold text-slate-900">Two formats available</p>
+            <p className="mt-2 text-sm text-slate-600">Quick invite or full kick-off meeting details.</p>
             <Link
-              href="/kybalion/reader.html"
-              className="mt-5 inline-flex rounded-full px-5 py-2 text-sm font-semibold"
-              style={{ background: "#2f5f8f", color: "#ffffff", border: "1px solid #2f5f8f" }}
+              href="/kybalion/invite1"
+              className="mt-4 inline-flex text-sm font-semibold text-slate-900 hover:text-slate-700"
             >
-              Open Reader
+              Open quick invite
             </Link>
           </div>
-
-          {/* Invites card */}
-          <div
-            className="rounded-2xl border p-6"
-            style={{ background: "#ffffff", borderColor: "#e2ddd7", boxShadow: "0 12px 30px rgba(20,20,20,0.08)" }}
-          >
-            <p className="text-xs uppercase tracking-[0.18em]" style={{ color: "#5b5450" }}>
-              Invites
-            </p>
-            <p className="mt-3 text-lg font-semibold" style={{ color: "#1f1c1a" }}>
-              Two formats available
-            </p>
-            <p className="mt-2 text-sm" style={{ color: "#5b5450" }}>
-              Quick invite or detailed kick-off meeting information.
-            </p>
-            <div className="mt-5 flex gap-3">
-              <Link
-                href="/kybalion/invite1"
-                className="inline-flex rounded-full border px-4 py-2 text-sm font-semibold"
-                style={{ background: "#fff", color: "#2f5f8f", borderColor: "#2f5f8f" }}
-              >
-                Quick Invite
-              </Link>
-              <Link
-                href="/kybalion/invite2"
-                className="inline-flex rounded-full border px-4 py-2 text-sm font-semibold"
-                style={{ background: "#fff", color: "#2f5f8f", borderColor: "#2f5f8f" }}
-              >
-                Full Invite
-              </Link>
-            </div>
-          </div>
-
-          {/* Docs card */}
-          <div
-            className="rounded-2xl border p-6"
-            style={{ background: "#ffffff", borderColor: "#e2ddd7", boxShadow: "0 12px 30px rgba(20,20,20,0.08)" }}
-          >
-            <p className="text-xs uppercase tracking-[0.18em]" style={{ color: "#5b5450" }}>
-              Documents
-            </p>
-            <p className="mt-3 text-lg font-semibold" style={{ color: "#1f1c1a" }}>
-              Session materials
-            </p>
-            <p className="mt-2 text-sm" style={{ color: "#5b5450" }}>
-              Download worksheets, slides, and templates for each session.
-            </p>
+          <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Docs</p>
+            <p className="mt-3 text-lg font-semibold text-slate-900">Session materials</p>
+            <p className="mt-2 text-sm text-slate-600">Download worksheets, slides, and templates.</p>
             <Link
               href="/kybalion/docs/"
-              className="mt-5 inline-flex rounded-full border px-5 py-2 text-sm font-semibold"
-              style={{ background: "#fff", color: "#2f5f8f", borderColor: "#2f5f8f" }}
+              className="mt-4 inline-flex text-sm font-semibold text-slate-900 hover:text-slate-700"
             >
-              Browse Docs
+              Browse docs
+            </Link>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Legacy</p>
+            <p className="mt-3 text-lg font-semibold text-slate-900">Original reading view</p>
+            <p className="mt-2 text-sm text-slate-600">Annotated stanza view preserved for reference.</p>
+            <Link
+              href="/old/kybalion"
+              className="mt-4 inline-flex text-sm font-semibold text-slate-900 hover:text-slate-700"
+            >
+              Open legacy
             </Link>
           </div>
         </section>
