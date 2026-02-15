@@ -22,6 +22,8 @@
 - Additional sessions accessibility contract now enforced in audit output: `#menuSessionsBtn` ↔ `#menuSessionsFlyout` linkage with `aria-controls="menuSessionsFlyout"` and synchronized `aria-expanded` state across top-level, docs, and reader runtimes.
 - Additional sessions keyboard contract now enforced in audit output: `Escape` closes sessions flyout first and returns focus to `#menuSessionsBtn` across top-level, docs, and reader runtimes (including fallback handlers).
 - Additional sessions focus-loop contract now enforced in audit output: opening sessions flyout moves focus to the first flyout item, and `Tab` / `Shift+Tab` are contained within the sessions flyout interaction loop across top-level, docs, and reader runtimes (including fallback handlers).
+- Additional sessions roving-focus contract now enforced in audit output: `ArrowDown` / `ArrowUp` navigation plus `Home` / `End` first-last jumps inside sessions flyout across top-level, docs, and reader runtimes (including fallback handlers).
+- Additional sessions listener hardening now enforced in audit output: Tab containment + roving-focus handlers must be attached to both `#menuSessionsBtn` and `#menuSessionsFlyout` in active runtime/fallback paths.
 
 ## Priority Actions (Kickoff)
 

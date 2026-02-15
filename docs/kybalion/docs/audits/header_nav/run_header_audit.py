@@ -538,7 +538,18 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 			"has_escape": bool(re.search(r"Escape", path.read_text(encoding="utf-8"))),
 			"has_focus_return": bool(re.search(r"menuSessionsBtn\.focus\s*\(", path.read_text(encoding="utf-8"))),
 			"has_first_item_focus": bool(re.search(r"focusFirstSessionsFlyoutItem", path.read_text(encoding="utf-8"))),
+			"has_last_item_focus": bool(re.search(r"focusLastSessionsFlyoutItem", path.read_text(encoding="utf-8"))),
+			"has_roving_handler": bool(re.search(r"handleSessionsFlyoutRovingKey", path.read_text(encoding="utf-8"))),
+			"has_tab_handler": bool(re.search(r"handleSessionsFlyoutTabKey", path.read_text(encoding="utf-8"))),
+			"has_arrow_down": bool(re.search(r"ArrowDown", path.read_text(encoding="utf-8"))),
+			"has_arrow_up": bool(re.search(r"ArrowUp", path.read_text(encoding="utf-8"))),
+			"has_home": bool(re.search(r"Home", path.read_text(encoding="utf-8"))),
+			"has_end": bool(re.search(r"End", path.read_text(encoding="utf-8"))),
 			"has_tab_containment": bool(re.search(r"handleSessionsFlyoutTabKey", path.read_text(encoding="utf-8"))) and bool(re.search(r"key\s*!==\s*[\"']Tab[\"']|key\s*===\s*[\"']Tab[\"']", path.read_text(encoding="utf-8"))),
+			"has_tab_listener_btn": bool(re.search(r"menuSessionsBtn\.addEventListener\(\s*[\"']keydown[\"']\s*,\s*handleSessionsFlyoutTabKey", path.read_text(encoding="utf-8"))),
+			"has_tab_listener_flyout": bool(re.search(r"menuSessionsFlyout\.addEventListener\(\s*[\"']keydown[\"']\s*,\s*handleSessionsFlyoutTabKey", path.read_text(encoding="utf-8"))),
+			"has_roving_listener_btn": bool(re.search(r"menuSessionsBtn\.addEventListener\(\s*[\"']keydown[\"']\s*,\s*handleSessionsFlyoutRovingKey", path.read_text(encoding="utf-8"))),
+			"has_roving_listener_flyout": bool(re.search(r"menuSessionsFlyout\.addEventListener\(\s*[\"']keydown[\"']\s*,\s*handleSessionsFlyoutRovingKey", path.read_text(encoding="utf-8"))),
 		}
 		for path in runtime_scripts.values()
 	}
@@ -673,6 +684,97 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 	else:
 		lines.append(
 			"- Sessions flyout focus/Tab containment violations found: " + ", ".join(sessions_focus_trap_violations)
+		)
+
+	sessions_roving_violations: list[str] = []
+	for page in all_pages:
+		page_text = (ROOT / page).read_text(encoding="utf-8")
+
+		sessions_btn_exists = bool(re.search(r'id="menuSessionsBtn"', page_text, flags=re.IGNORECASE))
+		sessions_flyout_exists = bool(re.search(r'id="menuSessionsFlyout"', page_text, flags=re.IGNORECASE))
+		if not sessions_btn_exists or not sessions_flyout_exists:
+			sessions_roving_violations.append(f"{page} (missing sessions flyout controls for roving-focus contract)")
+			continue
+
+		if page.startswith("docs/"):
+			required_runtime_keys = ["docs_module", "docs_fallback"]
+		elif page == "reader.html":
+			required_runtime_keys = ["reader_module", "reader_fallback"]
+		else:
+			required_runtime_keys = ["top_level"]
+
+		missing_roving_runtime = []
+		for runtime_key in required_runtime_keys:
+			runtime_path = runtime_scripts[runtime_key]
+			rel_runtime = runtime_path.relative_to(ROOT).as_posix()
+			runtime_meta = runtime_script_patterns.get(rel_runtime, {})
+			has_runtime_include = runtime_path.name in page_text
+			has_roving_contract = (
+				runtime_meta.get("has_roving_handler")
+				and runtime_meta.get("has_arrow_down")
+				and runtime_meta.get("has_arrow_up")
+				and runtime_meta.get("has_home")
+				and runtime_meta.get("has_end")
+				and runtime_meta.get("has_first_item_focus")
+				and runtime_meta.get("has_last_item_focus")
+			)
+			if not (has_runtime_include and has_roving_contract):
+				missing_roving_runtime.append(runtime_path.name)
+
+		if missing_roving_runtime:
+			sessions_roving_violations.append(
+				f"{page} (sessions roving-focus contract missing via {', '.join(missing_roving_runtime)})"
+			)
+
+	if not sessions_roving_violations:
+		lines.append(
+			"- Sessions flyout roving-focus contract is enforced across all audited pages: `ArrowDown`/`ArrowUp` move through session links with wrap behavior, and `Home`/`End` jump to first/last flyout item (via active page runtime/fallback wiring)."
+		)
+	else:
+		lines.append(
+			"- Sessions flyout roving-focus violations found: " + ", ".join(sessions_roving_violations)
+		)
+
+	sessions_listener_violations: list[str] = []
+	for page in all_pages:
+		page_text = (ROOT / page).read_text(encoding="utf-8")
+
+		if page.startswith("docs/"):
+			required_runtime_keys = ["docs_module", "docs_fallback"]
+		elif page == "reader.html":
+			required_runtime_keys = ["reader_module", "reader_fallback"]
+		else:
+			required_runtime_keys = ["top_level"]
+
+		missing_listener_runtime = []
+		for runtime_key in required_runtime_keys:
+			runtime_path = runtime_scripts[runtime_key]
+			rel_runtime = runtime_path.relative_to(ROOT).as_posix()
+			runtime_meta = runtime_script_patterns.get(rel_runtime, {})
+			has_runtime_include = runtime_path.name in page_text
+			has_listener_contract = (
+				runtime_meta.get("has_tab_handler")
+				and runtime_meta.get("has_roving_handler")
+				and runtime_meta.get("has_tab_listener_btn")
+				and runtime_meta.get("has_tab_listener_flyout")
+				and runtime_meta.get("has_roving_listener_btn")
+				and runtime_meta.get("has_roving_listener_flyout")
+			)
+			if not (has_runtime_include and has_listener_contract):
+				missing_listener_runtime.append(runtime_path.name)
+
+		if missing_listener_runtime:
+			sessions_listener_violations.append(
+				f"{page} (sessions keydown listener contract missing via {', '.join(missing_listener_runtime)})"
+			)
+
+	if not sessions_listener_violations:
+		lines.append(
+			"- Sessions flyout keyboard listener attachment is consistent across all audited pages: both Tab containment and roving-focus handlers are attached to `#menuSessionsBtn` and `#menuSessionsFlyout` in active runtime/fallback paths."
+		)
+	else:
+		lines.append(
+			"- Sessions flyout keyboard-listener attachment violations found: " + ", ".join(sessions_listener_violations)
 		)
 	lines.append("")
 

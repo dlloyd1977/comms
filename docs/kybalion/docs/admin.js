@@ -73,6 +73,67 @@ function focusFirstSessionsFlyoutItem() {
   }
 }
 
+function focusLastSessionsFlyoutItem() {
+  const items = getSessionsFlyoutFocusableItems();
+  if (items.length) {
+    items[items.length - 1].focus();
+  }
+}
+
+function moveSessionsFlyoutFocus(step) {
+  const items = getSessionsFlyoutFocusableItems();
+  if (!items.length) {
+    menuSessionsBtn?.focus();
+    return;
+  }
+
+  const active = document.activeElement;
+  const currentIndex = items.indexOf(active);
+  const startIndex = currentIndex === -1 ? 0 : currentIndex;
+  const nextIndex = (startIndex + step + items.length) % items.length;
+  items[nextIndex].focus();
+}
+
+function handleSessionsFlyoutRovingKey(event) {
+  if (!menuSessionsBtn || !menuSessionsFlyout) return;
+
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    if (menuSessionsFlyout.classList.contains("is-hidden")) {
+      setDocsSessionsFlyoutOpen(true);
+    } else {
+      moveSessionsFlyoutFocus(1);
+    }
+    return;
+  }
+
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    if (menuSessionsFlyout.classList.contains("is-hidden")) {
+      setDocsSessionsFlyoutOpen(true);
+      window.requestAnimationFrame(() => {
+        focusLastSessionsFlyoutItem();
+      });
+    } else {
+      moveSessionsFlyoutFocus(-1);
+    }
+    return;
+  }
+
+  if (menuSessionsFlyout.classList.contains("is-hidden")) return;
+
+  if (event.key === "Home") {
+    event.preventDefault();
+    focusFirstSessionsFlyoutItem();
+    return;
+  }
+
+  if (event.key === "End") {
+    event.preventDefault();
+    focusLastSessionsFlyoutItem();
+  }
+}
+
 function handleSessionsFlyoutTabKey(event) {
   if (event.key !== "Tab" || !menuSessionsBtn || !menuSessionsFlyout) return;
   if (menuSessionsFlyout.classList.contains("is-hidden")) return;
@@ -1753,6 +1814,8 @@ if (menuSessionsBtn && menuSessionsFlyout) {
 
   menuSessionsBtn.addEventListener("keydown", handleSessionsFlyoutTabKey);
   menuSessionsFlyout.addEventListener("keydown", handleSessionsFlyoutTabKey);
+  menuSessionsBtn.addEventListener("keydown", handleSessionsFlyoutRovingKey);
+  menuSessionsFlyout.addEventListener("keydown", handleSessionsFlyoutRovingKey);
 
   menuSessionsBtn.addEventListener("click", (e) => {
     e.stopPropagation();
