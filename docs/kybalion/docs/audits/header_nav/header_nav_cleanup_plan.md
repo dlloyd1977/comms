@@ -98,3 +98,5 @@
 - `index.html` moved from a 3-link header footprint to full shared Main Menu contract (`25` audited controls).
 - `invite1/index.html`, `invite2/index.html`, and `quick/index.html` moved from no detected header/menu controls to full shared Main Menu contract (`25` controls each).
 - Shared token usage normalized toward `menu-link` + `button secondary` patterns, with canonical class-token ordering reflected in artifacts.
+
+Operationally, these deltas indicate that header navigation is now standardized and predictable across all Kybalion entry points, which reduces UI drift risk and makes future menu/auth updates effectively one-pattern changes instead of page-by-page exceptions. The remaining work is no longer structural alignment; it is targeted runtime behavior parity and optional token tightening for non-global reader-specific controls.
