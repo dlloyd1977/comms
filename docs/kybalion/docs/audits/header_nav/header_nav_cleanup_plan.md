@@ -15,6 +15,16 @@
 - `main_menu_button_1` is the canonical name for the shared Kybalion Main Menu button pattern (`#menuBtn` + `#menuPanel`) used across hub, invite, quick, docs, and reader experiences.
 - All future menu-button design references in audit/cleanup notes should use `main_menu_button_1` as the baseline contract name.
 
+## Canonical Controls Index
+| Canonical Name | Quick Role | Primary Surface |
+|---|---|---|
+| `main_menu_button_1` | Global main-menu trigger + panel contract | Shared header/menu wrapper |
+| `doc_menu_link_1` | Standard navigation/document menu item contract | `#menuPanel` and `#menuSessionsFlyout` |
+| `sessions_trigger_1` | Sessions submenu trigger + flyout contract | Documents section in `#menuPanel` |
+| `auth_menu_link_1` | Auth state menu links (signed-out/signed-in) | Navigation section in `#menuPanel` |
+| `docs_admin_action_button_1` | Docs admin upload/create header actions | Docs `.header-actions` cluster |
+| `reader_profile_button_1` | Reader account/profile action controls | Reader header controls area |
+
 ## Control Glossary
 | Canonical Name | Selector Pattern | Visual Contract (Color/Style) | Interaction Pattern | Placement Contract | Behavior Contract |
 |---|---|---|---|---|---|
