@@ -54,14 +54,12 @@
 | menu-link | 426 |
 | is-hidden menu-link | 36 |
 | admin-only is-hidden menu-link | 36 |
-| button secondary | 22 |
+| button secondary | 32 |
 | menu-link menu-sessions-trigger | 22 |
+| button is-hidden secondary | 18 |
 | button is-hidden primary | 17 |
-| button is-hidden secondary | 17 |
 | file-input-hidden | 17 |
-| secondary | 10 |
-| is-hidden secondary | 1 |
-| search-button secondary | 1 |
+| button search-button secondary | 1 |
 | is-active view-pill-button | 1 |
 | view-pill-button | 1 |
 
