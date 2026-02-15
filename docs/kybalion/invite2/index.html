@@ -17,7 +17,7 @@
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://comms.davidelloyd.com/kybalion/invite2/" />
-    <meta property="og:image" content="https://comms.davidelloyd.com/kybalion/images/me_3.png" />
+    <meta property="og:image" content="https://comms.davidelloyd.com/kybalion/images/me/me_3.jpg" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Session 2 — Saturday, March 7, 2026 @ 7:00 PM" />
@@ -25,7 +25,7 @@
       name="twitter:description"
       content="Session 2: Chapter 2, The Seven Hermetic Principles. Study guides included."
     />
-    <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/me_3.png" />
+    <meta name="twitter:image" content="https://comms.davidelloyd.com/kybalion/images/me/me_3.jpg" />
 
     <style>
       :root {
@@ -66,9 +66,17 @@
 
       .hero {
         width: 100%;
-        height: auto;
+        height: min(58vh, 520px);
         display: block;
+        object-fit: cover;
+        object-position: center 22%;
         border-bottom: 1px solid var(--border);
+      }
+
+      @media (max-width: 768px) {
+        .hero {
+          height: min(44vh, 360px);
+        }
       }
 
       .content {
@@ -157,7 +165,7 @@
       <div class="card">
         <img
           class="hero"
-          src="/kybalion/images/me_3.png"
+          src="/kybalion/images/me/me_3.jpg"
           alt="The Kybalion meeting invite cover image"
           width="1200"
           height="700"
