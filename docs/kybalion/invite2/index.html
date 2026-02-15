@@ -35,6 +35,7 @@
         --text-main: #1f1c1a;
         --text-sub: #4f4945;
         --text-link: #1e4f82;
+        --accent: #2f5f8f;
         --accent-bg: #eef4fb;
       }
 
@@ -81,14 +82,20 @@
       }
 
       .button.secondary {
-        color: var(--text-link);
-        border: 1px solid var(--text-link);
+        color: var(--accent);
+        border: 1px solid var(--accent);
         background: #ffffff;
         border-radius: 999px;
         padding: 8px 14px;
-        font-size: 0.88rem;
+        font-size: 0.9rem;
         font-weight: 700;
         cursor: pointer;
+      }
+
+      .button.secondary:hover {
+        color: var(--accent);
+        border: 1px solid var(--accent);
+        background: #ffffff;
       }
 
       .menu-panel {
