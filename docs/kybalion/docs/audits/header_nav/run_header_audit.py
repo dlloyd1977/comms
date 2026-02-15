@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass
@@ -302,6 +303,73 @@ def format_signature_summary(signature: tuple[str, ...]) -> str:
 	return "; ".join(parts)
 
 
+def slugify_token(value: str) -> str:
+	normalized = re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
+	return normalized or "none"
+
+
+def slugify_label(value: str) -> str:
+	return slugify_token(normalize_label(value).replace("▸", "submenu"))
+
+
+def target_slug_from_row(row: dict[str, str]) -> str:
+	target = row.get("target", "").strip()
+	if not target:
+		return "none"
+	if target.startswith("http"):
+		target = target.split("?", 1)[0]
+	if "?redirect=" in target:
+		redirect = target.split("?redirect=", 1)[1]
+		return f"redirect_{slugify_token(redirect)}"
+	return slugify_token(target)
+
+
+def friendly_variant_name(base_name: str, row: dict[str, str], signature: tuple[str, ...]) -> str:
+	if base_name == "main_menu_button_1":
+		return "main_menu_button_1"
+
+	label_slug = slugify_label(row.get("label", ""))
+	target_slug = target_slug_from_row(row)
+	row_id = slugify_token(row.get("id", ""))
+	control_type = slugify_token(row.get("control_type", ""))
+
+	if base_name == "doc_menu_link_1":
+		if label_slug == "sessions_submenu":
+			label_slug = "sessions_trigger"
+		return f"doc_menu_link_{label_slug}"
+
+	if base_name == "auth_menu_link_1":
+		if row_id == "menusignoutlink":
+			return "auth_menu_sign_out_button"
+		if row_id == "menuchangepasswordlink":
+			return "auth_menu_change_password_link"
+		if row_id == "menuauthlink":
+			return f"auth_menu_sign_in_{target_slug}"
+		return f"auth_menu_{label_slug}_{target_slug}"
+
+	if base_name == "sessions_trigger_1":
+		return f"sessions_trigger_{control_type}_{target_slug}"
+
+	if base_name == "docs_admin_action_button_1":
+		if row_id == "headeruploadbtn":
+			return "docs_admin_upload_button"
+		if row_id == "headernewfolderbtn":
+			return "docs_admin_new_folder_button"
+		if row_id == "uploadinput":
+			return "docs_admin_upload_input"
+		return f"docs_admin_action_{row_id}"
+
+	if base_name == "reader_profile_button_1":
+		if row_id == "headerprofilebtn":
+			return "reader_profile_button"
+		if row_id == "headersignoutbtn":
+			return "reader_sign_out_button"
+		return f"reader_profile_action_{row_id}"
+
+	short_sig = hashlib.sha1("|".join(signature).encode("utf-8")).hexdigest()[:8]
+	return f"{base_name}_{label_slug}_{short_sig}"
+
+
 def collect_strict_identity_variants(rows: list[dict[str, str]]) -> list[dict[str, object]]:
 	base_to_rows: dict[str, list[dict[str, str]]] = defaultdict(list)
 	for row in rows:
@@ -331,18 +399,24 @@ def collect_strict_identity_variants(rows: list[dict[str, str]]) -> list[dict[st
 		)
 
 		variants: list[dict[str, object]] = []
-		for index, (signature, group_rows) in enumerate(sorted_groups, start=1):
-			auto_name = base_name if index == 1 else f"{base_name}_v{index}"
+		used_names: set[str] = set()
+		for signature, group_rows in sorted_groups:
 			pages = sorted({row["file"] for row in group_rows})
+			sample_row = group_rows[0]
+			permanent_name = friendly_variant_name(base_name, sample_row, signature)
+			if permanent_name in used_names:
+				sig_suffix = hashlib.sha1("|".join(signature).encode("utf-8")).hexdigest()[:6]
+				permanent_name = f"{permanent_name}_{sig_suffix}"
+			used_names.add(permanent_name)
 			variant = {
-				"name": auto_name,
+				"name": permanent_name,
 				"count": len(group_rows),
 				"pages": pages,
 				"signature": signature,
 				"signature_summary": format_signature_summary(signature),
-				"sample_label": group_rows[0].get("label", ""),
-				"sample_id": group_rows[0].get("id", ""),
-				"sample_classes": group_rows[0].get("classes", ""),
+				"sample_label": sample_row.get("label", ""),
+				"sample_id": sample_row.get("id", ""),
+				"sample_classes": sample_row.get("classes", ""),
 			}
 			variants.append(variant)
 
@@ -410,7 +484,7 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 
 	mismatch_entries = [entry for entry in strict_identity if entry["strict_status"] == "MISMATCH"]
 	if mismatch_entries:
-		lines.append("### Auto-Rename Variants (Strict Mismatches)")
+		lines.append("### Permanent Variant Names (Strict Mismatches)")
 		lines.append("")
 		for entry in mismatch_entries:
 			lines.append(f"#### {entry['base_name']}")

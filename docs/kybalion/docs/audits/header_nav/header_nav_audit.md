@@ -30,122 +30,122 @@
 | docs_admin_action_button_1 | 51 | 3 | MISMATCH |
 | reader_profile_button_1 | 1 | 1 | PASS |
 
-### Auto-Rename Variants (Strict Mismatches)
+### Permanent Variant Names (Strict Mismatches)
 
 #### doc_menu_link_1
 
 | Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |
 |---|---:|---:|---|---|---|
-| doc_menu_link_1 | 22 | 22 | Assets | (none) | menu-link admin-only is-hidden |
-| doc_menu_link_1_v2 | 22 | 22 | Document Library | (none) | menu-link |
-| doc_menu_link_1_v3 | 22 | 22 | General | (none) | menu-link |
-| doc_menu_link_1_v4 | 22 | 22 | Home | (none) | menu-link |
-| doc_menu_link_1_v5 | 22 | 22 | Kybalion Home | (none) | menu-link |
-| doc_menu_link_1_v6 | 22 | 22 | Master Documents | (none) | menu-link admin-only is-hidden |
-| doc_menu_link_1_v7 | 22 | 22 | Reader | (none) | menu-link |
-| doc_menu_link_1_v8 | 22 | 22 | Session 1 | (none) | menu-link |
-| doc_menu_link_1_v9 | 22 | 22 | Session 10 | (none) | menu-link |
-| doc_menu_link_1_v10 | 22 | 22 | Session 11 | (none) | menu-link |
-| doc_menu_link_1_v11 | 22 | 22 | Session 12 | (none) | menu-link |
-| doc_menu_link_1_v12 | 22 | 22 | Session 2 | (none) | menu-link |
-| doc_menu_link_1_v13 | 22 | 22 | Session 3 | (none) | menu-link |
-| doc_menu_link_1_v14 | 22 | 22 | Session 4 | (none) | menu-link |
-| doc_menu_link_1_v15 | 22 | 22 | Session 5 | (none) | menu-link |
-| doc_menu_link_1_v16 | 22 | 22 | Session 6 | (none) | menu-link |
-| doc_menu_link_1_v17 | 22 | 22 | Session 7 | (none) | menu-link |
-| doc_menu_link_1_v18 | 22 | 22 | Session 8 | (none) | menu-link |
-| doc_menu_link_1_v19 | 22 | 22 | Session 9 | (none) | menu-link |
-| doc_menu_link_1_v20 | 22 | 22 | Templates | (none) | menu-link |
+| doc_menu_link_assets | 22 | 22 | Assets | (none) | menu-link admin-only is-hidden |
+| doc_menu_link_document_library | 22 | 22 | Document Library | (none) | menu-link |
+| doc_menu_link_general | 22 | 22 | General | (none) | menu-link |
+| doc_menu_link_home | 22 | 22 | Home | (none) | menu-link |
+| doc_menu_link_kybalion_home | 22 | 22 | Kybalion Home | (none) | menu-link |
+| doc_menu_link_master_documents | 22 | 22 | Master Documents | (none) | menu-link admin-only is-hidden |
+| doc_menu_link_reader | 22 | 22 | Reader | (none) | menu-link |
+| doc_menu_link_session_1 | 22 | 22 | Session 1 | (none) | menu-link |
+| doc_menu_link_session_10 | 22 | 22 | Session 10 | (none) | menu-link |
+| doc_menu_link_session_11 | 22 | 22 | Session 11 | (none) | menu-link |
+| doc_menu_link_session_12 | 22 | 22 | Session 12 | (none) | menu-link |
+| doc_menu_link_session_2 | 22 | 22 | Session 2 | (none) | menu-link |
+| doc_menu_link_session_3 | 22 | 22 | Session 3 | (none) | menu-link |
+| doc_menu_link_session_4 | 22 | 22 | Session 4 | (none) | menu-link |
+| doc_menu_link_session_5 | 22 | 22 | Session 5 | (none) | menu-link |
+| doc_menu_link_session_6 | 22 | 22 | Session 6 | (none) | menu-link |
+| doc_menu_link_session_7 | 22 | 22 | Session 7 | (none) | menu-link |
+| doc_menu_link_session_8 | 22 | 22 | Session 8 | (none) | menu-link |
+| doc_menu_link_session_9 | 22 | 22 | Session 9 | (none) | menu-link |
+| doc_menu_link_templates | 22 | 22 | Templates | (none) | menu-link |
 
 - Signature details:
-  - `doc_menu_link_1`: control_type=a; label=Assets; text=Assets; target=/kybalion/docs/assets/; classes=menu-link admin-only is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `doc_menu_link_1_v2`: control_type=a; label=Document Library; text=Document Library; target=/kybalion/docs/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `doc_menu_link_1_v3`: control_type=a; label=General; text=General; target=/kybalion/docs/general/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `doc_menu_link_1_v4`: control_type=a; label=Home; text=Home; target=/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `doc_menu_link_1_v5`: control_type=a; label=Kybalion Home; text=Kybalion Home; target=/kybalion/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `doc_menu_link_1_v6`: control_type=a; label=Master Documents; text=Master Documents; target=/kybalion/docs/master-docs/; classes=menu-link admin-only is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `doc_menu_link_1_v7`: control_type=a; label=Reader; text=Reader; target=/kybalion/reader.html; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `doc_menu_link_1_v8`: control_type=a; label=Session 1; text=Session 1; target=/kybalion/docs/session-01/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v9`: control_type=a; label=Session 10; text=Session 10; target=/kybalion/docs/session-10/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v10`: control_type=a; label=Session 11; text=Session 11; target=/kybalion/docs/session-11/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v11`: control_type=a; label=Session 12; text=Session 12; target=/kybalion/docs/session-12/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v12`: control_type=a; label=Session 2; text=Session 2; target=/kybalion/docs/session-02/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v13`: control_type=a; label=Session 3; text=Session 3; target=/kybalion/docs/session-03/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v14`: control_type=a; label=Session 4; text=Session 4; target=/kybalion/docs/session-04/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v15`: control_type=a; label=Session 5; text=Session 5; target=/kybalion/docs/session-05/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v16`: control_type=a; label=Session 6; text=Session 6; target=/kybalion/docs/session-06/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v17`: control_type=a; label=Session 7; text=Session 7; target=/kybalion/docs/session-07/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v18`: control_type=a; label=Session 8; text=Session 8; target=/kybalion/docs/session-08/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v19`: control_type=a; label=Session 9; text=Session 9; target=/kybalion/docs/session-09/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
-  - `doc_menu_link_1_v20`: control_type=a; label=Templates; text=Templates; target=/kybalion/docs/templates/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `doc_menu_link_assets`: control_type=a; label=Assets; text=Assets; target=/kybalion/docs/assets/; classes=menu-link admin-only is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `doc_menu_link_document_library`: control_type=a; label=Document Library; text=Document Library; target=/kybalion/docs/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `doc_menu_link_general`: control_type=a; label=General; text=General; target=/kybalion/docs/general/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `doc_menu_link_home`: control_type=a; label=Home; text=Home; target=/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `doc_menu_link_kybalion_home`: control_type=a; label=Kybalion Home; text=Kybalion Home; target=/kybalion/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `doc_menu_link_master_documents`: control_type=a; label=Master Documents; text=Master Documents; target=/kybalion/docs/master-docs/; classes=menu-link admin-only is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `doc_menu_link_reader`: control_type=a; label=Reader; text=Reader; target=/kybalion/reader.html; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `doc_menu_link_session_1`: control_type=a; label=Session 1; text=Session 1; target=/kybalion/docs/session-01/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_10`: control_type=a; label=Session 10; text=Session 10; target=/kybalion/docs/session-10/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_11`: control_type=a; label=Session 11; text=Session 11; target=/kybalion/docs/session-11/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_12`: control_type=a; label=Session 12; text=Session 12; target=/kybalion/docs/session-12/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_2`: control_type=a; label=Session 2; text=Session 2; target=/kybalion/docs/session-02/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_3`: control_type=a; label=Session 3; text=Session 3; target=/kybalion/docs/session-03/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_4`: control_type=a; label=Session 4; text=Session 4; target=/kybalion/docs/session-04/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_5`: control_type=a; label=Session 5; text=Session 5; target=/kybalion/docs/session-05/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_6`: control_type=a; label=Session 6; text=Session 6; target=/kybalion/docs/session-06/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_7`: control_type=a; label=Session 7; text=Session 7; target=/kybalion/docs/session-07/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_8`: control_type=a; label=Session 8; text=Session 8; target=/kybalion/docs/session-08/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_session_9`: control_type=a; label=Session 9; text=Session 9; target=/kybalion/docs/session-09/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=yes; placement=header_menu
+  - `doc_menu_link_templates`: control_type=a; label=Templates; text=Templates; target=/kybalion/docs/templates/; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
 
 #### auth_menu_link_1
 
 | Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |
 |---|---:|---:|---|---|---|
-| auth_menu_link_1 | 22 | 22 | Change Password | menuChangePasswordLink | menu-link is-hidden |
-| auth_menu_link_1_v2 | 22 | 22 | Log Out | menuSignOutLink | menu-link is-hidden |
-| auth_menu_link_1_v3 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v4 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v5 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v6 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v7 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v8 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v9 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v10 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v11 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v12 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v13 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v14 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v15 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v16 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v17 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v18 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v19 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v20 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v21 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v22 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v23 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
-| auth_menu_link_1_v24 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_change_password_link | 22 | 22 | Change Password | menuChangePasswordLink | menu-link is-hidden |
+| auth_menu_sign_out_button | 22 | 22 | Log Out | menuSignOutLink | menu-link is-hidden |
+| auth_menu_sign_in_redirect_kybalion | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_assets | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_general | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_master_docs | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_01 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_02 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_03 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_04 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_05 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_06 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_07 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_08 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_09 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_10 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_11 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_session_12 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_docs_templates | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_invite1 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_invite2 | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_quick | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
+| auth_menu_sign_in_redirect_kybalion_reader_html | 1 | 1 | Sign In / Create Account | menuAuthLink | menu-link |
 
 - Signature details:
-  - `auth_menu_link_1`: control_type=a; label=Change Password; text=Change Password; target=/app/user-settings; id=menuChangePasswordLink; classes=menu-link is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v2`: control_type=button; label=Log Out; text=Log Out; target=menuSignOutLink; id=menuSignOutLink; classes=menu-link is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v3`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v4`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v5`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/assets/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v6`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/general/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v7`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/master-docs/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v8`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-01/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v9`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-02/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v10`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-03/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v11`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-04/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v12`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-05/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v13`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-06/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v14`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-07/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v15`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-08/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v16`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-09/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v17`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-10/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v18`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-11/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v19`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-12/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v20`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/templates/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v21`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/invite1/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v22`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/invite2/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v23`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/quick/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
-  - `auth_menu_link_1_v24`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/reader.html; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_change_password_link`: control_type=a; label=Change Password; text=Change Password; target=/app/user-settings; id=menuChangePasswordLink; classes=menu-link is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_out_button`: control_type=button; label=Log Out; text=Log Out; target=menuSignOutLink; id=menuSignOutLink; classes=menu-link is-hidden; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_assets`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/assets/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_general`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/general/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_master_docs`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/master-docs/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_01`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-01/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_02`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-02/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_03`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-03/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_04`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-04/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_05`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-05/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_06`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-06/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_07`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-07/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_08`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-08/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_09`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-09/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_10`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-10/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_11`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-11/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_session_12`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/session-12/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_docs_templates`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/docs/templates/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_invite1`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/invite1/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_invite2`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/invite2/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_quick`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/quick/; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
+  - `auth_menu_sign_in_redirect_kybalion_reader_html`: control_type=a; label=Sign In / Create Account; text=Sign In / Create Account; target=/auth/login?redirect=/kybalion/reader.html; id=menuAuthLink; classes=menu-link; is_menu_item=yes; is_dropdown_trigger=no; placement=header_menu
 
 #### docs_admin_action_button_1
 
 | Auto Name | Count | Pages | Sample Label | Sample ID | Sample Classes |
 |---|---:|---:|---|---|---|
-| docs_admin_action_button_1 | 17 | 17 | + New | headerNewFolderBtn | button secondary is-hidden |
-| docs_admin_action_button_1_v2 | 17 | 17 | Upload | headerUploadBtn | button primary is-hidden |
-| docs_admin_action_button_1_v3 | 17 | 17 | input:file | uploadInput | file-input-hidden |
+| docs_admin_new_folder_button | 17 | 17 | + New | headerNewFolderBtn | button secondary is-hidden |
+| docs_admin_upload_button | 17 | 17 | Upload | headerUploadBtn | button primary is-hidden |
+| docs_admin_upload_input | 17 | 17 | input:file | uploadInput | file-input-hidden |
 
 - Signature details:
-  - `docs_admin_action_button_1`: control_type=button; label=+ New; text=+ New; target=headerNewFolderBtn; id=headerNewFolderBtn; classes=button secondary is-hidden; is_menu_item=no; is_dropdown_trigger=no; placement=header
-  - `docs_admin_action_button_1_v2`: control_type=button; label=Upload; text=Upload; target=headerUploadBtn; id=headerUploadBtn; classes=button primary is-hidden; is_menu_item=no; is_dropdown_trigger=no; placement=header
-  - `docs_admin_action_button_1_v3`: control_type=input; label=input:file; target=uploadInput; id=uploadInput; classes=file-input-hidden; is_menu_item=no; is_dropdown_trigger=no; placement=header
+  - `docs_admin_new_folder_button`: control_type=button; label=+ New; text=+ New; target=headerNewFolderBtn; id=headerNewFolderBtn; classes=button secondary is-hidden; is_menu_item=no; is_dropdown_trigger=no; placement=header
+  - `docs_admin_upload_button`: control_type=button; label=Upload; text=Upload; target=headerUploadBtn; id=headerUploadBtn; classes=button primary is-hidden; is_menu_item=no; is_dropdown_trigger=no; placement=header
+  - `docs_admin_upload_input`: control_type=input; label=input:file; target=uploadInput; id=uploadInput; classes=file-input-hidden; is_menu_item=no; is_dropdown_trigger=no; placement=header
 
 ## Control Frequency
 
