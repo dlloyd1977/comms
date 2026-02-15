@@ -121,8 +121,10 @@ def infer_label(element: Element) -> str:
 	return element.tag
 
 
-def infer_placement(path_tags: tuple[str, ...], attrs: dict[str, str]) -> str:
+def infer_placement(path_tags: tuple[str, ...], attrs: dict[str, str], context_hints: str) -> str:
 	class_blob = attrs.get("class", "").lower()
+	if "menu" in context_hints and any(token in context_hints for token in ("header", "topbar", "nav")):
+		return "header_menu"
 	if "menu-panel" in class_blob:
 		return "header_menu_panel"
 	if "menu-wrapper" in class_blob or "menu" in class_blob:
@@ -163,7 +165,7 @@ def parse_controls(file_path: Path) -> list[dict[str, str]]:
 			"classes": " ".join(class_tokens(element.attrs)),
 			"is_menu_item": "yes" if in_menu else "no",
 			"is_dropdown_trigger": "yes" if "trigger" in context_hints or "flyout" in context_hints else "no",
-			"placement": infer_placement(element.path, element.attrs),
+			"placement": infer_placement(element.path, element.attrs, context_hints),
 		}
 		rows.append(row)
 	return rows

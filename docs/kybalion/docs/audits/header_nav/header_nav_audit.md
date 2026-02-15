@@ -43,8 +43,8 @@
 
 | Placement | Count |
 |---|---:|
-| header_menu | 524 |
-| header | 81 |
+| header_menu | 542 |
+| header | 63 |
 | other | 5 |
 
 ## Style Token Patterns
@@ -54,13 +54,12 @@
 | menu-link | 426 |
 | is-hidden menu-link | 36 |
 | admin-only is-hidden menu-link | 36 |
+| button secondary | 22 |
 | menu-link menu-sessions-trigger | 22 |
-| button secondary | 18 |
 | button is-hidden primary | 17 |
 | button is-hidden secondary | 17 |
 | file-input-hidden | 17 |
 | secondary | 10 |
-| menu-button | 4 |
 | is-hidden secondary | 1 |
 | search-button secondary | 1 |
 | is-active view-pill-button | 1 |
