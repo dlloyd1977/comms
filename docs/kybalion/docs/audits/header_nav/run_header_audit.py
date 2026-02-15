@@ -321,6 +321,29 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 		lines.append("- `menu-link` is now the dominant shared control token across pages.")
 	else:
 		lines.append("- Shared control style tokens are still fragmented across page types.")
+
+	required_admin_labels = {"assets", "master documents"}
+	admin_only_violations: list[str] = []
+	for page in all_pages:
+		page_rows = page_to_rows.get(page, [])
+		for label in required_admin_labels:
+			matches = [
+				row for row in page_rows
+				if normalize_label(row["label"]) == label
+			]
+			if not matches:
+				admin_only_violations.append(f"{page} ({label} missing)")
+				continue
+			if not any("admin-only" in row.get("classes", "") for row in matches):
+				admin_only_violations.append(f"{page} ({label} not admin-only)")
+
+	if not admin_only_violations:
+		lines.append("- `Assets` and `Master Documents` are consistently tagged as `admin-only` across all audited pages.")
+	else:
+		lines.append(
+			"- Admin-only contract violations found for `Assets`/`Master Documents`: "
+			+ ", ".join(admin_only_violations)
+		)
 	lines.append("")
 
 	lines.append("## Cleanup Kickoff")

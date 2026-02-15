@@ -182,6 +182,7 @@
 - `Main Menu` is present on all audited pages, so the global entry point is consistent for visitor/member/admin states.
 - All audited pages now include header/menu navigation controls.
 - `menu-link` is now the dominant shared control token across pages.
+- `Assets` and `Master Documents` are consistently tagged as `admin-only` across all audited pages.
 
 ## Cleanup Kickoff
 
