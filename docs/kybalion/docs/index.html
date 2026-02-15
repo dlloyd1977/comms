@@ -18,30 +18,19 @@
     data-docs-prefix=""
     data-members-table="active_members"
   >
-    <header class="page-header">
-      <div class="header-content">
-        <div class="brand">
-          <p class="eyebrow">Kybalion Docs</p>
-          <h1>Document Library</h1>
-          <p class="subtitle">
-            Session materials, templates, and facilitator resources for the Kybalion study series.
-          </p>
-        </div>
-        <div class="header-actions">
-          <span class="user-display is-hidden" id="userDisplay" data-layout-key="user" aria-live="polite"></span>
-          <button class="button primary is-hidden" type="button" id="headerUploadBtn">Upload</button>
-          <button class="button secondary is-hidden" type="button" id="headerNewFolderBtn">+ New</button>
-          <input type="file" id="uploadInput" class="file-input-hidden" multiple />
-          <div class="menu-wrapper" data-layout-key="menu">
-            <button class="button secondary" type="button" id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="menuPanel">Main Menu</button>
-            <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
+    <div class="page-wrap">
+      <header class="topbar">
+        <p class="brand topbar-brand">Kybalion Docs</p>
+        <div class="menu-wrapper" data-layout-key="menu">
+          <button class="button secondary" type="button" id="menuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="menuPanel">Main Menu</button>
+          <div class="menu-panel is-hidden" id="menuPanel" role="menu" aria-label="Documents">
               <div class="menu-section">
                 <p class="menu-title">Navigation</p>
                 <a class="menu-link" href="/">Home</a>
                 <a class="menu-link" href="/kybalion/">Kybalion Home</a>
                 <a class="menu-link" href="/kybalion/reader.html">Reader</a>
                 <a class="menu-link" href="/kybalion/docs/">Document Library</a>
-                                <a class="menu-link" href="/auth/login?redirect=/kybalion/docs/" id="menuAuthLink">Sign In / Create Account</a>
+                <a class="menu-link" href="/auth/login?redirect=/kybalion/docs/" id="menuAuthLink">Sign In / Create Account</a>
                 <a class="menu-link is-hidden" href="/app/user-settings" id="menuChangePasswordLink" aria-hidden="true">Change Password</a>
                 <button class="menu-link is-hidden" type="button" id="menuSignOutLink" aria-hidden="true">Log Out</button>
               </div>
@@ -69,11 +58,22 @@
                 <a class="menu-link admin-only is-hidden" href="/kybalion/docs/assets/">Assets</a>
                 <a class="menu-link admin-only is-hidden" href="/kybalion/docs/master-docs/">Master Documents</a>
               </div>
-            </div>
           </div>
         </div>
+      </header>
+      <div class="docs-header-meta">
+        <h1>Document Library</h1>
+        <p class="subtitle">
+          Session materials, templates, and facilitator resources for the Kybalion study series.
+        </p>
+        <div class="header-actions">
+          <span class="user-display is-hidden" id="userDisplay" data-layout-key="user" aria-live="polite"></span>
+          <button class="button primary is-hidden" type="button" id="headerUploadBtn">Upload</button>
+          <button class="button secondary is-hidden" type="button" id="headerNewFolderBtn">+ New</button>
+          <input type="file" id="uploadInput" class="file-input-hidden" multiple />
+        </div>
       </div>
-    </header>
+    </div>
 
     <main class="page">
       <p class="upload-status is-hidden" id="uploadStatus"></p>
