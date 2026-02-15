@@ -499,6 +499,75 @@ index.html,354,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header
 index.html,357,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
 index.html,358,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
 index.html,359,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
+invite1/index.html,224,button,Main Menu,menuBtn,menuBtn,menu-button,yes,no,header_menu
+invite1/index.html,237,a,Home,/,,menu-link,yes,no,header_menu
+invite1/index.html,238,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
+invite1/index.html,239,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
+invite1/index.html,240,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
+invite1/index.html,241,a,Sign In / Create Account,/auth/login?redirect=/kybalion/invite1/,,menu-link,yes,no,header_menu
+invite1/index.html,245,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
+invite1/index.html,247,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
+invite1/index.html,251,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
+invite1/index.html,252,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
+invite1/index.html,253,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
+invite1/index.html,254,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
+invite1/index.html,255,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
+invite1/index.html,256,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
+invite1/index.html,257,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
+invite1/index.html,258,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
+invite1/index.html,259,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
+invite1/index.html,260,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
+invite1/index.html,261,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
+invite1/index.html,262,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
+invite1/index.html,265,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
+invite1/index.html,266,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
+invite1/index.html,267,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
+invite2/index.html,294,button,Main Menu,menuBtn,menuBtn,menu-button,yes,no,header_menu
+invite2/index.html,307,a,Home,/,,menu-link,yes,no,header_menu
+invite2/index.html,308,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
+invite2/index.html,309,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
+invite2/index.html,310,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
+invite2/index.html,311,a,Sign In / Create Account,/auth/login?redirect=/kybalion/invite2/,,menu-link,yes,no,header_menu
+invite2/index.html,315,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
+invite2/index.html,317,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
+invite2/index.html,321,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
+invite2/index.html,322,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
+invite2/index.html,323,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
+invite2/index.html,324,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
+invite2/index.html,325,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
+invite2/index.html,326,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
+invite2/index.html,327,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
+invite2/index.html,328,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
+invite2/index.html,329,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
+invite2/index.html,330,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
+invite2/index.html,331,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
+invite2/index.html,332,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
+invite2/index.html,335,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
+invite2/index.html,336,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
+invite2/index.html,337,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
+quick/index.html,224,button,Main Menu,menuBtn,menuBtn,menu-button,yes,no,header_menu
+quick/index.html,237,a,Home,/,,menu-link,yes,no,header_menu
+quick/index.html,238,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
+quick/index.html,239,a,Reader,/kybalion/reader.html,,menu-link,yes,no,header_menu
+quick/index.html,240,a,Document Library,/kybalion/docs/,,menu-link,yes,no,header_menu
+quick/index.html,241,a,Sign In / Create Account,/auth/login?redirect=/kybalion/quick/,,menu-link,yes,no,header_menu
+quick/index.html,245,a,General,/kybalion/docs/general/,,menu-link,yes,no,header_menu
+quick/index.html,247,button,Sessions ▸,menuSessionsBtn,menuSessionsBtn,menu-link menu-sessions-trigger,yes,yes,header_menu
+quick/index.html,251,a,Session 1,/kybalion/docs/session-01/,,menu-link,yes,yes,header_menu
+quick/index.html,252,a,Session 2,/kybalion/docs/session-02/,,menu-link,yes,yes,header_menu
+quick/index.html,253,a,Session 3,/kybalion/docs/session-03/,,menu-link,yes,yes,header_menu
+quick/index.html,254,a,Session 4,/kybalion/docs/session-04/,,menu-link,yes,yes,header_menu
+quick/index.html,255,a,Session 5,/kybalion/docs/session-05/,,menu-link,yes,yes,header_menu
+quick/index.html,256,a,Session 6,/kybalion/docs/session-06/,,menu-link,yes,yes,header_menu
+quick/index.html,257,a,Session 7,/kybalion/docs/session-07/,,menu-link,yes,yes,header_menu
+quick/index.html,258,a,Session 8,/kybalion/docs/session-08/,,menu-link,yes,yes,header_menu
+quick/index.html,259,a,Session 9,/kybalion/docs/session-09/,,menu-link,yes,yes,header_menu
+quick/index.html,260,a,Session 10,/kybalion/docs/session-10/,,menu-link,yes,yes,header_menu
+quick/index.html,261,a,Session 11,/kybalion/docs/session-11/,,menu-link,yes,yes,header_menu
+quick/index.html,262,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header_menu
+quick/index.html,265,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
+quick/index.html,266,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
+quick/index.html,267,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
 reader.html,44,button,Profile,headerProfileBtn,headerProfileBtn,is-hidden secondary,no,no,header
 reader.html,46,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header
 reader.html,57,a,Home,/,,menu-link,yes,no,header_menu
