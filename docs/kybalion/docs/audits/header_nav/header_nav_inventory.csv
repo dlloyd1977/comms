@@ -568,7 +568,7 @@ quick/index.html,262,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,
 quick/index.html,265,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
 quick/index.html,266,a,Assets,/kybalion/docs/assets/,,menu-link,yes,no,header_menu
 quick/index.html,267,a,Master Documents,/kybalion/docs/master-docs/,,menu-link,yes,no,header_menu
-reader.html,44,button,Profile,headerProfileBtn,headerProfileBtn,is-hidden secondary,no,no,header
+reader.html,44,button,Profile,headerProfileBtn,headerProfileBtn,button is-hidden secondary,no,no,header
 reader.html,46,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 reader.html,57,a,Home,/,,menu-link,yes,no,header_menu
 reader.html,58,a,Kybalion Home,/kybalion/,,menu-link,yes,no,header_menu
@@ -594,18 +594,18 @@ reader.html,82,a,Session 12,/kybalion/docs/session-12/,,menu-link,yes,yes,header
 reader.html,85,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,header_menu
 reader.html,86,a,Assets,/kybalion/docs/assets/,,admin-only is-hidden menu-link,yes,no,header_menu
 reader.html,87,a,Master Documents,/kybalion/docs/master-docs/,,admin-only is-hidden menu-link,yes,no,header_menu
-reader.html,91,button,Edit layout,layoutEditBtn,layoutEditBtn,secondary,no,no,header
-reader.html,92,button,Reset layout,layoutResetBtn,layoutResetBtn,secondary,no,no,header
+reader.html,91,button,Edit layout,layoutEditBtn,layoutEditBtn,button secondary,no,no,header
+reader.html,92,button,Reset layout,layoutResetBtn,layoutResetBtn,button secondary,no,no,header
 reader.html,99,input,Search the text...,searchInput,searchInput,,no,no,header
-reader.html,100,button,Search,searchBtn,searchBtn,search-button secondary,no,no,header
+reader.html,100,button,Search,searchBtn,searchBtn,button search-button secondary,no,no,header
 reader.html,105,select,tagFilter,tagFilter,tagFilter,,no,no,header
 reader.html,112,button,Standard,viewModeStandardBtn,viewModeStandardBtn,is-active view-pill-button,no,no,header
 reader.html,122,button,Stanza,viewModeStanzaBtn,viewModeStanzaBtn,view-pill-button,no,no,header
-reader.html,136,button,Save highlight as Note,standardSaveHighlightBtn,standardSaveHighlightBtn,secondary,no,no,header
-reader.html,139,button,Add Tag,standardAddTagBtn,standardAddTagBtn,secondary,no,no,header
-reader.html,140,button,Annotate,standardAnnotateBtn,standardAnnotateBtn,secondary,no,no,header
-reader.html,141,button,View Notes,standardViewNotesBtn,standardViewNotesBtn,secondary,no,no,header
-reader.html,214,button,Copy All Notes,copyNotesBtn,copyNotesBtn,secondary,no,no,other
-reader.html,215,button,Close,closeNotesBtn,closeNotesBtn,secondary,no,no,other
-reader.html,346,button,Close,annotationCloseBtn,annotationCloseBtn,secondary,no,no,other
-reader.html,370,button,Close,profileCloseBtn,profileCloseBtn,secondary,no,no,other
+reader.html,136,button,Save highlight as Note,standardSaveHighlightBtn,standardSaveHighlightBtn,button secondary,no,no,header
+reader.html,139,button,Add Tag,standardAddTagBtn,standardAddTagBtn,button secondary,no,no,header
+reader.html,140,button,Annotate,standardAnnotateBtn,standardAnnotateBtn,button secondary,no,no,header
+reader.html,141,button,View Notes,standardViewNotesBtn,standardViewNotesBtn,button secondary,no,no,header
+reader.html,214,button,Copy All Notes,copyNotesBtn,copyNotesBtn,button secondary,no,no,other
+reader.html,215,button,Close,closeNotesBtn,closeNotesBtn,button secondary,no,no,other
+reader.html,346,button,Close,annotationCloseBtn,annotationCloseBtn,button secondary,no,no,other
+reader.html,370,button,Close,profileCloseBtn,profileCloseBtn,button secondary,no,no,other
