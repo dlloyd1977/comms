@@ -1,38 +1,38 @@
 # Header Navigation Audit
 
 - Pages scanned: 22
-- Header/menu controls found: 521
+- Header/menu controls found: 541
 - Pages without header/menu controls: 3
 
 ## Control Frequency
 
 | Control Label | Frequency |
 |---|---:|
+| main menu | 19 |
 | home | 19 |
+| kybalion home | 19 |
 | reader | 19 |
 | document library | 19 |
-| main menu | 18 |
-| kybalion home | 18 |
-| sign in / create account | 18 |
+| sign in / create account | 19 |
+| general | 19 |
+| sessions ▸ | 19 |
+| session 1 | 19 |
+| session 2 | 19 |
+| session 3 | 19 |
+| session 4 | 19 |
+| session 5 | 19 |
+| session 6 | 19 |
+| session 7 | 19 |
+| session 8 | 19 |
+| session 9 | 19 |
+| session 10 | 19 |
+| session 11 | 19 |
+| session 12 | 19 |
+| templates | 19 |
+| assets | 19 |
+| master documents | 19 |
 | change password | 18 |
 | log out | 18 |
-| general | 18 |
-| sessions ▸ | 18 |
-| session 1 | 18 |
-| session 2 | 18 |
-| session 3 | 18 |
-| session 4 | 18 |
-| session 5 | 18 |
-| session 6 | 18 |
-| session 7 | 18 |
-| session 8 | 18 |
-| session 9 | 18 |
-| session 10 | 18 |
-| session 11 | 18 |
-| session 12 | 18 |
-| templates | 18 |
-| assets | 18 |
-| master documents | 18 |
 | upload | 17 |
 | + new | 17 |
 | input:file | 17 |
@@ -43,23 +43,24 @@
 
 | Placement | Count |
 |---|---:|
-| header_menu | 432 |
-| header | 84 |
+| header_menu | 455 |
+| header | 81 |
 | other | 5 |
 
 ## Style Token Patterns
 
 | Class Tokens | Count |
 |---|---:|
-| menu-link | 342 |
+| menu-link | 363 |
 | is-hidden menu-link | 36 |
 | admin-only is-hidden menu-link | 36 |
+| menu-link menu-sessions-trigger | 19 |
 | button secondary | 18 |
-| menu-link menu-sessions-trigger | 18 |
 | button is-hidden primary | 17 |
 | button is-hidden secondary | 17 |
 | file-input-hidden | 17 |
 | secondary | 10 |
+| menu-button | 1 |
 | is-hidden secondary | 1 |
 | search-button secondary | 1 |
 | is-active view-pill-button | 1 |
@@ -153,9 +154,9 @@
 - Controls: + New, Assets, Change Password, Document Library, General, Home, input:file, Kybalion Home, Log Out, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates, Upload
 
 ### index.html
-- Total controls: 3
-- Unique labels: 3
-- Controls: Document Library, Home, Reader
+- Total controls: 23
+- Unique labels: 23
+- Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### invite1/index.html
 - No header/menu controls detected.
