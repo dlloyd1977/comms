@@ -1,7 +1,7 @@
 # Header Navigation Audit
 
 - Pages scanned: 22
-- Header/menu controls found: 610
+- Header/menu controls found: 618
 - Pages without header/menu controls: 0
 
 ## Control Frequency
@@ -14,6 +14,8 @@
 | reader | 22 |
 | document library | 22 |
 | sign in / create account | 22 |
+| change password | 22 |
+| log out | 22 |
 | general | 22 |
 | sessions ▸ | 22 |
 | session 1 | 22 |
@@ -31,8 +33,6 @@
 | templates | 22 |
 | assets | 22 |
 | master documents | 22 |
-| change password | 18 |
-| log out | 18 |
 | upload | 17 |
 | + new | 17 |
 | input:file | 17 |
@@ -43,7 +43,7 @@
 
 | Placement | Count |
 |---|---:|
-| header_menu | 542 |
+| header_menu | 550 |
 | header | 63 |
 | other | 5 |
 
@@ -52,7 +52,7 @@
 | Class Tokens | Count |
 |---|---:|
 | menu-link | 426 |
-| is-hidden menu-link | 36 |
+| is-hidden menu-link | 44 |
 | admin-only is-hidden menu-link | 36 |
 | button secondary | 32 |
 | menu-link menu-sessions-trigger | 22 |
@@ -151,24 +151,24 @@
 - Controls: + New, Assets, Change Password, Document Library, General, Home, input:file, Kybalion Home, Log Out, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates, Upload
 
 ### index.html
-- Total controls: 23
-- Unique labels: 23
-- Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
+- Total controls: 25
+- Unique labels: 25
+- Controls: Assets, Change Password, Document Library, General, Home, Kybalion Home, Log Out, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### invite1/index.html
-- Total controls: 23
-- Unique labels: 23
-- Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
+- Total controls: 25
+- Unique labels: 25
+- Controls: Assets, Change Password, Document Library, General, Home, Kybalion Home, Log Out, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### invite2/index.html
-- Total controls: 23
-- Unique labels: 23
-- Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
+- Total controls: 25
+- Unique labels: 25
+- Controls: Assets, Change Password, Document Library, General, Home, Kybalion Home, Log Out, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### quick/index.html
-- Total controls: 23
-- Unique labels: 23
-- Controls: Assets, Document Library, General, Home, Kybalion Home, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
+- Total controls: 25
+- Unique labels: 25
+- Controls: Assets, Change Password, Document Library, General, Home, Kybalion Home, Log Out, Main Menu, Master Documents, Reader, Session 1, Session 10, Session 11, Session 12, Session 2, Session 3, Session 4, Session 5, Session 6, Session 7, Session 8, Session 9, Sessions ▸, Sign In / Create Account, Templates
 
 ### reader.html
 - Total controls: 41
