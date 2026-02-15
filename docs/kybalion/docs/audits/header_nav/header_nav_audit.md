@@ -187,6 +187,7 @@
 - Menu ordering contract is consistent on all audited pages: Navigation (`Home → Kybalion Home → Reader → Document Library`) and Documents (`General → Sessions ▸ → Session 1..12 → Templates → Assets → Master Documents`).
 - Exact menu section labels and ARIA contract are consistent on all audited pages: section titles start with `Navigation`, `Documents`; `#menuBtn` uses `aria-haspopup="true"`, `aria-expanded="false"`, and `aria-controls="menuPanel"`; `#menuPanel` exposes `role="menu"` with `aria-label="Documents"`.
 - Sessions flyout ARIA linkage is enforced across all audited pages: `#menuSessionsBtn` and `#menuSessionsFlyout` are present and wired with `aria-controls="menuSessionsFlyout"` plus synchronized `aria-expanded` state (via explicit markup or page runtime initialization).
+- Sessions flyout keyboard contract is enforced across all audited pages: pressing `Escape` closes the sessions flyout first and returns focus to `#menuSessionsBtn` (via active page runtime/fallback wiring).
 
 ## Cleanup Kickoff
 

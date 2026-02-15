@@ -276,7 +276,7 @@ function setMenuOpen(open) {
   menuPanel.classList.toggle("is-hidden", !open);
   menuBtn.setAttribute("aria-expanded", String(open));
   if (!open) {
-    setReaderSessionsFlyoutOpen(false);
+    closeReaderSessionsFlyout();
   }
 }
 
@@ -284,6 +284,16 @@ function setReaderSessionsFlyoutOpen(open) {
   if (!menuSessionsBtn || !menuSessionsFlyout) return;
   menuSessionsFlyout.classList.toggle("is-hidden", !open);
   menuSessionsBtn.setAttribute("aria-expanded", String(open));
+}
+
+function closeReaderSessionsFlyout(returnFocus = false) {
+  if (!menuSessionsBtn || !menuSessionsFlyout) return false;
+  const wasOpen = !menuSessionsFlyout.classList.contains("is-hidden");
+  setReaderSessionsFlyoutOpen(false);
+  if (returnFocus && wasOpen) {
+    menuSessionsBtn.focus();
+  }
+  return wasOpen;
 }
 
 function initReaderSessionsFlyoutAria() {
@@ -2273,12 +2283,16 @@ async function init() {
       });
       document.addEventListener("click", () => {
         setMenuOpen(false);
-        if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
       });
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
+          if (closeReaderSessionsFlyout(true)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
           setMenuOpen(false);
-          if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
+          menuBtn?.focus();
         }
       });
     }

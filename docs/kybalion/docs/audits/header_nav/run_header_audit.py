@@ -535,6 +535,8 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 		str(path.relative_to(ROOT).as_posix()): {
 			"has_controls": bool(re.search(r"setAttribute\(\s*[\"']aria-controls[\"']\s*,\s*[\"']menuSessionsFlyout[\"']", path.read_text(encoding="utf-8"))),
 			"has_expanded": bool(re.search(r"setAttribute\(\s*[\"']aria-expanded[\"']", path.read_text(encoding="utf-8"))),
+			"has_escape": bool(re.search(r"Escape", path.read_text(encoding="utf-8"))),
+			"has_focus_return": bool(re.search(r"menuSessionsBtn\.focus\s*\(", path.read_text(encoding="utf-8"))),
 		}
 		for path in runtime_scripts.values()
 	}
@@ -587,6 +589,47 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 	else:
 		lines.append(
 			"- Sessions flyout ARIA linkage violations found: " + ", ".join(sessions_aria_violations)
+		)
+
+	sessions_keyboard_violations: list[str] = []
+	for page in all_pages:
+		page_text = (ROOT / page).read_text(encoding="utf-8")
+
+		sessions_btn_exists = bool(re.search(r'id="menuSessionsBtn"', page_text, flags=re.IGNORECASE))
+		sessions_flyout_exists = bool(re.search(r'id="menuSessionsFlyout"', page_text, flags=re.IGNORECASE))
+		if not sessions_btn_exists or not sessions_flyout_exists:
+			sessions_keyboard_violations.append(f"{page} (missing sessions flyout controls for keyboard contract)")
+			continue
+
+		if page.startswith("docs/"):
+			required_runtime_keys = ["docs_module", "docs_fallback"]
+		elif page == "reader.html":
+			required_runtime_keys = ["reader_module", "reader_fallback"]
+		else:
+			required_runtime_keys = ["top_level"]
+
+		missing_keyboard_runtime = []
+		for runtime_key in required_runtime_keys:
+			runtime_path = runtime_scripts[runtime_key]
+			rel_runtime = runtime_path.relative_to(ROOT).as_posix()
+			runtime_meta = runtime_script_patterns.get(rel_runtime, {})
+			has_runtime_include = runtime_path.name in page_text
+			has_keyboard_contract = runtime_meta.get("has_escape") and runtime_meta.get("has_focus_return")
+			if not (has_runtime_include and has_keyboard_contract):
+				missing_keyboard_runtime.append(runtime_path.name)
+
+		if missing_keyboard_runtime:
+			sessions_keyboard_violations.append(
+				f"{page} (sessions keyboard contract missing Escape+focus-return wiring via {', '.join(missing_keyboard_runtime)})"
+			)
+
+	if not sessions_keyboard_violations:
+		lines.append(
+			"- Sessions flyout keyboard contract is enforced across all audited pages: pressing `Escape` closes the sessions flyout first and returns focus to `#menuSessionsBtn` (via active page runtime/fallback wiring)."
+		)
+	else:
+		lines.append(
+			"- Sessions flyout keyboard contract violations found: " + ", ".join(sessions_keyboard_violations)
 		)
 	lines.append("")
 

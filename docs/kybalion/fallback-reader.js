@@ -22,6 +22,16 @@
     menuSessionsBtn.setAttribute("aria-expanded", String(open));
   }
 
+  function closeFallbackReaderSessionsFlyout(returnFocus) {
+    if (!menuSessionsBtn || !menuSessionsFlyout) return false;
+    var wasOpen = !menuSessionsFlyout.classList.contains("is-hidden");
+    setFallbackReaderSessionsFlyoutOpen(false);
+    if (returnFocus && wasOpen) {
+      menuSessionsBtn.focus();
+    }
+    return wasOpen;
+  }
+
   function initFallbackReaderSessionsFlyoutAria() {
     if (!menuSessionsBtn || !menuSessionsFlyout) return;
     menuSessionsBtn.setAttribute("aria-controls", "menuSessionsFlyout");
@@ -49,9 +59,14 @@
     document.addEventListener("keydown", function (e) {
       if (window.__readerModuleLoaded) return;
       if (e.key === "Escape") {
+        if (closeFallbackReaderSessionsFlyout(true)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
         menuPanel.classList.add("is-hidden");
         menuBtn.setAttribute("aria-expanded", "false");
-        if (menuSessionsFlyout) menuSessionsFlyout.classList.add("is-hidden");
+        menuBtn.focus();
       }
     });
   }
