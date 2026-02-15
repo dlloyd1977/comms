@@ -54,6 +54,52 @@ function setDocsSessionsFlyoutOpen(open) {
   if (!menuSessionsBtn || !menuSessionsFlyout) return;
   menuSessionsFlyout.classList.toggle("is-hidden", !open);
   menuSessionsBtn.setAttribute("aria-expanded", String(open));
+  if (open) {
+    window.requestAnimationFrame(() => {
+      focusFirstSessionsFlyoutItem();
+    });
+  }
+}
+
+function getSessionsFlyoutFocusableItems() {
+  if (!menuSessionsFlyout) return [];
+  return Array.from(menuSessionsFlyout.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+}
+
+function focusFirstSessionsFlyoutItem() {
+  const items = getSessionsFlyoutFocusableItems();
+  if (items.length) {
+    items[0].focus();
+  }
+}
+
+function handleSessionsFlyoutTabKey(event) {
+  if (event.key !== "Tab" || !menuSessionsBtn || !menuSessionsFlyout) return;
+  if (menuSessionsFlyout.classList.contains("is-hidden")) return;
+
+  const items = getSessionsFlyoutFocusableItems();
+  if (!items.length) {
+    event.preventDefault();
+    menuSessionsBtn.focus();
+    return;
+  }
+
+  const first = items[0];
+  const last = items[items.length - 1];
+  const active = document.activeElement;
+
+  if (event.shiftKey) {
+    if (active === first || active === menuSessionsBtn) {
+      event.preventDefault();
+      last.focus();
+    }
+    return;
+  }
+
+  if (active === menuSessionsBtn || active === last) {
+    event.preventDefault();
+    first.focus();
+  }
 }
 
 function closeDocsSessionsFlyout(returnFocus = false) {
@@ -1704,6 +1750,9 @@ if (menuSessionsBtn && menuSessionsFlyout) {
   initDocsSessionsFlyoutAria();
   let sessionsTimer = null;
   const sessionsWrapper = menuSessionsBtn.closest(".menu-sessions-wrapper");
+
+  menuSessionsBtn.addEventListener("keydown", handleSessionsFlyoutTabKey);
+  menuSessionsFlyout.addEventListener("keydown", handleSessionsFlyoutTabKey);
 
   menuSessionsBtn.addEventListener("click", (e) => {
     e.stopPropagation();

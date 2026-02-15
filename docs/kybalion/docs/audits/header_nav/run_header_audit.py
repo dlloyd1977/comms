@@ -537,6 +537,8 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 			"has_expanded": bool(re.search(r"setAttribute\(\s*[\"']aria-expanded[\"']", path.read_text(encoding="utf-8"))),
 			"has_escape": bool(re.search(r"Escape", path.read_text(encoding="utf-8"))),
 			"has_focus_return": bool(re.search(r"menuSessionsBtn\.focus\s*\(", path.read_text(encoding="utf-8"))),
+			"has_first_item_focus": bool(re.search(r"focusFirstSessionsFlyoutItem", path.read_text(encoding="utf-8"))),
+			"has_tab_containment": bool(re.search(r"handleSessionsFlyoutTabKey", path.read_text(encoding="utf-8"))) and bool(re.search(r"key\s*!==\s*[\"']Tab[\"']|key\s*===\s*[\"']Tab[\"']", path.read_text(encoding="utf-8"))),
 		}
 		for path in runtime_scripts.values()
 	}
@@ -630,6 +632,47 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 	else:
 		lines.append(
 			"- Sessions flyout keyboard contract violations found: " + ", ".join(sessions_keyboard_violations)
+		)
+
+	sessions_focus_trap_violations: list[str] = []
+	for page in all_pages:
+		page_text = (ROOT / page).read_text(encoding="utf-8")
+
+		sessions_btn_exists = bool(re.search(r'id="menuSessionsBtn"', page_text, flags=re.IGNORECASE))
+		sessions_flyout_exists = bool(re.search(r'id="menuSessionsFlyout"', page_text, flags=re.IGNORECASE))
+		if not sessions_btn_exists or not sessions_flyout_exists:
+			sessions_focus_trap_violations.append(f"{page} (missing sessions flyout controls for focus/Tab contract)")
+			continue
+
+		if page.startswith("docs/"):
+			required_runtime_keys = ["docs_module", "docs_fallback"]
+		elif page == "reader.html":
+			required_runtime_keys = ["reader_module", "reader_fallback"]
+		else:
+			required_runtime_keys = ["top_level"]
+
+		missing_focus_trap_runtime = []
+		for runtime_key in required_runtime_keys:
+			runtime_path = runtime_scripts[runtime_key]
+			rel_runtime = runtime_path.relative_to(ROOT).as_posix()
+			runtime_meta = runtime_script_patterns.get(rel_runtime, {})
+			has_runtime_include = runtime_path.name in page_text
+			has_focus_trap_contract = runtime_meta.get("has_first_item_focus") and runtime_meta.get("has_tab_containment")
+			if not (has_runtime_include and has_focus_trap_contract):
+				missing_focus_trap_runtime.append(runtime_path.name)
+
+		if missing_focus_trap_runtime:
+			sessions_focus_trap_violations.append(
+				f"{page} (sessions focus/Tab containment contract missing via {', '.join(missing_focus_trap_runtime)})"
+			)
+
+	if not sessions_focus_trap_violations:
+		lines.append(
+			"- Sessions flyout focus contract is enforced across all audited pages: opening the flyout focuses the first flyout item, and `Tab` / `Shift+Tab` are contained within the flyout interaction loop (via active page runtime/fallback wiring)."
+		)
+	else:
+		lines.append(
+			"- Sessions flyout focus/Tab containment violations found: " + ", ".join(sessions_focus_trap_violations)
 		)
 	lines.append("")
 

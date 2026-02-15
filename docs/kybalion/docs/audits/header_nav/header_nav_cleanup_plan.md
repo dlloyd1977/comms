@@ -21,6 +21,7 @@
 - Additional accessibility/semantic contract now enforced in audit output: exact `menu-title` section labels (`Navigation`, `Documents`) and ARIA parity between `#menuBtn` and `#menuPanel` (`aria-controls`, `aria-haspopup`, `aria-expanded`, `role=menu`, `aria-label=Documents`).
 - Additional sessions accessibility contract now enforced in audit output: `#menuSessionsBtn` ↔ `#menuSessionsFlyout` linkage with `aria-controls="menuSessionsFlyout"` and synchronized `aria-expanded` state across top-level, docs, and reader runtimes.
 - Additional sessions keyboard contract now enforced in audit output: `Escape` closes sessions flyout first and returns focus to `#menuSessionsBtn` across top-level, docs, and reader runtimes (including fallback handlers).
+- Additional sessions focus-loop contract now enforced in audit output: opening sessions flyout moves focus to the first flyout item, and `Tab` / `Shift+Tab` are contained within the sessions flyout interaction loop across top-level, docs, and reader runtimes (including fallback handlers).
 
 ## Priority Actions (Kickoff)
 
