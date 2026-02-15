@@ -2,7 +2,7 @@
 A hub for invites, quick updates, and links shared through emails, texts, and group messages.
 
 ## Version
-v1.6.0 — Kybalion landing-page puzzle layout updates, Card 1A session card, and reader view deep links (standard/stanza)
+v3.6.1 — Kybalion landing-page puzzle layout updates, Card 1A session card, and reader view deep links (standard/stanza)
 
 ## URL scheme
 
