@@ -219,6 +219,12 @@
   - `docs_admin_upload_button_feaaf7`: control_type=button; label=Upload; text=Upload; target=headerUploadBtn; id=headerUploadBtn; classes=button primary is-hidden; context_signature=html body div page-wrap div docs-header-meta div header-actions button button primary is-hidden headeruploadbtn; is_menu_item=no; is_dropdown_trigger=no; placement=other
   - `docs_admin_upload_input_07c76e`: control_type=input; label=input:file; target=uploadInput; id=uploadInput; classes=file-input-hidden; context_signature=html body div page-wrap div docs-header-meta div header-actions input file-input-hidden uploadinput; is_menu_item=no; is_dropdown_trigger=no; placement=other
 
+## Authoritative Main Menu Visual Contract
+
+- Source of truth: `index.html` (`/kybalion/`) menu selectors and token values.
+- Enforced target: `docs/styles.css` (`/kybalion/docs/`) must match authoritative menu tokens for key selectors.
+- PASS: Docs Main Menu visual tokens match the authoritative `/kybalion/` contract.
+
 ## Control Frequency
 
 | Control Label | Frequency |

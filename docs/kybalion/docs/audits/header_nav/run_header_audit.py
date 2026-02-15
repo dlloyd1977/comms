@@ -253,6 +253,102 @@ STRICT_IDENTITY_FIELDS = [
 ]
 
 
+AUTHORITATIVE_MENU_SELECTOR_PROPERTIES: dict[str, list[str]] = {
+	".button.secondary": [
+		"color",
+		"border",
+		"background",
+		"border-radius",
+		"padding",
+		"font-size",
+		"font-weight",
+	],
+	".menu-panel": [
+		"top",
+		"width",
+		"padding",
+		"border",
+		"border-radius",
+		"background",
+		"box-shadow",
+	],
+	".menu-title": [
+		"margin",
+		"font-size",
+		"letter-spacing",
+		"text-transform",
+		"color",
+	],
+	".menu-link": [
+		"display",
+		"width",
+		"text-align",
+		"color",
+		"background",
+		"border",
+		"border-radius",
+		"padding",
+		"font-size",
+		"font-weight",
+	],
+	".menu-arrow": ["margin-left"],
+	".menu-sessions-flyout": ["margin-top", "padding-left"],
+}
+
+
+def normalize_css_value(value: str) -> str:
+	return re.sub(r"\s+", " ", value.strip().lower())
+
+
+def extract_css_declarations(css_text: str, selector: str) -> dict[str, str]:
+	pattern = re.compile(rf"{re.escape(selector)}\s*\{{(.*?)\}}", flags=re.DOTALL)
+	match = pattern.search(css_text)
+	if not match:
+		return {}
+
+	block = match.group(1)
+	declarations: dict[str, str] = {}
+	for raw_decl in block.split(";"):
+		if ":" not in raw_decl:
+			continue
+		prop, value = raw_decl.split(":", 1)
+		prop_clean = prop.strip().lower()
+		value_clean = normalize_css_value(value)
+		if prop_clean and value_clean:
+			declarations[prop_clean] = value_clean
+	return declarations
+
+
+def collect_authoritative_menu_visual_violations() -> list[str]:
+	authoritative_css_source = (ROOT / "index.html").read_text(encoding="utf-8")
+	docs_css_source = (ROOT / "docs/styles.css").read_text(encoding="utf-8")
+
+	violations: list[str] = []
+	for selector, properties in AUTHORITATIVE_MENU_SELECTOR_PROPERTIES.items():
+		authoritative_decl = extract_css_declarations(authoritative_css_source, selector)
+		docs_decl = extract_css_declarations(docs_css_source, selector)
+
+		if not authoritative_decl:
+			violations.append(f"authoritative source missing selector `{selector}`")
+			continue
+		if not docs_decl:
+			violations.append(f"docs stylesheet missing selector `{selector}`")
+			continue
+
+		for prop in properties:
+			authoritative_value = authoritative_decl.get(prop, "")
+			docs_value = docs_decl.get(prop, "")
+			if not authoritative_value:
+				violations.append(f"authoritative `{selector}` missing `{prop}`")
+				continue
+			if authoritative_value != docs_value:
+				violations.append(
+					f"`{selector}` `{prop}` mismatch (authoritative: `{authoritative_value}` | docs: `{docs_value or '(missing)'}`)"
+				)
+
+	return violations
+
+
 def has_class_token(classes_blob: str, token: str) -> bool:
 	return token in classes_blob.split()
 
@@ -512,6 +608,19 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 	else:
 		lines.append("- No strict mismatches found. Canonical controls currently resolve to one unique signature each.")
 		lines.append("")
+
+	visual_violations = collect_authoritative_menu_visual_violations()
+	lines.append("## Authoritative Main Menu Visual Contract")
+	lines.append("")
+	lines.append("- Source of truth: `index.html` (`/kybalion/`) menu selectors and token values.")
+	lines.append("- Enforced target: `docs/styles.css` (`/kybalion/docs/`) must match authoritative menu tokens for key selectors.")
+	if not visual_violations:
+		lines.append("- PASS: Docs Main Menu visual tokens match the authoritative `/kybalion/` contract.")
+	else:
+		lines.append("- FAIL: Docs Main Menu visual token mismatches detected:")
+		for violation in visual_violations:
+			lines.append(f"  - {violation}")
+	lines.append("")
 
 	lines.append("## Control Frequency")
 	lines.append("")
