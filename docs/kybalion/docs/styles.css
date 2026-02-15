@@ -24,6 +24,12 @@ body {
   color: var(--ink);
 }
 
+.page-wrap {
+  margin: 0 auto;
+  max-width: 1140px;
+  padding: 12px 20px 0;
+}
+
 h1,
 h2,
 h3,
@@ -42,6 +48,31 @@ button {
   position: sticky;
   top: 0;
   z-index: 30;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #f8f5f1;
+}
+
+.topbar-brand {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.docs-header-meta {
+  margin: 10px 2px 0;
+  display: grid;
+  gap: 8px;
 }
 
 body.layout-editing .page-header {
