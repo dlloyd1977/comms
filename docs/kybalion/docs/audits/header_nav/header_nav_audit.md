@@ -179,7 +179,7 @@
 
 - Docs/reader pages follow the Main Menu panel pattern with `menu-link` controls.
 - The hub page now uses the shared Main Menu panel contract.
-- `Main Menu` is present on all audited pages, so the global entry point is consistent for visitor/member/admin states.
+- `Main Menu` is present on all audited pages, so the global entry point is consistent for visitor/member/admin states. This shared menu-button design is standardized as `main_menu_button_1`.
 - All audited pages now include header/menu navigation controls.
 - `menu-link` is now the dominant shared control token across pages.
 - `Assets` and `Master Documents` are consistently tagged as `admin-only` across all audited pages.

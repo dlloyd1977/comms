@@ -304,7 +304,7 @@ def build_markdown(rows: list[dict[str, str]], html_files: list[Path]) -> str:
 	]
 	missing_main_menu = [page for page in all_pages if page not in pages_with_main_menu]
 	if not missing_main_menu:
-		lines.append("- `Main Menu` is present on all audited pages, so the global entry point is consistent for visitor/member/admin states.")
+		lines.append("- `Main Menu` is present on all audited pages, so the global entry point is consistent for visitor/member/admin states. This shared menu-button design is standardized as `main_menu_button_1`.")
 	else:
 		lines.append(
 			f"- `Main Menu` is missing on: {', '.join(missing_main_menu)}."
