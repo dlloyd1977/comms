@@ -20,6 +20,53 @@
     if (!menuSessionsBtn || !menuSessionsFlyout) return;
     menuSessionsFlyout.classList.toggle("is-hidden", !open);
     menuSessionsBtn.setAttribute("aria-expanded", String(open));
+    if (open) {
+      window.requestAnimationFrame(function () {
+        focusFirstSessionsFlyoutItem();
+      });
+    }
+  }
+
+  function getSessionsFlyoutFocusableItems() {
+    if (!menuSessionsFlyout) return [];
+    return Array.from(menuSessionsFlyout.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+  }
+
+  function focusFirstSessionsFlyoutItem() {
+    var items = getSessionsFlyoutFocusableItems();
+    if (items.length) {
+      items[0].focus();
+    }
+  }
+
+  function handleSessionsFlyoutTabKey(event) {
+    if (window.__readerModuleLoaded) return;
+    if (event.key !== "Tab" || !menuSessionsBtn || !menuSessionsFlyout) return;
+    if (menuSessionsFlyout.classList.contains("is-hidden")) return;
+
+    var items = getSessionsFlyoutFocusableItems();
+    if (!items.length) {
+      event.preventDefault();
+      menuSessionsBtn.focus();
+      return;
+    }
+
+    var first = items[0];
+    var last = items[items.length - 1];
+    var active = document.activeElement;
+
+    if (event.shiftKey) {
+      if (active === first || active === menuSessionsBtn) {
+        event.preventDefault();
+        last.focus();
+      }
+      return;
+    }
+
+    if (active === menuSessionsBtn || active === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
 
   function closeFallbackReaderSessionsFlyout(returnFocus) {
@@ -74,6 +121,8 @@
   // ── Sessions flyout ──
   if (menuSessionsBtn && menuSessionsFlyout) {
     initFallbackReaderSessionsFlyoutAria();
+    menuSessionsBtn.addEventListener("keydown", handleSessionsFlyoutTabKey);
+    menuSessionsFlyout.addEventListener("keydown", handleSessionsFlyoutTabKey);
     menuSessionsBtn.addEventListener("click", function (e) {
       if (window.__readerModuleLoaded) return;
       e.stopPropagation();
