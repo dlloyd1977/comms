@@ -1,6 +1,6 @@
 file,line,control_type,label,target,id,classes,is_menu_item,is_dropdown_trigger,placement
 docs/assets/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/assets/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/assets/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/assets/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/assets/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/assets/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -28,7 +28,7 @@ docs/assets/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,yes,n
 docs/assets/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/assets/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/general/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/general/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/general/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/general/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/general/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/general/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -57,7 +57,7 @@ docs/general/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only
 docs/general/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/general/index.html,88,input,Search,,,,no,no,other
 docs/index.html,32,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/index.html,33,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/index.html,33,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/index.html,34,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/index.html,36,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/index.html,40,a,Home,/,,menu-link,yes,no,header_menu
@@ -85,7 +85,7 @@ docs/index.html,68,a,Templates,/kybalion/docs/templates/,,menu-link,yes,no,heade
 docs/index.html,69,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/index.html,70,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/master-docs/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/master-docs/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/master-docs/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/master-docs/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/master-docs/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/master-docs/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -113,7 +113,7 @@ docs/master-docs/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,
 docs/master-docs/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/master-docs/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-01/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-01/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-01/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-01/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-01/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-01/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -141,7 +141,7 @@ docs/session-01/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-01/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-01/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-02/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-02/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-02/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-02/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-02/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-02/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -169,7 +169,7 @@ docs/session-02/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-02/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-02/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-03/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-03/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-03/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-03/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-03/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-03/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -197,7 +197,7 @@ docs/session-03/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-03/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-03/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-04/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-04/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-04/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-04/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-04/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-04/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -225,7 +225,7 @@ docs/session-04/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-04/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-04/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-05/index.html,26,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-05/index.html,27,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-05/index.html,27,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-05/index.html,28,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-05/index.html,30,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-05/index.html,34,a,Home,/,,menu-link,yes,no,header_menu
@@ -253,7 +253,7 @@ docs/session-05/index.html,62,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-05/index.html,63,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-05/index.html,64,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-06/index.html,26,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-06/index.html,27,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-06/index.html,27,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-06/index.html,28,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-06/index.html,30,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-06/index.html,34,a,Home,/,,menu-link,yes,no,header_menu
@@ -281,7 +281,7 @@ docs/session-06/index.html,62,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-06/index.html,63,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-06/index.html,64,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-07/index.html,26,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-07/index.html,27,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-07/index.html,27,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-07/index.html,28,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-07/index.html,30,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-07/index.html,34,a,Home,/,,menu-link,yes,no,header_menu
@@ -309,7 +309,7 @@ docs/session-07/index.html,62,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-07/index.html,63,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-07/index.html,64,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-08/index.html,26,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-08/index.html,27,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-08/index.html,27,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-08/index.html,28,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-08/index.html,30,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-08/index.html,34,a,Home,/,,menu-link,yes,no,header_menu
@@ -337,7 +337,7 @@ docs/session-08/index.html,62,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-08/index.html,63,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-08/index.html,64,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-09/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-09/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-09/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-09/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-09/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-09/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -365,7 +365,7 @@ docs/session-09/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-09/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-09/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-10/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-10/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-10/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-10/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-10/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-10/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -393,7 +393,7 @@ docs/session-10/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-10/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-10/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-11/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-11/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-11/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-11/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-11/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-11/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -421,7 +421,7 @@ docs/session-11/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-11/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-11/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-12/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/session-12/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/session-12/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/session-12/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/session-12/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/session-12/index.html,35,a,Home,/,,menu-link,yes,no,header_menu
@@ -449,7 +449,7 @@ docs/session-12/index.html,63,a,Templates,/kybalion/docs/templates/,,menu-link,y
 docs/session-12/index.html,64,a,Assets,/kybalion/docs/assets/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/session-12/index.html,65,a,Master Documents,/kybalion/docs/master-docs/,,menu-link admin-only is-hidden,yes,no,header_menu
 docs/templates/index.html,27,button,Upload,headerUploadBtn,headerUploadBtn,button primary is-hidden,no,no,header
-docs/templates/index.html,28,button,+ New,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
+docs/templates/index.html,28,button,#NAME?,headerNewFolderBtn,headerNewFolderBtn,button secondary is-hidden,no,no,header
 docs/templates/index.html,29,input,input:file,uploadInput,uploadInput,file-input-hidden,no,no,header
 docs/templates/index.html,31,button,Main Menu,menuBtn,menuBtn,button secondary,yes,no,header_menu
 docs/templates/index.html,35,a,Home,/,,menu-link,yes,no,header_menu

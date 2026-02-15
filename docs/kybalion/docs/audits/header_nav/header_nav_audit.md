@@ -4,6 +4,18 @@
 - Header/menu controls found: 618
 - Pages without header/menu controls: 0
 
+## Canonical Controls Index
+
+| Canonical Name | Quick Role | Primary Surface |
+|---|---|---|
+| `main_menu_button_1` | Global main-menu trigger + panel contract | Shared header/menu wrapper |
+| `doc_menu_link_1` | Standard navigation/document menu item contract | `#menuPanel` and `#menuSessionsFlyout` |
+| `sessions_trigger_1` | Sessions submenu trigger + flyout contract | Documents section in `#menuPanel` |
+| `auth_menu_link_1` | Auth state menu links (signed-out/signed-in) | Navigation section in `#menuPanel` |
+| `docs_admin_action_button_1` | Docs admin upload/create header actions | Docs `.header-actions` cluster |
+| `reader_profile_button_1` | Reader account/profile action controls | Reader header controls area |
+- Reference glossary definitions: [Header Navigation Cleanup Plan — Control Glossary](header_nav_cleanup_plan.md#control-glossary).
+
 ## Control Frequency
 
 | Control Label | Frequency |
