@@ -242,9 +242,7 @@ function updateDocsMenuAccess() {
       link.removeAttribute("tabindex");
     }
   });
-  if (menuWrapper) {
-    menuWrapper.classList.toggle("is-hidden", !canView);
-  }
+  // Menu wrapper (button) stays visible; only individual links are gated
   if (!canView) {
     setMenuOpen(false);
   }
