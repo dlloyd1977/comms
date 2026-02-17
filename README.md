@@ -2,7 +2,7 @@
 A hub for invites, quick updates, and links shared through emails, texts, and group messages.
 
 ## Version
-v3.8.1 — Auth login timeout safeguards to prevent stalled sign-in state
+v3.8.2 — Restored Kybalion invite2 page to approved commit 11defc1
 
 ## URL scheme
 
