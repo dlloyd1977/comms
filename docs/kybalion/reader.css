@@ -106,8 +106,17 @@ h1 {
 
 .header-actions {
   display: flex;
-  gap: 12px;
+  gap: 6px;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.header-actions [data-layout-key] {
+  pointer-events: auto;
 }
 
 /* ── Menu ──────────────────────────── */
@@ -123,12 +132,14 @@ h1 {
   right: 0;
   width: min(360px, 85vw);
   background: #ffffff;
-  border: 1px solid var(--border);
+  border: 1px solid #e1dfdd;
   border-radius: 14px;
   box-shadow: 0 8px 26px rgba(35, 74, 112, 0.12);
   padding: 10px;
   z-index: 40;
-  color: var(--ink);
+  color: #323130;
+  font-family: "Segoe UI", "Segoe UI Variable", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  line-height: 1.6;
 }
 
 .menu-section {
@@ -140,7 +151,7 @@ h1 {
 .menu-section + .menu-section {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #e1dfdd;
 }
 
 .menu-title {
@@ -148,7 +159,7 @@ h1 {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--muted);
+  color: #605e5c;
 }
 
 .menu-link {
@@ -211,12 +222,12 @@ h1 {
   opacity: 0.45;
   pointer-events: none;
   cursor: not-allowed;
-  color: var(--muted);
+  color: #605e5c;
 }
 
 .menu-link.is-disabled:hover {
   background: transparent;
-  color: var(--muted);
+  color: #605e5c;
 }
 
 /* ── User display ─────────────────── */
@@ -381,6 +392,27 @@ body.layout-freeform .controls [data-layout-key] {
 
 .layout-editing .is-disabled * {
   pointer-events: auto;
+}
+
+.layout-editing .button.is-active {
+  background: #106ebe;
+  color: #ffffff;
+  border-color: #106ebe;
+}
+
+.header-actions > #layoutEditBtn,
+.header-actions > #layoutResetBtn,
+.layout-admin-btn {
+  padding: 3px 8px !important;
+  font-size: 0.75rem !important;
+  white-space: nowrap;
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  line-height: 1.3;
+  vertical-align: middle;
+  display: inline-flex;
 }
 
 .is-disabled {
