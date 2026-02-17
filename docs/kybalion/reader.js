@@ -209,40 +209,12 @@ function updateMenuAdminUI() {
 }
 
 function updateDocsMenuAccess() {
-  const isGuest = state.auth.mode === "guest";
+  // Match docs/admin.js behavior: navigation and document links are always
+  // visible. Only admin-only links are gated (handled by updateMenuAdminUI).
+  // Auth links (Sign In / Change Password / Log Out) are handled by
+  // updateUserDisplay. This function only closes the panel when the user
+  // lacks read access to the reader content itself.
   const canView = state.access.activeMember || isAdminUser(state.auth.user);
-
-  // For guests: show menu but gray out (disable) all links
-  if (isGuest) {
-    docsMenuLinks.forEach((link) => {
-      if (link.classList.contains("admin-only")) {
-        link.classList.add("is-hidden");
-        link.setAttribute("aria-hidden", "true");
-      } else {
-        link.classList.remove("is-hidden");
-        link.setAttribute("aria-hidden", "false");
-        link.classList.add("is-disabled");
-        link.setAttribute("aria-disabled", "true");
-        link.setAttribute("tabindex", "-1");
-      }
-    });
-    if (menuWrapper) {
-      menuWrapper.classList.remove("is-hidden");
-    }
-    return;
-  }
-
-  // Non-guest: restore normal link state
-  docsMenuLinks.forEach((link) => {
-    if (!link.classList.contains("admin-only")) {
-      link.classList.toggle("is-hidden", !canView);
-      link.setAttribute("aria-hidden", String(!canView));
-      link.classList.remove("is-disabled");
-      link.removeAttribute("aria-disabled");
-      link.removeAttribute("tabindex");
-    }
-  });
-  // Menu wrapper (button) stays visible; only individual links are gated
   if (!canView) {
     setMenuOpen(false);
   }
