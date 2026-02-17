@@ -104,6 +104,31 @@ function LoginForm() {
         }
     }, [showMFAPrompt, router]);
 
+    useEffect(() => {
+        let active = true;
+
+        const redirectIfAuthenticated = async () => {
+            try {
+                const client = await createSPASassClient();
+                const supabase = client.getSupabaseClient();
+                const { data } = await supabase.auth.getSession();
+
+                if (!active || !data.session) {
+                    return;
+                }
+
+                window.location.href = redirectTo;
+            } catch {
+            }
+        };
+
+        redirectIfAuthenticated();
+
+        return () => {
+            active = false;
+        };
+    }, [redirectTo]);
+
 
     return (
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
