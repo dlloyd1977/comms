@@ -2,7 +2,7 @@
 A hub for invites, quick updates, and links shared through emails, texts, and group messages.
 
 ## Version
-v3.8.0 — Document Library body refresh with streamlined layout and removed on-page upload/new controls
+v3.8.1 — Auth login timeout safeguards to prevent stalled sign-in state
 
 ## URL scheme
 
