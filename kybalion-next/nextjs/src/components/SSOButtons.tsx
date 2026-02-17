@@ -2,6 +2,7 @@
 
 import { createSPAClient } from '@/lib/supabase/client';
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 type Provider = 'github' | 'google' | 'facebook' | 'apple';
 
@@ -61,12 +62,59 @@ const PROVIDER_CONFIGS = {
 
 function getEnabledProviders(): Provider[] {
     const providersStr = process.env.NEXT_PUBLIC_SSO_PROVIDERS || '';
-    return providersStr.split(',').filter((provider): provider is Provider =>
-        provider.trim().toLowerCase() in PROVIDER_CONFIGS
-    );
+    return providersStr
+        .split(',')
+        .map((provider) => provider.trim().toLowerCase())
+        .filter((provider): provider is Provider => provider in PROVIDER_CONFIGS);
 }
 
 export default function SSOButtons({ onError }: SSOButtonsProps) {
+    const configuredProviders = useMemo(() => getEnabledProviders(), []);
+    const [enabledProviders, setEnabledProviders] = useState<Provider[]>(configuredProviders);
+
+    useEffect(() => {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !anonKey || configuredProviders.length === 0) {
+            return;
+        }
+
+        let active = true;
+
+        fetch(`${supabaseUrl}/auth/v1/settings`, {
+            headers: {
+                apikey: anonKey,
+            },
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    return null;
+                }
+                return response.json();
+            })
+            .then((settings) => {
+                if (!active || !settings || typeof settings !== 'object') {
+                    return;
+                }
+
+                const external = (settings as { external?: Record<string, boolean> }).external;
+                if (!external || typeof external !== 'object') {
+                    return;
+                }
+
+                const filtered = configuredProviders.filter((provider) => external[provider] === true);
+                setEnabledProviders(filtered);
+            })
+            .catch(() => {
+                // Keep configured provider list if settings lookup fails.
+            });
+
+        return () => {
+            active = false;
+        };
+    }, [configuredProviders]);
+
     const handleSSOLogin = async (provider: Provider) => {
         try {
             const supabase = createSPAClient();
@@ -80,14 +128,15 @@ export default function SSOButtons({ onError }: SSOButtonsProps) {
             if (error) throw error;
         } catch (err: Error | unknown) {
             if (err instanceof Error) {
+                if (/unsupported provider/i.test(err.message)) {
+                    setEnabledProviders((prev) => prev.filter((p) => p !== provider));
+                }
                 onError?.(err.message);
             } else {
                 onError?.('An unknown error occurred');
             }
         }
     };
-
-    const enabledProviders = getEnabledProviders();
 
     if (enabledProviders.length === 0) {
         return null;
