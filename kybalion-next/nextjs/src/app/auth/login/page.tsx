@@ -7,6 +7,24 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import SSOButtons from '@/components/SSOButtons';
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: string): Promise<T> {
+    return new Promise((resolve, reject) => {
+        const timeoutId = window.setTimeout(() => {
+            reject(new Error(timeoutMessage));
+        }, timeoutMs);
+
+        promise
+            .then((value) => {
+                window.clearTimeout(timeoutId);
+                resolve(value);
+            })
+            .catch((error) => {
+                window.clearTimeout(timeoutId);
+                reject(error);
+            });
+    });
+}
+
 function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -26,13 +44,21 @@ function LoginForm() {
 
         try {
             const client = await createSPASassClient();
-            const { error: signInError } = await client.loginEmail(email, password);
+            const { error: signInError } = await withTimeout(
+                client.loginEmail(email, password),
+                15000,
+                'Sign-in timed out. Please try again.'
+            );
 
             if (signInError) throw signInError;
 
             // Check if MFA is required
             const supabase = client.getSupabaseClient();
-            const { data: mfaData, error: mfaError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+            const { data: mfaData, error: mfaError } = await withTimeout(
+                supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+                8000,
+                'MFA check timed out. Please try again.'
+            );
 
             if (mfaError) throw mfaError;
 
