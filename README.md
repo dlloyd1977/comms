@@ -2,7 +2,7 @@
 A hub for invites, quick updates, and links shared through emails, texts, and group messages.
 
 ## Version
-v3.7.1 — Reader Standard View update: increased default visible TOC area for improved chapter navigation
+v3.8.0 — Document Library body refresh with streamlined layout and removed on-page upload/new controls
 
 ## URL scheme
 
