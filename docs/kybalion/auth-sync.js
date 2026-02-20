@@ -27,6 +27,13 @@
 
   var MAX_CHUNK_SIZE = 3180;
   var COOKIE_MAX_AGE = 400 * 24 * 60 * 60; // 34560000 seconds (400 days)
+  var INACTIVITY_TIMEOUT_MS = 6 * 60 * 60 * 1000; // 6 hours
+  var INACTIVITY_CHECK_INTERVAL_MS = 60 * 1000; // 1 minute
+  var ACTIVITY_WRITE_DEBOUNCE_MS = 30 * 1000; // 30 seconds
+  var lastActivityWriteAt = 0;
+  var inactivityIntervalId = null;
+  var activityListenersBound = false;
+  var forcedLogoutInProgress = false;
 
   /**
    * Extract the Supabase project ref from the page's data attributes.
@@ -47,6 +54,41 @@
   function getStorageKey() {
     var ref = getRef();
     return ref ? "sb-" + ref + "-auth-token" : "";
+  }
+
+  /**
+   * Get the localStorage key used to track last user activity.
+   */
+  function getLastActiveKey() {
+    var storageKey = getStorageKey();
+    return storageKey ? storageKey + "-last-active-at" : "";
+  }
+
+  function safeGetLocalStorage(key) {
+    if (!key) return null;
+    try {
+      return window.localStorage?.getItem(key) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function safeSetLocalStorage(key, value) {
+    if (!key) return;
+    try {
+      window.localStorage?.setItem(key, value);
+    } catch {
+      // Ignore quota/private-mode failures.
+    }
+  }
+
+  function safeRemoveLocalStorage(key) {
+    if (!key) return;
+    try {
+      window.localStorage?.removeItem(key);
+    } catch {
+      // Ignore failures.
+    }
   }
 
   // ── Cookie helpers ─────────────────────────────────────────
@@ -87,6 +129,127 @@
       result[name] = value;
     }
     return result;
+  }
+
+  function hasSessionInCookies() {
+    var key = getStorageKey();
+    if (!key) return false;
+    var cookies = getAllCookies();
+    if (Object.prototype.hasOwnProperty.call(cookies, key)) {
+      return true;
+    }
+    for (var i = 0; i < 20; i++) {
+      if (Object.prototype.hasOwnProperty.call(cookies, key + "." + i)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function hasSessionInLocalStorage() {
+    var key = getStorageKey();
+    if (!key) return false;
+    return Boolean(safeGetLocalStorage(key));
+  }
+
+  function hasAnySession() {
+    return hasSessionInLocalStorage() || hasSessionInCookies();
+  }
+
+  function getLastActiveAt() {
+    var value = safeGetLocalStorage(getLastActiveKey());
+    if (!value) return null;
+    var timestamp = Number(value);
+    return Number.isFinite(timestamp) ? timestamp : null;
+  }
+
+  function touchLastActive(forceWrite) {
+    if (!hasAnySession()) return;
+    var now = Date.now();
+    if (!forceWrite && now - lastActivityWriteAt < ACTIVITY_WRITE_DEBOUNCE_MS) {
+      return;
+    }
+    lastActivityWriteAt = now;
+    safeSetLocalStorage(getLastActiveKey(), String(now));
+  }
+
+  async function forceLogoutForInactivity() {
+    if (forcedLogoutInProgress) return;
+    forcedLogoutInProgress = true;
+    console.warn("[auth-sync] Inactivity timeout reached (6h). Signing out.");
+
+    var url = document.body?.dataset?.supabaseUrl || "";
+    var anonKey = document.body?.dataset?.supabaseAnonKey || "";
+    if (url && anonKey && window.supabase?.createClient) {
+      try {
+        var client = window.supabase.createClient(url, anonKey);
+        await client.auth.signOut({ scope: "global" });
+      } catch (e) {
+        console.warn("[auth-sync] Global signOut failed during inactivity logout:", e);
+      }
+    }
+
+    clearAll();
+    window.location.reload();
+  }
+
+  function checkInactivity() {
+    if (!hasAnySession()) {
+      forcedLogoutInProgress = false;
+      return;
+    }
+
+    var lastActiveAt = getLastActiveAt();
+    if (!lastActiveAt) {
+      touchLastActive(true);
+      return;
+    }
+
+    var elapsed = Date.now() - lastActiveAt;
+    if (elapsed >= INACTIVITY_TIMEOUT_MS) {
+      void forceLogoutForInactivity();
+    }
+  }
+
+  function bindActivityListeners() {
+    if (activityListenersBound) return;
+    activityListenersBound = true;
+
+    var events = ["click", "keydown", "pointerdown", "touchstart", "scroll"];
+    var handler = function () {
+      touchLastActive(false);
+    };
+
+    for (var i = 0; i < events.length; i++) {
+      document.addEventListener(events[i], handler, { passive: true });
+    }
+
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        touchLastActive(true);
+        checkInactivity();
+      }
+    });
+
+    window.addEventListener("focus", function () {
+      touchLastActive(true);
+      checkInactivity();
+    });
+  }
+
+  function initInactivityEnforcement() {
+    bindActivityListeners();
+
+    if (hasAnySession() && !getLastActiveAt()) {
+      touchLastActive(true);
+    }
+
+    checkInactivity();
+
+    if (inactivityIntervalId) {
+      window.clearInterval(inactivityIntervalId);
+    }
+    inactivityIntervalId = window.setInterval(checkInactivity, INACTIVITY_CHECK_INTERVAL_MS);
   }
 
   // ── Chunking (matches @supabase/ssr chunker.js) ────────────
@@ -173,6 +336,8 @@
       setCookie(chunks[i].name, chunks[i].value);
     }
 
+    touchLastActive(true);
+
     console.log("[auth-sync] Session synced to cookies (" + chunks.length + " chunk(s))");
   }
 
@@ -189,6 +354,7 @@
     try {
       var value = typeof session === "string" ? session : JSON.stringify(session);
       localStorage.setItem(key, value);
+      touchLastActive(true);
       console.log("[auth-sync] Session synced to localStorage");
     } catch (e) {
       console.warn("[auth-sync] Could not write to localStorage:", e);
@@ -237,6 +403,8 @@
   function clearAll() {
     clearCookies();
     clearLocalStorage();
+    safeRemoveLocalStorage(getLastActiveKey());
+    forcedLogoutInProgress = false;
   }
 
   // Expose as a global
@@ -248,7 +416,12 @@
     clearAll: clearAll,
     getRef: getRef,
     getStorageKey: getStorageKey,
+    touchLastActive: touchLastActive,
+    getLastActiveAt: getLastActiveAt,
+    inactivityTimeoutMs: INACTIVITY_TIMEOUT_MS,
   };
+
+  initInactivityEnforcement();
 
   console.log("[auth-sync] Bidirectional auth sync loaded");
 })();
