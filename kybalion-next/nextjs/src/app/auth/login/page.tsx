@@ -56,7 +56,7 @@ function LoginForm() {
             const supabase = client.getSupabaseClient();
             const { data: mfaData, error: mfaError } = await withTimeout(
                 supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
-                8000,
+                20000,
                 'MFA check timed out. Please try again.'
             );
 
