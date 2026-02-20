@@ -1,5 +1,5 @@
 /**
- * auth-sync.js — Bidirectional session sync between localStorage and cookies.
+ * auth-sync.js v3.10.0 — Bidirectional session sync between localStorage and cookies.
  *
  * The Kybalion site uses two Supabase client types:
  *   1. @supabase/ssr (Next.js pages) — stores sessions in cookies
@@ -407,21 +407,99 @@
     forcedLogoutInProgress = false;
   }
 
+  // ── Read session from cookies (reassemble chunks) ───────────
+
+  /**
+   * Read the session JSON from cookies, reassembling chunked values.
+   * Returns the parsed session object, or null if no session cookie exists.
+   */
+  function readSessionFromCookies() {
+    var key = getStorageKey();
+    if (!key) return null;
+
+    var cookies = getAllCookies();
+
+    // Try non-chunked key first
+    if (Object.prototype.hasOwnProperty.call(cookies, key)) {
+      try {
+        return JSON.parse(cookies[key]);
+      } catch {
+        return null;
+      }
+    }
+
+    // Try chunked keys: key.0, key.1, ...
+    var parts = [];
+    for (var i = 0; i < 20; i++) {
+      var chunkName = key + "." + i;
+      if (!Object.prototype.hasOwnProperty.call(cookies, chunkName)) break;
+      parts.push(cookies[chunkName]);
+    }
+    if (parts.length === 0) return null;
+
+    try {
+      return JSON.parse(parts.join(""));
+    } catch {
+      return null;
+    }
+  }
+
+  // ── Auto-sync on page load ────────────────────────────────
+
+  /**
+   * Automatically sync sessions between cookies and localStorage on page load.
+   * - If cookies have a session but localStorage doesn't → sync to localStorage
+   *   (covers: user signed in on Next.js page, navigated to static page)
+   * - If localStorage has a session but cookies don't → sync to cookies
+   *   (covers: user signed in on static/reader page, navigated to Next.js page)
+   */
+  function autoSyncOnInit() {
+    var hasCookies = hasSessionInCookies();
+    var hasLocal = hasSessionInLocalStorage();
+
+    if (hasCookies && !hasLocal) {
+      // Cookie → localStorage: user signed in on Next.js, visiting static page
+      var session = readSessionFromCookies();
+      if (session) {
+        syncToLocalStorage(session);
+        console.log("[auth-sync] Auto-synced session from cookies → localStorage");
+      }
+    } else if (hasLocal && !hasCookies) {
+      // localStorage → cookies: user signed in on static page, visiting Next.js
+      var key = getStorageKey();
+      var raw = safeGetLocalStorage(key);
+      if (raw) {
+        try {
+          var sessionObj = JSON.parse(raw);
+          syncToCookies(sessionObj);
+          console.log("[auth-sync] Auto-synced session from localStorage → cookies");
+        } catch {
+          // Corrupted localStorage entry; skip
+        }
+      }
+    }
+  }
+
   // Expose as a global
   window.__authSync = {
     syncToCookies: syncToCookies,
     syncToLocalStorage: syncToLocalStorage,
+    readSessionFromCookies: readSessionFromCookies,
     clearCookies: clearCookies,
     clearLocalStorage: clearLocalStorage,
     clearAll: clearAll,
     getRef: getRef,
     getStorageKey: getStorageKey,
+    hasSessionInCookies: hasSessionInCookies,
+    hasSessionInLocalStorage: hasSessionInLocalStorage,
+    hasAnySession: hasAnySession,
     touchLastActive: touchLastActive,
     getLastActiveAt: getLastActiveAt,
     inactivityTimeoutMs: INACTIVITY_TIMEOUT_MS,
   };
 
+  autoSyncOnInit();
   initInactivityEnforcement();
 
-  console.log("[auth-sync] Bidirectional auth sync loaded");
+  console.log("[auth-sync] Bidirectional auth sync loaded (v3.10.0)");
 })();
