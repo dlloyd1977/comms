@@ -1,5 +1,5 @@
 /**
- * auth-sync.js — Bidirectional session sync between localStorage and cookies.
+ * auth-sync.js v3.10.0 — Bidirectional session sync between localStorage and cookies.
  *
  * The Kybalion site uses two Supabase client types:
  *   1. @supabase/ssr (Next.js pages) — stores sessions in cookies
@@ -27,6 +27,13 @@
 
   var MAX_CHUNK_SIZE = 3180;
   var COOKIE_MAX_AGE = 400 * 24 * 60 * 60; // 34560000 seconds (400 days)
+  var INACTIVITY_TIMEOUT_MS = 6 * 60 * 60 * 1000; // 6 hours
+  var INACTIVITY_CHECK_INTERVAL_MS = 60 * 1000; // 1 minute
+  var ACTIVITY_WRITE_DEBOUNCE_MS = 30 * 1000; // 30 seconds
+  var lastActivityWriteAt = 0;
+  var inactivityIntervalId = null;
+  var activityListenersBound = false;
+  var forcedLogoutInProgress = false;
 
   /**
    * Extract the Supabase project ref from the page's data attributes.
@@ -47,6 +54,41 @@
   function getStorageKey() {
     var ref = getRef();
     return ref ? "sb-" + ref + "-auth-token" : "";
+  }
+
+  /**
+   * Get the localStorage key used to track last user activity.
+   */
+  function getLastActiveKey() {
+    var storageKey = getStorageKey();
+    return storageKey ? storageKey + "-last-active-at" : "";
+  }
+
+  function safeGetLocalStorage(key) {
+    if (!key) return null;
+    try {
+      return window.localStorage?.getItem(key) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function safeSetLocalStorage(key, value) {
+    if (!key) return;
+    try {
+      window.localStorage?.setItem(key, value);
+    } catch {
+      // Ignore quota/private-mode failures.
+    }
+  }
+
+  function safeRemoveLocalStorage(key) {
+    if (!key) return;
+    try {
+      window.localStorage?.removeItem(key);
+    } catch {
+      // Ignore failures.
+    }
   }
 
   // ── Cookie helpers ─────────────────────────────────────────
@@ -87,6 +129,127 @@
       result[name] = value;
     }
     return result;
+  }
+
+  function hasSessionInCookies() {
+    var key = getStorageKey();
+    if (!key) return false;
+    var cookies = getAllCookies();
+    if (Object.prototype.hasOwnProperty.call(cookies, key)) {
+      return true;
+    }
+    for (var i = 0; i < 20; i++) {
+      if (Object.prototype.hasOwnProperty.call(cookies, key + "." + i)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function hasSessionInLocalStorage() {
+    var key = getStorageKey();
+    if (!key) return false;
+    return Boolean(safeGetLocalStorage(key));
+  }
+
+  function hasAnySession() {
+    return hasSessionInLocalStorage() || hasSessionInCookies();
+  }
+
+  function getLastActiveAt() {
+    var value = safeGetLocalStorage(getLastActiveKey());
+    if (!value) return null;
+    var timestamp = Number(value);
+    return Number.isFinite(timestamp) ? timestamp : null;
+  }
+
+  function touchLastActive(forceWrite) {
+    if (!hasAnySession()) return;
+    var now = Date.now();
+    if (!forceWrite && now - lastActivityWriteAt < ACTIVITY_WRITE_DEBOUNCE_MS) {
+      return;
+    }
+    lastActivityWriteAt = now;
+    safeSetLocalStorage(getLastActiveKey(), String(now));
+  }
+
+  async function forceLogoutForInactivity() {
+    if (forcedLogoutInProgress) return;
+    forcedLogoutInProgress = true;
+    console.warn("[auth-sync] Inactivity timeout reached (6h). Signing out.");
+
+    var url = document.body?.dataset?.supabaseUrl || "";
+    var anonKey = document.body?.dataset?.supabaseAnonKey || "";
+    if (url && anonKey && window.supabase?.createClient) {
+      try {
+        var client = window.supabase.createClient(url, anonKey);
+        await client.auth.signOut({ scope: "global" });
+      } catch (e) {
+        console.warn("[auth-sync] Global signOut failed during inactivity logout:", e);
+      }
+    }
+
+    clearAll();
+    window.location.reload();
+  }
+
+  function checkInactivity() {
+    if (!hasAnySession()) {
+      forcedLogoutInProgress = false;
+      return;
+    }
+
+    var lastActiveAt = getLastActiveAt();
+    if (!lastActiveAt) {
+      touchLastActive(true);
+      return;
+    }
+
+    var elapsed = Date.now() - lastActiveAt;
+    if (elapsed >= INACTIVITY_TIMEOUT_MS) {
+      void forceLogoutForInactivity();
+    }
+  }
+
+  function bindActivityListeners() {
+    if (activityListenersBound) return;
+    activityListenersBound = true;
+
+    var events = ["click", "keydown", "pointerdown", "touchstart", "scroll"];
+    var handler = function () {
+      touchLastActive(false);
+    };
+
+    for (var i = 0; i < events.length; i++) {
+      document.addEventListener(events[i], handler, { passive: true });
+    }
+
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        touchLastActive(true);
+        checkInactivity();
+      }
+    });
+
+    window.addEventListener("focus", function () {
+      touchLastActive(true);
+      checkInactivity();
+    });
+  }
+
+  function initInactivityEnforcement() {
+    bindActivityListeners();
+
+    if (hasAnySession() && !getLastActiveAt()) {
+      touchLastActive(true);
+    }
+
+    checkInactivity();
+
+    if (inactivityIntervalId) {
+      window.clearInterval(inactivityIntervalId);
+    }
+    inactivityIntervalId = window.setInterval(checkInactivity, INACTIVITY_CHECK_INTERVAL_MS);
   }
 
   // ── Chunking (matches @supabase/ssr chunker.js) ────────────
@@ -173,6 +336,8 @@
       setCookie(chunks[i].name, chunks[i].value);
     }
 
+    touchLastActive(true);
+
     console.log("[auth-sync] Session synced to cookies (" + chunks.length + " chunk(s))");
   }
 
@@ -189,6 +354,7 @@
     try {
       var value = typeof session === "string" ? session : JSON.stringify(session);
       localStorage.setItem(key, value);
+      touchLastActive(true);
       console.log("[auth-sync] Session synced to localStorage");
     } catch (e) {
       console.warn("[auth-sync] Could not write to localStorage:", e);
@@ -237,18 +403,103 @@
   function clearAll() {
     clearCookies();
     clearLocalStorage();
+    safeRemoveLocalStorage(getLastActiveKey());
+    forcedLogoutInProgress = false;
+  }
+
+  // ── Read session from cookies (reassemble chunks) ───────────
+
+  /**
+   * Read the session JSON from cookies, reassembling chunked values.
+   * Returns the parsed session object, or null if no session cookie exists.
+   */
+  function readSessionFromCookies() {
+    var key = getStorageKey();
+    if (!key) return null;
+
+    var cookies = getAllCookies();
+
+    // Try non-chunked key first
+    if (Object.prototype.hasOwnProperty.call(cookies, key)) {
+      try {
+        return JSON.parse(cookies[key]);
+      } catch {
+        return null;
+      }
+    }
+
+    // Try chunked keys: key.0, key.1, ...
+    var parts = [];
+    for (var i = 0; i < 20; i++) {
+      var chunkName = key + "." + i;
+      if (!Object.prototype.hasOwnProperty.call(cookies, chunkName)) break;
+      parts.push(cookies[chunkName]);
+    }
+    if (parts.length === 0) return null;
+
+    try {
+      return JSON.parse(parts.join(""));
+    } catch {
+      return null;
+    }
+  }
+
+  // ── Auto-sync on page load ────────────────────────────────
+
+  /**
+   * Automatically sync sessions between cookies and localStorage on page load.
+   * - If cookies have a session but localStorage doesn't → sync to localStorage
+   *   (covers: user signed in on Next.js page, navigated to static page)
+   * - If localStorage has a session but cookies don't → sync to cookies
+   *   (covers: user signed in on static/reader page, navigated to Next.js page)
+   */
+  function autoSyncOnInit() {
+    var hasCookies = hasSessionInCookies();
+    var hasLocal = hasSessionInLocalStorage();
+
+    if (hasCookies && !hasLocal) {
+      // Cookie → localStorage: user signed in on Next.js, visiting static page
+      var session = readSessionFromCookies();
+      if (session) {
+        syncToLocalStorage(session);
+        console.log("[auth-sync] Auto-synced session from cookies → localStorage");
+      }
+    } else if (hasLocal && !hasCookies) {
+      // localStorage → cookies: user signed in on static page, visiting Next.js
+      var key = getStorageKey();
+      var raw = safeGetLocalStorage(key);
+      if (raw) {
+        try {
+          var sessionObj = JSON.parse(raw);
+          syncToCookies(sessionObj);
+          console.log("[auth-sync] Auto-synced session from localStorage → cookies");
+        } catch {
+          // Corrupted localStorage entry; skip
+        }
+      }
+    }
   }
 
   // Expose as a global
   window.__authSync = {
     syncToCookies: syncToCookies,
     syncToLocalStorage: syncToLocalStorage,
+    readSessionFromCookies: readSessionFromCookies,
     clearCookies: clearCookies,
     clearLocalStorage: clearLocalStorage,
     clearAll: clearAll,
     getRef: getRef,
     getStorageKey: getStorageKey,
+    hasSessionInCookies: hasSessionInCookies,
+    hasSessionInLocalStorage: hasSessionInLocalStorage,
+    hasAnySession: hasAnySession,
+    touchLastActive: touchLastActive,
+    getLastActiveAt: getLastActiveAt,
+    inactivityTimeoutMs: INACTIVITY_TIMEOUT_MS,
   };
 
-  console.log("[auth-sync] Bidirectional auth sync loaded");
+  autoSyncOnInit();
+  initInactivityEnforcement();
+
+  console.log("[auth-sync] Bidirectional auth sync loaded (v3.10.0)");
 })();
