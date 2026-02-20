@@ -75,9 +75,16 @@ export default function StaticMainMenu() {
     const setAuthState = async () => {
       try {
         const supabase = await createSPASassClient();
-        const {
-          data: { user },
-        } = await supabase.getSupabaseClient().auth.getUser();
+        const client = supabase.getSupabaseClient();
+        const { data: sessionData } = await client.auth.getSession();
+        let user = sessionData.session?.user ?? null;
+
+        if (!user) {
+          const {
+            data: { user: fetchedUser },
+          } = await client.auth.getUser();
+          user = fetchedUser ?? null;
+        }
 
         if (user) {
           const email = user.email || "";
