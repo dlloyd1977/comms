@@ -81,6 +81,9 @@ function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [connectivityMessage, setConnectivityMessage] = useState('');
+    const [connectivityOk, setConnectivityOk] = useState<boolean | null>(null);
+    const [checkingConnectivity, setCheckingConnectivity] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showMFAPrompt, setShowMFAPrompt] = useState(false);
     const router = useRouter();
@@ -88,6 +91,77 @@ function LoginForm() {
     const rawRedirect = searchParams.get('redirect') || '/kybalion/';
     // Safety: only allow relative paths to prevent open redirects
     const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/kybalion/';
+
+    const runConnectivityCheck = async () => {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+        if (!supabaseUrl || !anonKey) {
+            setConnectivityOk(false);
+            setConnectivityMessage('Connectivity check failed: missing Supabase configuration.');
+            return;
+        }
+
+        setCheckingConnectivity(true);
+        setConnectivityMessage('Running connectivity check…');
+        setConnectivityOk(null);
+
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => {
+            controller.abort();
+        }, 8000);
+
+        try {
+            const response = await fetch(`${supabaseUrl}/auth/v1/settings`, {
+                method: 'GET',
+                headers: {
+                    apikey: anonKey,
+                },
+                signal: controller.signal,
+                cache: 'no-store',
+            });
+
+            if (!response.ok) {
+                let details = '';
+                try {
+                    const payload = await response.json() as { msg?: string; error_description?: string };
+                    details = payload.error_description || payload.msg || '';
+                } catch {
+                    details = '';
+                }
+                setConnectivityOk(false);
+                setConnectivityMessage(details ? `Connectivity check failed: ${details}` : `Connectivity check failed: HTTP ${response.status}.`);
+                return;
+            }
+
+            setConnectivityOk(true);
+            setConnectivityMessage('Connectivity check passed: Supabase auth endpoint is reachable.');
+        } catch (err) {
+            if (err instanceof DOMException && err.name === 'AbortError') {
+                setConnectivityOk(false);
+                setConnectivityMessage('Connectivity check timed out after 8 seconds.');
+                return;
+            }
+
+            if (isNetworkLoadError(err)) {
+                setConnectivityOk(false);
+                setConnectivityMessage('Connectivity check failed: network/DNS issue reaching Supabase.');
+                return;
+            }
+
+            if (err instanceof Error) {
+                setConnectivityOk(false);
+                setConnectivityMessage(`Connectivity check failed: ${err.message}`);
+                return;
+            }
+
+            setConnectivityOk(false);
+            setConnectivityMessage('Connectivity check failed due to an unknown error.');
+        } finally {
+            window.clearTimeout(timeoutId);
+            setCheckingConnectivity(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -273,6 +347,23 @@ function LoginForm() {
                         {loading ? 'Signing in...' : 'Sign in'}
                     </button>
                 </div>
+
+                <div>
+                    <button
+                        type="button"
+                        onClick={runConnectivityCheck}
+                        disabled={checkingConnectivity}
+                        className="flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50"
+                    >
+                        {checkingConnectivity ? 'Running connectivity check…' : 'Run connectivity check'}
+                    </button>
+                </div>
+
+                {connectivityMessage && (
+                    <div className={`p-3 text-sm rounded-lg ${connectivityOk ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}>
+                        {connectivityMessage}
+                    </div>
+                )}
             </form>
 
             <SSOButtons onError={setError} />
