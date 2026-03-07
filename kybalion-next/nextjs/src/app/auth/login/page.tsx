@@ -166,7 +166,9 @@ function LoginForm() {
                 return;
             }
         } catch (err) {
-            if (err instanceof Error) {
+            if (isNetworkLoadError(err)) {
+                setError('Unable to reach Supabase auth service (network/DNS). Disable VPN or content blockers, or switch DNS (1.1.1.1 / 8.8.8.8), then retry.');
+            } else if (err instanceof Error) {
                 setError(err.message);
             } else {
                 setError('An unknown error occurred');
