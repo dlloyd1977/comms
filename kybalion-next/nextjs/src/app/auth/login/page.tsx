@@ -25,6 +25,58 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMessage: 
     });
 }
 
+function isNetworkLoadError(error: unknown): boolean {
+    if (!(error instanceof Error)) {
+        return false;
+    }
+
+    const message = error.message.toLowerCase();
+    return (
+        message.includes('load failed') ||
+        message.includes('failed to fetch') ||
+        message.includes('networkerror when attempting to fetch resource')
+    );
+}
+
+async function signInWithPasswordRestFallback(email: string, password: string) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !anonKey) {
+        throw new Error('Auth configuration missing.');
+    }
+
+    const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify({ email, password }),
+    });
+
+    const payload = await response.json().catch(() => null) as {
+        error_description?: string;
+        msg?: string;
+        access_token?: string;
+        refresh_token?: string;
+    } | null;
+
+    if (!response.ok) {
+        throw new Error(payload?.error_description || payload?.msg || 'Sign-in failed.');
+    }
+
+    if (!payload?.access_token || !payload?.refresh_token) {
+        throw new Error('Sign-in failed. Missing session token.');
+    }
+
+    return {
+        access_token: payload.access_token,
+        refresh_token: payload.refresh_token,
+    };
+}
+
 function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -44,16 +96,43 @@ function LoginForm() {
 
         try {
             const client = await createSPASassClient();
-            const { error: signInError } = await withTimeout(
-                client.loginEmail(email, password),
-                15000,
-                'Sign-in timed out. Please try again.'
-            );
+            const supabase = client.getSupabaseClient();
 
-            if (signInError) throw signInError;
+            const completeFallbackSignIn = async () => {
+                const sessionTokens = await withTimeout(
+                    signInWithPasswordRestFallback(email, password),
+                    15000,
+                    'Sign-in timed out. Please try again.'
+                );
+                const { error: setSessionError } = await supabase.auth.setSession(sessionTokens);
+                if (setSessionError) {
+                    throw setSessionError;
+                }
+            };
+
+            try {
+                const { error: signInError } = await withTimeout(
+                    client.loginEmail(email, password),
+                    15000,
+                    'Sign-in timed out. Please try again.'
+                );
+
+                if (signInError) {
+                    if (isNetworkLoadError(signInError)) {
+                        await completeFallbackSignIn();
+                    } else {
+                        throw signInError;
+                    }
+                }
+            } catch (loginErr) {
+                if (isNetworkLoadError(loginErr)) {
+                    await completeFallbackSignIn();
+                } else {
+                    throw loginErr;
+                }
+            }
 
             // Check if MFA is required
-            const supabase = client.getSupabaseClient();
             const { data: mfaData, error: mfaError } = await withTimeout(
                 supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
                 20000,
