@@ -1,1 +1,0 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[0],{1069:(e,n,t)=>{"use strict";t.r(n),t.d(n,{default:()=>c});var s=t(5155);function c(){return(0,s.jsx)("div",{className:"container mx-auto px-4 py-8",children:"Select document on the left."})}t(2115)},4473:(e,n,t)=>{Promise.resolve().then(t.bind(t,1069))}},e=>{e.O(0,[441,255,358],()=>e(e.s=4473)),_N_E=e.O()}]);
