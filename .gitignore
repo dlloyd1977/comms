@@ -28,3 +28,7 @@ project.log
 # Cache
 .cache/
 **/.cache/
+
+# IDE metadata
+.idea/
+**/.idea/
