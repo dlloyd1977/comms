@@ -37,8 +37,8 @@ elif [[ -n "${LITE_ZIPS_ROOT:-}" && -d "${LITE_ZIPS_ROOT}" ]]; then
   OUT_PARENT="${LITE_ZIPS_ROOT}"
 elif [[ -n "${LITE_ZIP_OUT:-}" && -d "${LITE_ZIP_OUT}" ]]; then
   OUT_PARENT="${LITE_ZIP_OUT}"
-elif [[ -d "/Volumes/JBOD/Dropbox/documents/VSCode_Scripts/lite_zips" ]]; then
-  OUT_PARENT="/Volumes/JBOD/Dropbox/documents/VSCode_Scripts/lite_zips"
+elif [[ -d "/Volumes/24TB_3/VSCode_Scripts/lite_zips" ]]; then
+  OUT_PARENT="/Volumes/24TB_3/VSCode_Scripts/lite_zips"
 elif [[ -d "${HOME}/VSCode_Scripts/lite_zips" ]]; then
   OUT_PARENT="${HOME}/VSCode_Scripts/lite_zips"
 else
